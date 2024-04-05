@@ -46,14 +46,24 @@ export function getScreenBuilder(screen: ScreenName, parent: any): ScreenBuilder
 function getScreen(screenName: any, parent: any): ScreenType {
 
     switch (screenName) {
+        case 'MainScreen':
+            return require('./../screenHandelers/MainScreen').default;
+        case 'IndexScreen':
+            return require('./../screenHandelers/IndexScreen').default;
         case 'HomeScreen':
-            return require('./../screenHandelers/HomeScreen').default;
+            return require('./../screenHandelers/HomeScreen').default;      
         case 'SearchScreen':
             return require('./../screenHandelers/SearchScreen').default;
         case 'News':
             return require('./../screens/News/News').default;
         case 'SpecificDistrict':
             return require('./../screens/News/SpecificDistrict').default;
+        case 'DetailedNewsInfo':
+            return require('./../screens/News/detailedNewsInfo').default;
+        case 'SearchIndex':
+            return require('./../screens/Search/SearchIndex').default;
+        case 'SearchCategory':
+            return require('./../screens/Search/SearchCategory').default;
         
     }
     return assertUnreachableScreen(screenName);

@@ -6,7 +6,6 @@ import { Alert, Linking, Platform, PermissionsAndroid } from 'react-native';
 
 export const BASE_URL = 'http://192.168.10.219:3000/api/v2/';
 // export const BASE_URL = 'https://viridian-slug-sari.cyclic.app/api/v2/';
-import NetInfo from '@react-native-community/netinfo';
 
 // const api={};
 const api = axios.create({
@@ -23,9 +22,6 @@ const handleError = (error) => {
     console.error( error);
      if (error.response) {
             // The request was made and the server responded with a status code
-            console.log('Response Data:', error.response.data);
-            console.log('Response Status:', error.response.status);
-            console.log('Response Headers:', error.response.headers);
         } else if (error.request) {
             // The request was made but no response was received
             console.log('Request:', error.request);
@@ -62,7 +58,7 @@ export const post = async (endpoint, data = {}) => {
 
         const response = await api.post(endpoint, requestPayLoad);
 
-        console.log(endpoint + ' Response : ', JSON.stringify(response.data, null, 4));
+        // console.log(endpoint + ' Response : ', JSON.stringify(response.data, null, 4));
         // return response
         if (([200].indexOf(response?.status) > -1)) {
             return response?.data ? response.data : null;

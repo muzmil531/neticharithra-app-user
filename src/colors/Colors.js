@@ -6,7 +6,7 @@ const colorTheme = {
     whiteSmoke: "#f5f5f5",
     grey:"grey",
     lightGrey:"#C4C7C5",
-    activeColor: "#3B82F6",
+    activeColor: "#442EB7",
     black: "black",
 
 
@@ -31,7 +31,7 @@ const light = {
     chipText: colorTheme.activeColor,
     navbarIcon: colorTheme.activeColor,
     activeChipBackground: colorTheme.activeColor,
-    activeChipText: colorTheme.white,
+    activeChipText: colorTheme.activeColor,
     buttonBackground: colorTheme.activeColor,
     buttonText: colorTheme.white,
     iconColor: colorTheme.grey,

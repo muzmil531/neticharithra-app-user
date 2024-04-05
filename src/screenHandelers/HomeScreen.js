@@ -10,6 +10,7 @@ import { getScreenBuilder } from '../route/ScreenRegistry';
 import { onAppEndLaunch } from '../route/launch-profiler';
 import Colors from '../colors/Colors';
 import { retrieveData } from '../handelers/AsyncStorageHandeler';
+import { scaleFont } from '../handelers/ReusableHandeler';
 const Tab = createMaterialTopTabNavigator();
 
 export default function HomeScreen() {
@@ -71,6 +72,7 @@ export default function HomeScreen() {
             // }}
 
             screenOptions={{
+                
                 tabBarActiveTintColor: colors.heading,
                 tabBarInactiveTintColor: colors.textColor,
                 tabBarStyle: {
@@ -82,7 +84,7 @@ export default function HomeScreen() {
                 scrollEnabled: true, // Enable scrolling for tabs
                 tabBarLabelStyle: {
                     fontWeight: 'bold',
-                    fontSize:15
+                    fontSize:scaleFont(12)
                 },
             }}
         >

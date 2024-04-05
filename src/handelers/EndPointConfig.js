@@ -4,7 +4,10 @@
 const EndPointConfig = {
    
     getMetaData: 'getMetaData',
-    getHomeData:'public/getNewsList'
+    getHomeData:'public/getNewsList',
+    getNewsInfo:'public/getNewsInfo',
+    getAllNews:'public/getAllNews',
+    getDistrictNewsList:'public/getDistrictNewsList'
     // Add more endpoints as needed
 };
 

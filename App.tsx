@@ -18,17 +18,11 @@ import {
   View,
 } from 'react-native';
 
-import {
-  
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Main from './src/route/Main';
 import Colors from './src/colors/Colors';
+
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -52,8 +46,6 @@ function App(): React.JSX.Element {
     <SafeAreaProvider>
       <GestureHandlerRootView style={{ flex: 1 }}>
         {/* <BottomSheetModalProvider> */}
-          {/* <NavigationContainer > */}
-          {/* <NavigationContainer theme={navTheme} ref={navigationRef}> */}
           <NavigationContainer theme={navTheme}>
             <Main />
           </NavigationContainer>
