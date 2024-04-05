@@ -29,9 +29,9 @@ const LanguageSelectionScreen = ({ navigation }) => {
                     <CustomHeader />
                 </Appbar.Header>
                 <View style={styles.content}>
-                    {languageList?.map(lang => {
+                    {languageList?.map((lang,index) => {
                         return (
-                            <Card style={[styles.card, { borderBottomColor: 'red', borderBottomWidth: 2, height:'auto'}]} elevation={4}>
+                            <Card  key={index} style={[styles.card, { borderBottomColor: 'red', borderBottomWidth: 2, height:'auto'}]} elevation={4}>
                                 <Card.Content style={styles.cardContent}>
                                     <View style={styles.logo}>
                                         <Avatar.Image size={48} source={lang?.image} />
