@@ -3,8 +3,10 @@
 import axios from 'axios';
 
 import { Alert, Linking, Platform, PermissionsAndroid } from 'react-native';
+import { retrieveData } from './AsyncStorageHandeler';
 
-export const BASE_URL = 'http://192.168.10.219:3000/api/v2/';
+// export const BASE_URL = 'http://192.168.10.219:3000/api/v2/';
+export const BASE_URL = 'http://192.168.11.181:3000/api/v2/';
 // export const BASE_URL = 'https://viridian-slug-sari.cyclic.app/api/v2/';
 
 // const api={};
@@ -48,7 +50,9 @@ export const get = async (endpoint, params = {}) => {
 export const post = async (endpoint, data = {}) => {
     try {
 
-        let requestPayLoad = data;
+        let dataLang = await retrieveData('userLanguageSaved', 'string');
+        console.log(dataLang)
+        let requestPayLoad = {...data, language:dataLang || 'en'};
 
 
 
@@ -58,7 +62,7 @@ export const post = async (endpoint, data = {}) => {
 
         const response = await api.post(endpoint, requestPayLoad);
 
-        // console.log(endpoint + ' Response : ', JSON.stringify(response.data, null, 4));
+        console.log(endpoint + ' Response : ', JSON.stringify(response.data, null, 4));
         // return response
         if (([200].indexOf(response?.status) > -1)) {
             return response?.data ? response.data : null;

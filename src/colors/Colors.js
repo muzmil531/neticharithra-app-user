@@ -34,6 +34,8 @@ const light = {
     activeChipText: colorTheme.activeColor,
     buttonBackground: colorTheme.activeColor,
     buttonText: colorTheme.white,
+    primaryBackground: colorTheme.activeColor,
+    primaryText: colorTheme.white,
     iconColor: colorTheme.grey,
     secondary:colorTheme.grey,
     subChipBackground:colorTheme.pallateColor6,

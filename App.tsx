@@ -23,7 +23,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Main from './src/route/Main';
 import Colors from './src/colors/Colors';
 
-
+import i18next from './services/i18next'
 type SectionProps = PropsWithChildren<{
   title: string;
 }>;

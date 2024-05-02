@@ -1,0 +1,14 @@
+{
+    "en":{
+            "name":"English",
+            "nativeName":"English",
+            "code":"en"
+    },
+    "te":{
+        "name":"Telugu",
+        "nativeName":"తెలుగు",
+        "code":"te",
+        "color":"red",
+        "imageName":"./../assets/languageImages/telugu.jpg"
+    }
+}

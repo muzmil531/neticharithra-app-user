@@ -32,12 +32,11 @@ const jsonsList = {
                 "key": "town",
                 "label": "మండలం / పట్టణం",
                 bindLabel:'regionalLanguage',
-                bindValue:'label',                fullObject:true,
-
+                bindValue:'label',                
+                fullObject:true,
                 "hideSelectKey":true,
                 "required": true,
-                "options": [ ],
-                // emitInstantChange:true
+                "options": [ ]
             },
            
         ],

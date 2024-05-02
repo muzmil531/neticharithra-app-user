@@ -22,15 +22,17 @@ export const removeData = async (key) => {
 };
 
 // Retrieve data
-export const retrieveData = async (key) => {
+export const retrieveData = async (key, type='') => {
     try {
         const value = await AsyncStorage.getItem(key);
         //
-        if (value !== null) {
+        if (value !== null && type !== 'string') {
             return JSON.parse(value);
-        } else {
+        } else if(value && type === 'string') {
             //
-            return null;
+            return value;
+        } else {
+            return null
         }
     } catch (error) {
         console.error('Error retrieving data:', error);

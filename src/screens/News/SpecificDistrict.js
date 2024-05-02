@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
-import { View, FlatList, Text, Animated, StyleSheet, RefreshControl, TouchableOpacity } from 'react-native';
+import { View, FlatList, Text, Animated, StyleSheet, RefreshControl, TouchableOpacity, NativeModules } from 'react-native';
 import NewsContainer from '../../components/NewsContainer';
 import { post } from '../../handelers/APIHandeler';
 import EndPointConfig from '../../handelers/EndPointConfig';
@@ -9,7 +9,9 @@ import { scaleFont } from '../../handelers/ReusableHandeler';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import { ActivityIndicator } from 'react-native-paper';
 import { getJSONData } from '../../components/dfmFields';
-import { retrieveData } from '../../handelers/AsyncStorageHandeler';
+import { retrieveData, saveData } from '../../handelers/AsyncStorageHandeler';
+import { useTranslation } from 'react-i18next';
+import DFM from '../../components/DFM';
 
 const SpecificDistrict = () => {
     const styles = StyleSheet.create({
@@ -49,13 +51,14 @@ const SpecificDistrict = () => {
     const translateYAnim = useRef(new Animated.Value(300)).current;
     const [loading, setLoading] = useState(false);
     const flatListRef = useRef(null);
-    
+
     let [savedLocationInfo, setsavedLocationInfo] = useState();
     let [formValue, setformValue] = useState({});
     let [fieldOptions, setfieldOptions] = useState({});
-    let [dfmFields, setDFMFields] = useState(getJSONData('addDistrict'));
+    let [dfmFields, setDFMFields] = useState();
     let [showScreen, setShowScreen] = useState(false)
     const [showMessage, setShowMessage] = useState(false);
+    const { t } = useTranslation();
 
 
     useEffect(() => {
@@ -69,11 +72,11 @@ const SpecificDistrict = () => {
         ).start();
     }, [translateYAnim]);
 
-  
+
     const getNewsList = (payload, initialLoad = false) => {
         setLoading(true);
         try {
-            post(EndPointConfig.getDistrictNewsList, {...payload, ...savedLocationInfo || {}})
+            post(EndPointConfig.getDistrictNewsList, { ...payload, ...savedLocationInfo || {} })
                 .then(function (response) {
                     console.log("RECIVED BACK")
 
@@ -85,12 +88,12 @@ const SpecificDistrict = () => {
                             if (response?.data?.records?.length <= 1) {
                                 return;
                             }
-                          
-                
-                              setShowMessage(true);
-                              setTimeout(() => {
+
+
+                            setShowMessage(true);
+                            setTimeout(() => {
                                 setShowMessage(false);
-                              }, 3000)
+                            }, 3000)
                         } else {
                             setListOfEntries((prev) => {
                                 return [...prev, ...response?.data?.records || []];
@@ -131,7 +134,8 @@ const SpecificDistrict = () => {
         setPaginationMetaData(defaultPaginationMetaData);
         getNewsList(defaultPaginationMetaData, true);
         setRefreshing(false);
-        flatListRef?.current?.scrollToOffset({ offset: 0, animated: true });    };
+        flatListRef?.current?.scrollToOffset({ offset: 0, animated: true });
+    };
 
 
 
@@ -140,14 +144,17 @@ const SpecificDistrict = () => {
         React.useCallback(() => {
             // clearAllData()
             const fetchData = async () => {
+
                 let data = await retrieveData('userSavedLocation');
                 if (data) {
                     setsavedLocationInfo(data);
                     console.log(data);
                     setShowScreen(true);
-                    getNewsList({...paginationMetaData, ...data}, true);
+                    getNewsList({ ...paginationMetaData, ...data }, true);
 
                 } else {
+                    let dfm = await t('homeScreen.addDistrictDFM', { returnObjects: true }) || [];
+                    setDFMFields(dfm)
                     getMetaData();
                 }
                 // initialLoad()
@@ -192,8 +199,10 @@ const SpecificDistrict = () => {
                         }));
                         // console.log("2responseresponse", response?.data?.metaList[0])
                     }
-
+                    setShowScreen(true);
                 })
+
+
                 .catch(function (error) {
                     console.error(error);
                     //   setRefreshing(false);
@@ -239,11 +248,11 @@ const SpecificDistrict = () => {
 
                         <>
                             <View style={{ flex: 1 }}>
-                            {listOfEntries.length === 0 && !loading && (
-        <View style={styles.loadingContainer}>
-          <Text>వార్తలు ఏవీ అందుబాటులో లేవు.. కొంత సమయం తర్వాత తిరిగి రండి...</Text>
-        </View>
-      )}
+                                {listOfEntries.length === 0 && !loading && (
+                                    <View style={styles.loadingContainer}>
+                                        <Text>{t('homeScreen.noNews')}</Text>
+                                    </View>
+                                )}
                                 <Animated.FlatList
                                     ref={flatListRef}
                                     data={listOfEntries}
@@ -295,11 +304,11 @@ const SpecificDistrict = () => {
                                         />
                                     }
                                 />
-                                  {showMessage && (
-        <View style={styles.scrollDownIndicator}>
-          <Text style={styles.scrollDownText}>Scroll down to read more</Text>
-        </View>
-      )}
+                                {showMessage && (
+                                    <View style={styles.scrollDownIndicator}>
+                                        <Text style={styles.scrollDownText}>Scroll down to read more</Text>
+                                    </View>
+                                )}
                                 {loading && (
                                     <View style={styles.loadingContainer}>
                                         <ActivityIndicator size="large" color="white" />

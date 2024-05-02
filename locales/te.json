@@ -1,0 +1,301 @@
+{
+  "languageCode": "te",
+  "change-language": "CHANGE language te",
+  "welcome": "స్వాగతం సాయి",
+  "maxOf3Images":"గరిష్టంగా మూడు చిత్రాలు మాత్రమే అనుమతించబడతాయి",
+  "noImages":"చిత్రాలు ఏవీ అప్‌లోడ్ చేయబడలేదు.. చిత్రాలను అప్‌లోడ్ చేయడానికి క్లిక్ చేయండి",
+  "someThingWentWrong":"సర్వర్ సమస్య.. కొంత సమయం తర్వాత ప్రయత్నించండి",
+  "success":"జయప్రదంగా పూర్తయ్యింది",
+  "indexScreen": {
+    "tabs": [
+      {
+        "heading": "సెట్టింగ్‌లు",
+        "route": "Settings",
+        "iconType": "FontAwesome5",
+        "icon": "cogs"
+      },
+      {
+        "heading": "హోం",
+        "route": "HomeScreen",
+        "iconType": "FontAwesome5",
+        "icon": "home"
+      },
+      {
+        "heading": "సెర్చ్",
+        "route": "SearchScreen",
+        "iconType": "FontAwesome5",
+        "icon": "search"
+      },
+      {
+        "heading": " ",
+        "route": "DetailedNewsInfo",
+        "iconType": "FontAwesome5",
+        "noRoute": true
+      },
+      {
+        "heading": "పోస్ట్",
+        "route": "PostIndex",
+        "iconType": "FontAwesome5",
+        "icon": "plus-circle"
+      },
+     
+      {
+        "heading": "DetailedNewsInfo",
+        "route": "DetailedNewsInfo",
+        "hide": true
+      }
+    ]
+  },
+  "homeScreen": {
+    "tabs": [
+      {
+        "heading": "న్యూస్",
+        "route": "News"
+      },
+      {
+        "heading": "మీ జిల్లా వార్తలు",
+        "route": "SpecificDistrict"
+      }
+    ],
+    "noNews": "వార్తలు ఏవీ అందుబాటులో లేవు.. కొంత సమయం తర్వాత తిరిగి ప్రయత్నించండి...",
+    "labelAdd": "జిల్లా వార్తలు",
+    "addDistrictDFM": {
+      "fields": [
+        {
+          "type": "select",
+          "key": "state",
+          "label": "రాష్ట్రం",
+          "bindLabel": "te",
+          "fullObject": true,
+          "hideSelectKey": true,
+          "required": true,
+          "options": [],
+          "emitInstantChange": true,
+          "onChangeMakeValuesEmpty": [
+            "district",
+            "town"
+          ]
+        },
+        {
+          "type": "select",
+          "key": "district",
+          "label": "జిల్లా",
+          "bindLabel": "te",
+          "hideSelectKey": true,
+          "fullObject": true,
+          "required": true,
+          "options": [],
+          "emitInstantChange": true,
+          "onChangeMakeValuesEmpty": [
+            "town"
+          ]
+        },
+        {
+          "type": "select",
+          "key": "town",
+          "label": "మండలం / పట్టణం",
+          "bindLabel": "te",
+          "bindValue": "label",
+          "fullObject": true,
+          "hideSelectKey": true,
+          "required": true,
+          "options": []
+        }
+      ],
+      "bottomActions": [
+        {
+          "type": "submit",
+          "label": "సేవ్ చేసి కొనసాగించాము",
+          "action": "submit",
+          "icon": "",
+          "buttonType": "primary"
+        }
+      ],
+      "bottomConfigurations": {
+        "marginBottom": 155
+      }
+    }
+  },
+  "searchScreen": {
+    "tabsName": {
+      "searchIndex": "సెర్చ్",
+      "SearchCategory": "విభాగం"
+    },
+    "tabs": [
+      {
+        "component": "SearchIndex",
+        "name": "సెర్చ్ న్యూస్"
+      },
+      {
+        "component": "SearchCategory",
+        "name": "విభాగం"
+      }
+    ]
+  },
+  "postScreen":{
+   
+      "tabsInitialOTPRequest": [
+        {
+          "heading": "ఓటీపీ రిక్వెస్ట్",
+          "route": "PostIndex/OTPRequest",
+          "iconType": "FontAwesome5",
+          "icon": "plus-circle"
+        },
+        {
+          "heading": "హోమ్ రిక్వెస్ట్",
+          "route": "PostIndex/PublicUserSummary",
+          "iconType": "FontAwesome5",
+          "icon": "plus-circle"
+        },
+        {
+          "heading": "వార్తలను పోస్ట్ ",
+          "route": "PostIndex/PublicNewsPost",
+          "iconType": "FontAwesome5",
+          "icon": "plus-circle"
+        }
+      ],
+      "tabsNewsAccess": [
+    
+        {
+          "heading": "హోమ్",
+          "route": "PostIndex/PublicUserSummary",
+          "iconType": "FontAwesome5",
+          "icon": "plus-circle"
+        },
+        {
+          "heading": "వార్తలను పోస్ట్ ",
+          "route": "PostIndex/PublicNewsPost",
+          "iconType": "FontAwesome5",
+          "icon": "plus-circle"
+        }
+       
+      ],
+      "validMobileNumberError1":"మొబైల్ నంబర్‌ని చెక్ చేయండి..",
+      "validMobileNumberError2":" నంబర్ తప్పుగా నమోదు చేయబడింది",
+      "addNews": {
+        "fields": [
+          {
+            "type": "text",
+            "key": "title",
+            "label": "టైటిల్",
+            "required": true            
+          },
+          {
+            "type": "text",
+            "key": "sub_title",
+            "label": "టైటిల్ 2",
+            "required": false            
+          },
+          {
+            "type": "text",
+            "key": "description",
+            "label": "సమాచారం",
+            "required": true            
+          },
+          {
+            "type": "imageUpload",
+            "key": "images",
+            "label": "ఫోటోలు",
+            "default":[],
+            "required": false            
+          },
+          {
+            "type": "select",
+            "key": "category",
+            "label": "వర్గం",
+            "bindLabel": "te",
+            "bindValue":"label",
+            "fullObject": false,
+            "hideSelectKey": true,
+            "required": true,
+            "options": [],
+            "emitInstantChange": true
+           
+          },
+          {
+            "type": "select",
+            "key": "newsType",
+            "label": "ప్రాంతీయ / జాతీయ / అంతర్జాతీయ",
+            "bindLabel": "te",
+            "bindValue":"value",
+            "fullObject": false,
+            "hideSelectKey": true,
+            "required": true,
+            "options": [],
+            "emitInstantChange": true
+           
+          },
+          {
+            "type": "select",
+            "key": "state",
+            "label": "రాష్ట్రం",
+            "bindLabel": "te",            "bindValue":"value",
+
+            "fullObject": false,
+            "hideSelectKey": true,
+            "required": true,
+            "options": [],
+            "emitInstantChange": true,
+            "onChangeMakeValuesEmpty": [
+              "district",
+              "mandal"
+            ]
+          },
+          {
+            "type": "select",
+            "key": "district",
+            "label": "జిల్లా",
+            "bindLabel": "te",
+            "hideSelectKey": true,            "bindValue":"value",
+
+            "fullObject": false,
+            "required": true,
+            "options": [],
+            "emitInstantChange": true,
+            "onChangeMakeValuesEmpty": [
+              "mandal"
+            ]
+          },
+          {
+            "type": "select",
+            "key": "mandal",
+            "label": "మండలం / పట్టణం",
+            "bindLabel": "te",
+            "bindValue": "label",
+            "fullObject": false,
+            "hideSelectKey": true,
+            "required": true,
+            "options": []
+          }
+        ],
+        "bottomActions": [
+          {
+            "type": "submit",
+            "label": "సేవ్ చేసి కొనసాగించాము",
+            "action": "submit",
+            "icon": "",
+            "buttonType": "primary"
+          }
+        ],
+        "bottomConfigurations": {
+          "marginBottom": 155
+        }
+      },
+      "newPost":"కొత్త పోస్ట్",
+      "noNewsAvailable":"ఏ వార్తలూ అందుబాటులో లేవు.. చూడడానికి ఏవైనా వార్తలను దయచేసి పోస్ట్ చేయండి..!"
+    
+  },
+  "settingsScreen":{
+    "yourDetails":"మీ వివరాలు",
+    "mobileNumber":"మొబైల్ నంబర్",
+    "emailId":"ఇమెయిల్ ఐడి",
+    "address":"చిరునామా",
+    "newsPreferance":"మీ వార్తల ప్రాధాన్యత",
+    "mandal":"మండలం",
+    "district": "జిల్లా",
+    "state": "రాష్ట్రం",
+    "pending":"పెండింగ్‌లో ఉంది", 
+    "approved":"ఆమోదించబడింది", 
+    "rejected":"తిరస్కరించబడింది"
+  }
+}

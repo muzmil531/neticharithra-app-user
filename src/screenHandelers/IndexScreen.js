@@ -6,58 +6,88 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import { onAppEndLaunch } from '../route/launch-profiler';
 import Colors from '../colors/Colors';
 import { getScreenBuilder } from '../route/ScreenRegistry';
+import { useTranslation } from 'react-i18next';
+// import i18next from 'i18next';
+import i18next from './../../services/i18next';
+import { retrieveData } from '../handelers/AsyncStorageHandeler';
+import Toast from 'react-native-toast-message';
 
 const Tab = createBottomTabNavigator();
 
 export default function IndexScreen() {
-    var [screens, setScreens] = useState([
-        {
-            heading: 'హోం', route: 'HomeScreen',
-            iconType: 'FontAwesome5', icon: "home"
+    // var [screens, setScreens] = useState([
+    //     {
+    //         heading: 'హోం', route: 'HomeScreen',
+    //         iconType: 'FontAwesome5', icon: "home"
 
-        },
-        {
-            heading: 'సెర్చ్', route: 'SearchScreen',
-            iconType: 'FontAwesome5', icon: "search"
-        },
-        {
-            heading: ' ', route: 'HomeScreen',
-            iconType: 'FontAwesome5'
+    //     },
+    //     {
+    //         heading: 'సెర్చ్', route: 'SearchScreen',
+    //         iconType: 'FontAwesome5', icon: "search"
+    //     },
+    //     {
+    //         heading: ' ', route: 'HomeScreen',
+    //         iconType: 'FontAwesome5'
 
-        },
-        {
-            heading: 'పోస్ట్', route: 'HomeScreen',
-            iconType: 'FontAwesome5', icon: "plus-circle"
+    //     },
+    //     {
+    //         heading: 'పోస్ట్', route: 'HomeScreen',
+    //         iconType: 'FontAwesome5', icon: "plus-circle"
 
-        },
+    //     },
 
-        {
-            heading: 'సెట్టింగ్‌లు', route: 'SearchScreen',
-            iconType: 'FontAwesome5', icon: "cogs"
-        },
+    //     {
+    //         heading: 'సెట్టింగ్‌లు', route: 'SearchScreen',
+    //         iconType: 'FontAwesome5', icon: "cogs"
+    //     },
 
-        // {
-        //     heading: 'Details', route: 'DetailedNewsInfo',
-        //     hide: true,
-        //     iconType: 'FontAwesome5'
+    // ]);
 
-        // },
-    ]);
+    var [screens, setScreens] = useState()
     const colors = Colors[useColorScheme()];
+    const { t } = useTranslation();
 
-    useEffect(() => {
-        // clearAllData()
-        const fetchData = async () => {
-            requestAnimationFrame(() => {
-                onAppEndLaunch();
-            });
+    // useEffect(() => {
+    //     // clearAllData()
+    //     const fetchData = async () => {
+    //        let lang= await retrieveData('userLanguageSaved', 'string') || 'en';
+    //        console.log("LANG", lang)
+    //         // i18next.changeLanguage(lang);
+    //         console.log(t('welcome'))
+    //         requestAnimationFrame(() => {
+    //             onAppEndLaunch();
+    //         });
 
-            // Do something with the retrieved data
-        };
+    //         // Do something with the retrieved data
+    //     };
 
-        fetchData();
+    //     fetchData();
 
-    }, []);
+    // }, []);
+    useFocusEffect(
+        React.useCallback(() => {
+            const fetchDataAndChangeLanguage = async () => {
+                try {
+                    let lang = await retrieveData('userLanguageSaved', 'string');
+                    console.log("LANG", lang);
+                    i18next.changeLanguage(lang);
+                    let tabs =await t('indexScreen.tabs', { returnObjects: true }) || [];
+                    setScreens(tabs)
+                    requestAnimationFrame(() => {
+                        onAppEndLaunch(); // Assuming this function is defined elsewhere
+                    });
+                } catch (error) {
+                    console.error('Error fetching and changing language:', error);
+                }
+            };
+
+            fetchDataAndChangeLanguage();
+
+            return () => {
+                // Cleanup function (if needed)
+            };
+        }, []) // Dependency array includes i18n to re-trigger effect when i18n changes
+    );
 
 
     const LogoComponent = () => {
@@ -105,11 +135,14 @@ export default function IndexScreen() {
             </TouchableOpacity>
         );
     };
-
+const handleTabPress = (props) => {
+    console.log("SCREEEEM",props)
+}
 
     return (
         <>
-
+        {screens?.length>0 && 
+        
             <Tab.Navigator
                 initialRouteName="SpecificDistrict"
                 screenOptions={{
@@ -129,10 +162,18 @@ export default function IndexScreen() {
                         fontSize: 15,
                         paddingBottom: 5
                     },
-
+                    // tabBarButton: props => (
+                    //     <TouchableOpacity
+                    //         {...props}
+                    //         onPress={() => {
+                    //             // props.onPress();
+                    //             handleTabPress(props); // Pass the route name to the handler
+                    //         }}
+                    //     />
+                    // ),
                 }}
             >
-                {screens.map((screen, index) => {
+                {screens?.map((screen, index) => {
                     if (!screen.hide) {
                         return (
                             <Tab.Screen
@@ -141,6 +182,8 @@ export default function IndexScreen() {
                                 getComponent={getScreenBuilder(screen.route)}
                                 options={{
                                     tabBarLabel: screen.heading,
+                                 
+
                                     tabBarIcon: ({ color, size, focused }) => (
                                         // Conditionally change icon color based on focused state
                                         <FontAwesome5
@@ -153,6 +196,18 @@ export default function IndexScreen() {
                                         />
                                     )
                                 }}
+                                listeners={({ navigation, route }) => ({
+                                    tabPress: (e) => {
+                                        // e.preventDefault();
+                                        if(screen?.noRoute){
+                                            e.preventDefault();
+                                        }
+                                        // console.log(screen)
+                                        // console.log(navigation)
+                                        // Pass the complete screen object to the handler
+                                        // handleTabPress(screen);
+                                    },
+                                })}
                             />
                         );
                     }
@@ -160,6 +215,9 @@ export default function IndexScreen() {
                 })}
 
             </Tab.Navigator>
+        }
+
+<Toast position="bottom" bottomOffset={100} />
 
             <LogoComponent />
 

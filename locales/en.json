@@ -1,0 +1,122 @@
+{
+  "change-language": "CHANGE language",
+  "welcome": "WELCOME EN",
+  "indexScreen": {
+    "tabs": [
+      {
+        "heading": "Home",
+        "route": "HomeScreen",
+        "iconType": "FontAwesome5",
+        "icon": "home"
+      },
+      {
+        "heading": "Search",
+        "route": "SearchScreen",
+        "iconType": "FontAwesome5",
+        "icon": "search"
+      },
+      {
+        "heading": " ",
+        "route": "HomeScreen",
+        "iconType": "FontAwesome5"
+      },
+      {
+        "heading": "Post",
+        "route": "HomeScreen",
+        "iconType": "FontAwesome5",
+        "icon": "plus-circle"
+      },
+      {
+        "heading": "Settings",
+        "route": "SearchScreen",
+        "iconType": "FontAwesome5",
+        "icon": "cogs"
+      }
+    ]
+  },
+  "homeScreen": {
+    "tabs": [
+      {
+        "heading": "News",
+        "route": "News"
+      },
+      {
+        "heading": "Your District News",
+        "route": "SpecificDistrict"
+      }
+    ],
+    "noNews": "No news available right now.. Try after sometime..",
+    "labelAdd": "district News",
+    "addDistrictDFM": {
+      "fields": [
+        {
+          "type": "select",
+          "key": "state",
+          "label": "State",
+          "fullObject": true,
+          "hideSelectKey": true,
+          "required": true,
+          "options": [],
+          "emitInstantChange": true,
+          "onChangeMakeValuesEmpty": [
+            "district",
+            "town"
+          ]
+        },
+        {
+          "type": "select",
+          "key": "district",
+          "label": "District",
+          "bindLabel": "regionalLanguage",
+          "hideSelectKey": true,
+          "fullObject": true,
+          "required": true,
+          "options": [],
+          "emitInstantChange": true,
+          "onChangeMakeValuesEmpty": [
+            "town"
+          ]
+        },
+        {
+          "type": "select",
+          "key": "town",
+          "label": "Mandal / Town",
+          "bindLabel": "regionalLanguage",
+          "bindValue": "label",
+          "fullObject": true,
+          "hideSelectKey": true,
+          "required": true,
+          "options": []
+        }
+      ],
+      "bottomActions": [
+        {
+          "type": "submit",
+          "label": "Save and Proceed",
+          "action": "submit",
+          "icon": "",
+          "buttonType": "primary"
+        }
+      ],
+      "bottomConfigurations": {
+        "marginBottom": 155
+      }
+    }
+  },
+  "searchScreen": {
+    "tabsName":{
+      "searchIndex":"Search",
+      "SearchCategory":"Categroy"
+    },
+    "tabs": [
+      {
+        "component": "SearchIndex",
+        "name": "Search"
+      },
+      {
+        "component": "SearchCategory",
+        "name": "Category"
+      }
+    ]
+  }
+}

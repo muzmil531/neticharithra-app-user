@@ -3,9 +3,15 @@ import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef,
 
 import { Button, TextInput, Text, HelperText, Chip, Checkbox, } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/FontAwesome'
+import ImagePicker, { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 
 import { Dropdown } from 'react-native-element-dropdown';
 import Colors from '../colors/Colors';
+import axios from 'axios';
+import { BASE_URL } from '../handelers/APIHandeler';
+import EndPointConfig from '../handelers/EndPointConfig';
+import ToasterService from './ToasterService';
+import { useTranslation } from 'react-i18next';
 
 const DFM = forwardRef(({ dfmValues, dfmForm, fieldOptions, onFormSubmit, editFilterData, applyFilters, resetableFields, maxHeight, updateValues, parentField, htmlContent = {}, extraOptions = {} }, ref) => {
     useImperativeHandle(ref, () => ({
@@ -19,6 +25,7 @@ const DFM = forwardRef(({ dfmValues, dfmForm, fieldOptions, onFormSubmit, editFi
 
     const [dfmFieldsList, setDFMFieldsList] = useState([])
 
+    const {t} = useTranslation()
     useEffect(() => {
 
         if (!dfmValues) {
@@ -64,7 +71,7 @@ const DFM = forwardRef(({ dfmValues, dfmForm, fieldOptions, onFormSubmit, editFi
             if (dfmForm.fields[index]['type'] === 'select' && formValuesCopy[dfmForm.fields[index].key] && dfmForm.fields[index].fullObject) {
 
                 formValuesCopy[dfmForm.fields[index].key] = formValuesCopy[dfmForm.fields[index].key][dfmForm.fields[index].bindValue ? dfmForm.fields[index].bindValue : "value"]
-                
+
             }
 
 
@@ -100,6 +107,7 @@ const DFM = forwardRef(({ dfmValues, dfmForm, fieldOptions, onFormSubmit, editFi
     }, [fieldOptions, dfmForm]);
 
     useEffect(() => {
+
 
         if (dfmForm?.fields?.length > 0) {
 
@@ -205,7 +213,6 @@ const DFM = forwardRef(({ dfmValues, dfmForm, fieldOptions, onFormSubmit, editFi
         } else {
             onFormSubmit(btn)
         }
-        setLoader(false)
     }
     const validateForm = () => {
         if (!dfmForm) {
@@ -315,18 +322,154 @@ const DFM = forwardRef(({ dfmValues, dfmForm, fieldOptions, onFormSubmit, editFi
 
     const styles = StyleSheet.create({
 
-        input: {
-            flex: 1,
-            color: "white",
-            // marginVertical: -10
-        },
-
 
     })
 
+    const selectImageFromLibrary = (field) => {
+        console.log(formValues?.[field?.key])
+        if (formValues?.[field?.key]?.length >= 3) {
+            ToasterService.showError(t('maxOf3Images'))
+            return
+        }
+        const options = {
+            mediaType: 'photo',
+        };
+
+        launchImageLibrary(options, (response) => {
+            if (response.assets && response.assets.length > 0) {
+                if (((formValues?.[field?.key]?.length || 0) + (response?.assets?.length || 0)) > 3) {
+                    ToasterService.showError(t('maxOf3Images'))
+                    return
+                } else {
+                    uploadImage(response.assets, field);
+                }
+            }
+        });
+    };
+
+    const uploadImage = (images, field) => {
+        const formData = new FormData();
+
+        images.forEach(image => {
+            formData.append('images', {
+                uri: image.uri,
+                type: image.type,
+                name: image.fileName || 'image.jpg',
+            });
+
+        })
+        setTimeout(() => {
+            
+        console.log(images)
+        console.log(BASE_URL + EndPointConfig.uploadFilesS3)
+        axios.post(BASE_URL + EndPointConfig.uploadFilesS3, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        })
+            .then((response) => {
+
+                setFormValues(prev => ({
+                    ...prev,
+                    [field.key]: Array.isArray(prev[field.key])
+                      ? [...prev[field.key], ...response.data.data]
+                      : [...response.data.data]
+                  }));
+            })
+            .catch((error) => {
+                console.error('Error uploading image:', error);
+            });
+        }, 500);
+    };
 
 
+    const stylesUploade = StyleSheet.create({
+        header: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            // paddingHorizontal: 20,
+            marginBottom: 10,
+            marginTop:10
+        },
+        heading: {
+            fontSize: 20,
+            fontWeight: 'bold',
+        },
+        addButton: {
+            fontSize: 20,
+            color: 'green',
+        },
+        imagesRow: {
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            // paddingHorizontal: 10,
+        },
+        imageContainer: {
+            width: '30%', // Adjust according to your requirements
+            marginBottom: 10,
+        },
+        image: {
+            width: '100%',
+            height: 150, // Adjust the height as needed
+            resizeMode: 'cover',
+        },
+        iconContainer: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            paddingHorizontal: 5,
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+        },
+        icon: {
+            fontSize: 20,
+            color: 'white',
+            padding: 5,
+        },
+    });
 
+    const renderImages = (imagesList) => {
+        if(imagesList?.length > 0){
+            return imagesList.map((imageUrl, index) => {
+                return (
+                    <View key={index} style={stylesUploade.imageContainer}>
+                        <Image source={{ uri: imageUrl?.tempURL }} style={stylesUploade.image} resizeMode="cover" />
+                        <View style={stylesUploade.iconContainer}>
+                            <TouchableOpacity onPress={() => onViewPress(imageUrl?.tempURL)}>
+                                <Icon name="eye" style={stylesUploade.icon} />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => onDeletePress(imageUrl?.tempURL)}>
+                                <Icon name="trash" style={stylesUploade.icon} />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                );
+            });
+        } else {
+            return (<>
+            
+            <Text>
+{
+            t('noImages')}
+            </Text>
+            </>)
+        }
+    };
+
+    const onViewPress = (imageUrl) => {
+        // Implement view functionality
+        console.log('View Image:', imageUrl);
+    };
+
+    const onDeletePress = (imageUrl) => {
+        // Implement delete functionality
+        console.log('Delete Image:', imageUrl);
+    };
     return (
         <>
 
@@ -378,12 +521,12 @@ const DFM = forwardRef(({ dfmValues, dfmForm, fieldOptions, onFormSubmit, editFi
 
                                     <TextInput
 
-                                        style={[styles.input, { backgroundColor: colors.backgroundColor, marginTop: 4, }]} label={field.label}
+                                        style={[{ backgroundColor: colors.backgroundColor, marginTop: 4, }]} label={field.label}
                                         value={formValues?.[field.key] || ''}
                                         key={field.key}
                                         mode="outlined"
                                         disabled={field?.disabled || false}
-                                        placeholder={"Enter " + field.label}
+                                        placeholder={field.label}
 
                                         onChangeText={(event) => handleInputChange(event, field)}
                                         keyboardType={field.keyboardType ? field.keyboardType : 'default'}
@@ -413,12 +556,29 @@ const DFM = forwardRef(({ dfmValues, dfmForm, fieldOptions, onFormSubmit, editFi
                                 </TouchableOpacity>
                             }
 
+                            {
+                                field.type === 'imageUpload' && !field.hide &&
+
+                                <>
+                                    <View style={stylesUploade.header}>
+                                        <Text style={stylesUploade.heading}>{field?.label || ''}</Text>
+                                        <TouchableOpacity onPress={() => selectImageFromLibrary(field)}>
+                                            <Icon name="plus" style={stylesUploade.addButton} />
+                                        </TouchableOpacity>
+                                    </View>
+                                    <View style={stylesUploade.imagesRow}>{renderImages(formValues?.[field?.key] || [])}</View>
+
+
+
+                                </>
+                            }
+
                             {field.type === 'select' && !field.hide &&
                                 <>
 
                                     <View style={stylesSelect.container}>
                                         <Text style={[stylesSelect.label,]}>
-                                           {field.label}
+                                            {field.label}
                                         </Text>
                                         <Dropdown
                                             style={[stylesSelect.dropdown]}
@@ -435,7 +595,7 @@ const DFM = forwardRef(({ dfmValues, dfmForm, fieldOptions, onFormSubmit, editFi
                                             disable={field?.disabled || false}
                                             valueField={field?.bindValue ? field.bindValue : "value"}
                                             mode="outlined"
-                                            placeholder={(field?.hideSelectKey ? ' ':'Select ') + field.label}
+                                            placeholder={(field?.hideSelectKey ? ' ' : 'Select ') + field.label}
                                             searchPlaceholder="Search..."
                                             value={formValues[field.key] || ""}
                                             onChange={item => {
@@ -611,7 +771,7 @@ const DFM = forwardRef(({ dfmValues, dfmForm, fieldOptions, onFormSubmit, editFi
 
                             }, { ...btn?.configuration }]} icon={btn.icon} mode="contained"
                                 onPress={() => footerButtonsHandeler(btn)}>
-                                <Text color={colors.buttonText}>{btn.label}</Text>
+                                {btn.label}
                             </Button>
                         )
                     })
@@ -631,6 +791,7 @@ const stylesSelect = StyleSheet.create({
     container: {
         backgroundColor: 'white',
         padding: 16,
+        paddingHorizontal: 0
     },
     dropdown: {
         height: 50,
@@ -645,7 +806,7 @@ const stylesSelect = StyleSheet.create({
     label: {
         position: 'absolute',
         backgroundColor: 'white',
-        left: 22,
+        left: 6,
         top: 8,
         zIndex: 999,
         paddingHorizontal: 8,

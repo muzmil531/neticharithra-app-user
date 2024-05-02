@@ -16,12 +16,15 @@ const Stack = createNativeStackNavigator();
 export default function Main() {
 
     let [languageSaved, setLanguageSaved] = useState();
+    let [showScreen, setShowScreen] = useState(false)
     useEffect(() => {
         // clearAllData()
         const fetchData = async () => {
 
-            let data = await retrieveData('userLanguageSaved');
+            let data = await retrieveData('userLanguageSaved', 'string');
             setLanguageSaved(data)
+            console.log("SAVED LANG", data)
+            setShowScreen(true)
             requestAnimationFrame(() => {
                 onAppEndLaunch();
             });
@@ -40,22 +43,28 @@ export default function Main() {
     return (
         <>
 
+        {
+            showScreen && 
             <Stack.Navigator
-                initialRouteName={languageSaved ? "IndexScreen" : 'MainScreen'}
-                screenOptions={{
-                    headerMode: 'screen',
-                }}>
-                {
-                    screens.map(screen => (
-                        <Stack.Screen
-                            key={screen}
-                            name={screen}
-                            getComponent={getScreenBuilder(screen)}
-                            options={{ headerShown: false }}
-                        />
-                    ))
-                }
-            </Stack.Navigator>
+            initialRouteName={languageSaved ? "IndexScreen" : 'MainScreen'}
+            screenOptions={{
+                headerMode: 'screen',
+            }}>
+            {
+                screens.map(screen => (
+                    <Stack.Screen
+                        key={screen}
+                        name={screen}
+                        getComponent={getScreenBuilder(screen)}
+                        options={{ headerShown: false }}
+                    />
+                ))
+            }
+        </Stack.Navigator>
+
+        }
+
+         
         </>
     );
 }

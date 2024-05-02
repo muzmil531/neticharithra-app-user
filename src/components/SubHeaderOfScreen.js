@@ -20,43 +20,43 @@ const SubHeaderOfScreen = ({ elements, chipActionEmitter, externalActiveState })
         child: {
             HeadingConfiguration: { fontWeight: 700, fontSize: 16, color: colors.heading },
             ItemConfiguration: {
-                color: colors.chipText, fontWeight: 700,paddingHorizontal:6, 
+                color: colors.chipText, fontWeight: 700, paddingHorizontal: 6,
             },
             activeItemConfiguration: {
                 color: colors.activeChipText
             }
         },
         iconStyle: { fontSize: 12, color: colors.heading },
-        chipsConfiguration: { marginTop: 10},
+        chipsConfiguration: { marginTop: 10 },
     })
 
     const [activeScreen, setActiveScreen] = useState(elements?.initialActiveScreen);
-   
+
 
     useFocusEffect(
-         React.useCallback(() => {
+        React.useCallback(() => {
             setActiveScreen(elements.initialActiveScreen)
-    }, [])
+        }, [])
     )
-    
+
 
     const functionCall = (chip) => {
 
-        if (!externalActiveState){
+        if (!externalActiveState) {
             setActiveScreen(chip.label)
         }
 
-         if (chip?.callBack) {
+        if (chip?.callBack) {
             //
             chip.callBack("chip")
         }
-        if(chipActionEmitter){
+        if (chipActionEmitter) {
             chipActionEmitter(chip)
         } else if (chip?.navigationLink) {
             navigation.navigate(chip.navigationLink)
-        } 
-       
-      
+        }
+
+
     }
 
 
@@ -67,10 +67,10 @@ const SubHeaderOfScreen = ({ elements, chipActionEmitter, externalActiveState })
                 styles.parent.ItemsConfiguration,
                 chip?.configuration?.parent,
                 elements?.chips?.itemsConfiguration?.parent,
-                activeScreen == chip.label && [styles.parent.activeItemsConfiguration,elements?.chips?.itemActiveStyle?.parent]]}>
+                activeScreen == chip.label && [styles.parent.activeItemsConfiguration, elements?.chips?.itemActiveStyle?.parent]]}>
             <Text
-                style={[styles.child.ItemConfiguration,elements?.chips?.itemsConfiguration?.child,
-                    chip?.configuration?.child, activeScreen == chip.label && [styles.child.activeItemConfiguration, elements?.chips?.itemActiveStyle?.child]]}>
+                style={[styles.child.ItemConfiguration, elements?.chips?.itemsConfiguration?.child,
+                chip?.configuration?.child, activeScreen == chip.label && [styles.child.activeItemConfiguration, elements?.chips?.itemActiveStyle?.child]]}>
                 {chip.label}</Text>
         </TouchableOpacity>
     }
@@ -78,15 +78,19 @@ const SubHeaderOfScreen = ({ elements, chipActionEmitter, externalActiveState })
     return (
         <View style={styles.container}>
             {
-                elements.heading && <TouchableOpacity style={[styles.parent.HeadingConfiguration, elements.heading?.configuration?.parent]} onPress={() => { if (elements?.heading?.callBack) { elements.heading.callBack({type:'back'})} else { navigation.goBack() };  }}>
-                    <Icon style={[styles.iconStyle, elements.heading.iconStyle]} name="chevron-left"  />
-                    <Text style={[styles.child.HeadingConfiguration,elements.heading.configuration?.parent]}>{elements.heading.label}</Text>
+                elements.heading && <TouchableOpacity style={[styles.parent.HeadingConfiguration, elements.heading?.configuration?.parent]} onPress={() => { if (elements?.heading?.callBack) { elements.heading.callBack({ type: 'back' }) } else { navigation.goBack() }; }}>
+                    {
+                        !elements?.heading?.hideIcon &&
+
+                        <Icon style={[styles.iconStyle, elements.heading.iconStyle]} name="chevron-left" />
+                    }
+                    <Text style={[styles.child.HeadingConfiguration, elements.heading.configuration?.parent]}>{elements.heading.label}</Text>
                 </TouchableOpacity>
             }
 
             {
                 elements?.chips?.data?.length > 0 && <FlatList
-                    style={[styles.chipsConfiguration,elements.chips.configuration]}
+                    style={[styles.chipsConfiguration, elements.chips.configuration]}
                     horizontal
                     data={elements.chips.data}
                     keyExtractor={(item, index) => index}

@@ -7,6 +7,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { scaleFont } from '../../handelers/ReusableHandeler';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import { ActivityIndicator } from 'react-native-paper';
+import { useTranslation } from 'react-i18next';
 
 const News = () => {
   const styles = StyleSheet.create({
@@ -32,6 +33,7 @@ const News = () => {
       justifyContent: 'center',
       alignItems: 'center',
       backgroundColor: 'rgba(0, 0, 0, 0.2)', // Semi-transparent background
+      textAlign:'center'
     },
   });
 
@@ -47,6 +49,7 @@ const News = () => {
   const [loading, setLoading] = useState(false);
   const flatListRef = useRef(null);
   const [showMessage, setShowMessage] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     Animated.timing(
@@ -59,13 +62,11 @@ const News = () => {
     ).start();
   }, [translateYAnim]);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      getNewsList(paginationMetaData, true);
-      return () => { };
-    }, [])
-  );
 
+  useEffect(() => {
+    getNewsList(paginationMetaData, true);
+
+  }, []);
   const getNewsList = (payload, initialLoad = false) => {
     setLoading(true);
     try {
@@ -130,7 +131,7 @@ const News = () => {
     <View style={{ flex: 1 }}>
        {listOfEntries.length === 0 && !loading && (
         <View style={styles.loadingContainer}>
-          <Text>వార్తలు ఏవీ అందుబాటులో లేవు.. కొంత సమయం తర్వాత తిరిగి రండి...</Text>
+          <Text>{t('homeScreen.noNews')}</Text>
         </View>
       )}
       <Animated.FlatList
