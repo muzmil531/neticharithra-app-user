@@ -249,6 +249,7 @@ const publicUserStyles = StyleSheet.create({
         color: '#007bff', // Adjust color as needed
         fontWeight: 'bold',
         paddingHorizontal: 10,
+        marginLeft: 10
     },
     newsPreferences: {
         padding: 20,

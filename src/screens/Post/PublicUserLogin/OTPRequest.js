@@ -14,7 +14,7 @@ const OTPRequest = (props) => {
     const [phoneNumber, setPhoneNumber] = useState('');
     const { t } = useTranslation();
     const [showSections, setShowSections] = useState({
-        otpField: true,
+        otpField: false,
         userDetails: false
     });
     const navigation = useNavigation();

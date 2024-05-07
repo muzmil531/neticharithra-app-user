@@ -1,11 +1,4 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import { NavigationContainer,DefaultTheme } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import React from 'react';
 import type { PropsWithChildren } from 'react';
 import {
@@ -24,16 +17,13 @@ import Main from './src/route/Main';
 import Colors from './src/colors/Colors';
 
 import i18next from './services/i18next'
+
 type SectionProps = PropsWithChildren<{
   title: string;
 }>;
 
 function App(): React.JSX.Element {
-  // const isDarkMode = useColorScheme() === 'dark';
-
-
   const colors = Colors[useColorScheme()]
-
   const navTheme = {
     ...DefaultTheme,
     colors: {
@@ -44,15 +34,14 @@ function App(): React.JSX.Element {
   };
   return (
     <SafeAreaProvider>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        {/* <BottomSheetModalProvider> */}
+      <GestureHandlerRootView >
+        <SafeAreaView style={{ flex: 1 }}>
           <NavigationContainer theme={navTheme}>
             <Main />
           </NavigationContainer>
-        {/* </BottomSheetModalProvider> */}
+        </SafeAreaView>
       </GestureHandlerRootView>
     </SafeAreaProvider>
-   
   );
 }
 

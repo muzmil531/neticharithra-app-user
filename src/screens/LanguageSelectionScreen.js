@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Alert } from 'react-native';
+import { View, Text, StyleSheet, Alert, Dimensions } from 'react-native';
 import { Appbar, Avatar, Button, Card, Checkbox } from 'react-native-paper';
 import { scaleFont } from '../handelers/ReusableHandeler';
 
@@ -125,12 +125,14 @@ const LanguageSelectionScreen = ({ }) => {
     );
 };
 
+const screenHeight = Dimensions.get('window').height;
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
     header: {
-        height: 'auto',
+        // height: 'auto',
         elevation: 3,
         paddingVertical: 20,
         paddingHorizontal: 10,
