@@ -13,7 +13,7 @@ import { retrieveData, saveData } from '../../handelers/AsyncStorageHandeler';
 import { useTranslation } from 'react-i18next';
 import DFM from '../../components/DFM';
 
-const SpecificDistrict = () => {
+const SpecificDistrict = (props) => {
     const styles = StyleSheet.create({
         scrollDownIndicator: {
             position: 'absolute',
@@ -145,17 +145,23 @@ const SpecificDistrict = () => {
             // clearAllData()
             const fetchData = async () => {
 
+                let dfm = await t('homeScreen.addDistrictDFM', { returnObjects: true }) || [];
+                setDFMFields(dfm)
+
                 let data = await retrieveData('userSavedLocation');
+                console.log('dataaa', data)
+                getMetaData();
+                if (data?.state?.value) {
+                    getMetaData(data?.state?.value, data)
+                }
+
                 if (data) {
                     setsavedLocationInfo(data);
+                    setformValue(data)
                     console.log(data);
                     setShowScreen(true);
                     getNewsList({ ...paginationMetaData, ...data }, true);
 
-                } else {
-                    let dfm = await t('homeScreen.addDistrictDFM', { returnObjects: true }) || [];
-                    setDFMFields(dfm)
-                    getMetaData();
                 }
                 // initialLoad()
             };
@@ -173,9 +179,10 @@ const SpecificDistrict = () => {
 
 
 
-    getMetaData = (stateId) => {
+    getMetaData = (stateId, values) => {
         try {
             // 'AP_DISTRICTS', 'AP_DISTRICT_MANDALS'
+            console.log("stateId", stateId)
             const metaList = stateId ? [stateId + '_DISTRICTS', stateId + '_DISTRICT_MANDALS_REGIONAL'] : ['STATES']
             post(EndPointConfig.getMetaData, { metaList })
                 .then(function (response) {
@@ -192,6 +199,11 @@ const SpecificDistrict = () => {
                             options.town_all = response?.data[metaList[1]] || [];
                         }
 
+                        if (values) {
+
+                            options.town = options.town_all[values?.district?.value]
+
+                        }
                         // Update fieldOptions state using the current state and new options
                         setfieldOptions(prev => ({
                             ...prev,
@@ -230,7 +242,12 @@ const SpecificDistrict = () => {
         } else if (event?.type === 'submit') {
             let resp = await saveData('userSavedLocation', JSON.stringify(event?.values) || {})
             setTimeout(() => {
-                NativeModules.DevSettings.reload();
+                if (props?.redirectBack) {
+                    props?.redirectBack({ 'status': "success" })
+                } else {
+
+                    NativeModules.DevSettings.reload();
+                }
 
             }, 1000);
         }
@@ -244,10 +261,10 @@ const SpecificDistrict = () => {
                 <>
 
                     {
-                        savedLocationInfo &&
+                        savedLocationInfo && !props?.directDFM &&
 
                         <>
-                            <View style={{ flex: 1 }}>
+                            <View >
                                 {listOfEntries.length === 0 && !loading && (
                                     <View style={styles.loadingContainer}>
                                         <Text>{t('homeScreen.noNews')}</Text>
@@ -330,9 +347,9 @@ const SpecificDistrict = () => {
                         </>
                     }
                     {
-                        !savedLocationInfo && <>
+                        (!savedLocationInfo || props?.directDFM) && <>
                             {dfmFields &&
-                                <DFM dfmForm={dfmFields} dfmValues={formValue} fieldOptions={fieldOptions} onFormSubmit={formSubmitHandeler} />
+                                <DFM dfmForm={dfmFields} maxHeight={props?.dfmHeight} dfmValues={formValue} fieldOptions={fieldOptions} onFormSubmit={formSubmitHandeler} />
                             }
 
 

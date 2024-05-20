@@ -25,7 +25,7 @@ const DFM = forwardRef(({ dfmValues, dfmForm, fieldOptions, onFormSubmit, editFi
 
     const [dfmFieldsList, setDFMFieldsList] = useState([])
 
-    const {t} = useTranslation()
+    const { t } = useTranslation()
     useEffect(() => {
 
         if (!dfmValues) {
@@ -33,6 +33,7 @@ const DFM = forwardRef(({ dfmValues, dfmForm, fieldOptions, onFormSubmit, editFi
         } else {
             updateFormValues();
         }
+        // console.log("values", dfmValues)
     }, [dfmValues])
     // useEffect(() => {
 
@@ -359,26 +360,26 @@ const DFM = forwardRef(({ dfmValues, dfmForm, fieldOptions, onFormSubmit, editFi
 
         })
         setTimeout(() => {
-            
-        console.log(images)
-        console.log(BASE_URL + EndPointConfig.uploadFilesS3)
-        axios.post(BASE_URL + EndPointConfig.uploadFilesS3, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        })
-            .then((response) => {
 
-                setFormValues(prev => ({
-                    ...prev,
-                    [field.key]: Array.isArray(prev[field.key])
-                      ? [...prev[field.key], ...response.data.data]
-                      : [...response.data.data]
-                  }));
+            console.log(images)
+            console.log(BASE_URL + EndPointConfig.uploadFilesS3)
+            axios.post(BASE_URL + EndPointConfig.uploadFilesS3, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
             })
-            .catch((error) => {
-                console.error('Error uploading image:', error);
-            });
+                .then((response) => {
+
+                    setFormValues(prev => ({
+                        ...prev,
+                        [field.key]: Array.isArray(prev[field.key])
+                            ? [...prev[field.key], ...response.data.data]
+                            : [...response.data.data]
+                    }));
+                })
+                .catch((error) => {
+                    console.error('Error uploading image:', error);
+                });
         }, 500);
     };
 
@@ -390,7 +391,7 @@ const DFM = forwardRef(({ dfmValues, dfmForm, fieldOptions, onFormSubmit, editFi
             alignItems: 'center',
             // paddingHorizontal: 20,
             marginBottom: 10,
-            marginTop:10
+            marginTop: 10
         },
         heading: {
             fontSize: 20,
@@ -434,7 +435,7 @@ const DFM = forwardRef(({ dfmValues, dfmForm, fieldOptions, onFormSubmit, editFi
     });
 
     const renderImages = (imagesList) => {
-        if(imagesList?.length > 0){
+        if (imagesList?.length > 0) {
             return imagesList.map((imageUrl, index) => {
                 return (
                     <View key={index} style={stylesUploade.imageContainer}>
@@ -452,11 +453,11 @@ const DFM = forwardRef(({ dfmValues, dfmForm, fieldOptions, onFormSubmit, editFi
             });
         } else {
             return (<>
-            
-            <Text>
-{
-            t('noImages')}
-            </Text>
+
+                <Text>
+                    {
+                        t('noImages')}
+                </Text>
             </>)
         }
     };
@@ -777,7 +778,6 @@ const DFM = forwardRef(({ dfmValues, dfmForm, fieldOptions, onFormSubmit, editFi
                     })
                     }
                 </View>
-                {/* <LoaderScreen loading={loader} /> */}
 
             </ScrollView>
 

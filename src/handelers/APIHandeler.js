@@ -20,17 +20,17 @@ const api = axios.create({
 
 const handleError = (error) => {
     // Handle errors here (e.g., logging, showing a message to the user)
-    console.error( "error");
-    console.error( error);
-     if (error.response) {
-            // The request was made and the server responded with a status code
-        } else if (error.request) {
-            // The request was made but no response was received
-            console.log('Request:', error.request);
-        } else {
-            // Something happened in setting up the request that triggered an error
-            console.log('Error:', error.message);
-        }
+    console.error("error");
+    console.error(error);
+    if (error.response) {
+        // The request was made and the server responded with a status code
+    } else if (error.request) {
+        // The request was made but no response was received
+        console.log('Request:', error.request);
+    } else {
+        // Something happened in setting up the request that triggered an error
+        console.log('Error:', error.message);
+    }
     // ToastService.showError(error.toString());
     return null
     // throw error; // Rethrow the error to propagate it to the caller
@@ -51,28 +51,28 @@ export const post = async (endpoint, data = {}) => {
     try {
 
         let dataLang = await retrieveData('userLanguageSaved', 'string');
-        console.log(dataLang)
-        let requestPayLoad = {...data, language:dataLang || 'en'};
+        // console.log(dataLang)
+        let requestPayLoad = { ...data, language: dataLang || 'en' };
 
 
 
 
 
-        console.log(endpoint + ' Request Payload : ', JSON.stringify(requestPayLoad, null, 4));
+        // console.log(endpoint + ' Request Payload : ', JSON.stringify(requestPayLoad, null, 4));
 
         const response = await api.post(endpoint, requestPayLoad);
 
-        console.log(endpoint + ' Response : ', JSON.stringify(response.data, null, 4));
+        // console.log(endpoint + ' Response : ', JSON.stringify(response.data, null, 4));
         // return response
         if (([200].indexOf(response?.status) > -1)) {
             return response?.data ? response.data : null;
-        } 
+        }
 
     } catch (error) {
 
         // console.log(' Error : ', JSON.stringify(error, null, 4));
 
-       
+
         // ToastService.showError('Something went wrong..! Try after some time..!'); // Use the reusable ToastService
         handleError(error);
         Alert.alert(error?.toString())
