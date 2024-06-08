@@ -1,3 +1,5 @@
+import { formatDistanceToNow } from 'date-fns'
+
 export function epochToDate(epoch) {
     // Convert epoch to milliseconds
     const date = new Date(epoch );
@@ -41,3 +43,7 @@ export const calculateNumberOfLines = (percentageHeight, fontSize) => {
     return numberOfLines;
 };
 
+
+export function timeAgo(date) {
+    return formatDistanceToNow(new Date(date), { addSuffix: true })
+}

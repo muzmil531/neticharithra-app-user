@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "280305038691",
+    "project_id": "neticharithra-ncmedia",
+    "storage_bucket": "neticharithra-ncmedia.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:280305038691:android:0a7afa58c1576729d04f56",
+        "android_client_info": {
+          "package_name": "com.neticharithramobileapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "280305038691-ejv2d0oleur8gei0scg8818etc1jglue.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDIZvcBgCeQbLAP09Ao1mVWDeIR3z-GiJY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "280305038691-ejv2d0oleur8gei0scg8818etc1jglue.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -17,18 +17,24 @@
       },
       {
         "heading": " ",
-        "route": "HomeScreen",
-        "iconType": "FontAwesome5"
+        "route": "DetailedNewsInfo",
+        "iconType": "FontAwesome5",
+        "noRoute": true
       },
       {
         "heading": "Post",
-        "route": "HomeScreen",
+        "route": "PostIndex",
         "iconType": "FontAwesome5",
         "icon": "plus-circle"
       },
       {
+        "heading": "DetailedNewsInfo",
+        "route": "DetailedNewsInfo",
+        "hide": true
+      },
+      {
         "heading": "Settings",
-        "route": "SearchScreen",
+        "route": "Settings",
         "iconType": "FontAwesome5",
         "icon": "cogs"
       }
@@ -118,5 +124,219 @@
         "name": "Category"
       }
     ]
+  },
+  "postScreen": {
+    "tabsInitialOTPRequest": [
+      {
+        "heading": "OTP Request",
+        "route": "PostIndex/OTPRequest",
+        "iconType": "FontAwesome5",
+        "icon": "plus-circle"
+      },
+      {
+        "heading": "Home",
+        "route": "PostIndex/PublicUserSummary",
+        "iconType": "FontAwesome5",
+        "icon": "plus-circle"
+      },
+      {
+        "heading": "News Post",
+        "route": "PostIndex/PublicNewsPost",
+        "iconType": "FontAwesome5",
+        "icon": "plus-circle"
+      }
+    ],
+    "tabsNewsAccess": [
+      {
+        "heading": "Home",
+        "route": "PostIndex/PublicUserSummary",
+        "iconType": "FontAwesome5",
+        "icon": "plus-circle"
+      },
+      {
+        "heading": "Post News",
+        "route": "PostIndex/PublicNewsPost",
+        "iconType": "FontAwesome5",
+        "icon": "plus-circle"
+      }
+    ],
+    "validMobileNumberError1": "Check your mobile number..",
+    "validMobileNumberError2": "Incorrect Mobile Number",
+    "addNews": {
+      "fields": [
+        {
+          "type": "text",
+          "key": "title",
+          "label": "Title",
+          "required": true
+        },
+        {
+          "type": "text",
+          "key": "sub_title",
+          "label": "Sub Title",
+          "required": false
+        },
+        {
+          "type": "text",
+          "key": "description",
+          "label": "Description",
+          "required": true
+        },
+        {
+          "type": "imageUpload",
+          "key": "images",
+          "label": "Images",
+          "default": [],
+          "required": false
+        },
+        {
+          "type": "select",
+          "key": "category",
+          "label": "Category",
+          "bindLabel": "te",
+          "bindValue": "label",
+          "fullObject": false,
+          "hideSelectKey": true,
+          "required": true,
+          "options": [],
+          "emitInstantChange": true
+        },
+        {
+          "type": "select",
+          "key": "newsType",
+          "label": "Local / Reginal / International",
+          "bindLabel": "te",
+          "bindValue": "value",
+          "fullObject": false,
+          "hideSelectKey": true,
+          "required": true,
+          "options": [],
+          "emitInstantChange": true
+        },
+        {
+          "type": "select",
+          "key": "state",
+          "label": "State",
+          "bindLabel": "te",
+          "bindValue": "value",
+          "fullObject": false,
+          "hideSelectKey": true,
+          "required": true,
+          "options": [],
+          "emitInstantChange": true,
+          "onChangeMakeValuesEmpty": [
+            "district",
+            "mandal"
+          ]
+        },
+        {
+          "type": "select",
+          "key": "district",
+          "label": "District",
+          "bindLabel": "te",
+          "hideSelectKey": true,
+          "bindValue": "value",
+          "fullObject": false,
+          "required": true,
+          "options": [],
+          "emitInstantChange": true,
+          "onChangeMakeValuesEmpty": [
+            "mandal"
+          ]
+        },
+        {
+          "type": "select",
+          "key": "mandal",
+          "label": "Mandal / Town",
+          "bindLabel": "te",
+          "bindValue": "label",
+          "fullObject": false,
+          "hideSelectKey": true,
+          "required": true,
+          "options": []
+        }
+      ],
+      "bottomActions": [
+        {
+          "type": "submit",
+          "label": "Save and Proceed",
+          "action": "submit",
+          "icon": "",
+          "buttonType": "primary"
+        }
+      ],
+      "bottomConfigurations": {
+        "marginBottom": 155
+      }
+    },
+    "newPost": "New Post",
+    "noNewsAvailable": "No.. News available..!"
+  },
+  "settingsScreen": {
+    "yourDetails": "Details",
+    "mobileNumber": "Mobile Number",
+    "emailId": "Email ID",
+    "address": "Address",
+    "newsPreferance": "Your News Preferences",
+    "mandal": "Mandal",
+    "district": "District",
+    "state": "State",
+    "pending": "Pending",
+    "approved": "Published",
+    "rejected": "Rejected"
+  },
+  "userDetailsDFM": {
+    "fields": [
+      {
+        "type": "text",
+        "key": "name",
+        "label": "Name",
+        "required": true,
+        "disabled": false
+      },
+      {
+        "type": "text",
+        "key": "countryCode",
+        "label": "Country Code",
+        "required": true,
+        "disabled": true
+      },
+      {
+        "type": "text",
+        "key": "mobileNumber",
+        "label": "Mobile Number",
+        "keyboardType": "number-pad",
+        "required": true,
+        "disabled": true
+      },
+      {
+        "type": "text",
+        "key": "mail",
+        "label": "Email ID",
+        "keyboardType": "email-address",
+        "required": false,
+        "disabled": false
+      },
+      {
+        "type": "text",
+        "key": "address",
+        "label": "Address",
+        "keyboardType": "email-address",
+        "required": false,
+        "disabled": false
+      }
+    ],
+    "bottomActions": [
+      {
+        "type": "submit",
+        "label": "Save and Proceed",
+        "action": "submit",
+        "icon": "",
+        "buttonType": "primary"
+      }
+    ],
+    "bottomConfigurations": {
+      "marginBottom": 30
+    }
   }
 }

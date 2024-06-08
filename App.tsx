@@ -1,5 +1,5 @@
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import type { PropsWithChildren } from 'react';
 import {
   SafeAreaView,
@@ -17,6 +17,7 @@ import Main from './src/route/Main';
 import Colors from './src/colors/Colors';
 
 import i18next from './services/i18next'
+import { foreGroundNotification, requestUserPermission } from './src/services/NotificationServices';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -32,6 +33,16 @@ function App(): React.JSX.Element {
       text: colors.heading
     },
   };
+
+  useEffect(() => {
+    
+    requestUserPermission()
+    foreGroundNotification()
+    return () => {
+      
+    }
+  }, [])
+  
   return (
     <SafeAreaProvider>
       <GestureHandlerRootView >

@@ -12,6 +12,7 @@ import { getJSONData } from '../../components/dfmFields';
 import { retrieveData, saveData } from '../../handelers/AsyncStorageHandeler';
 import { useTranslation } from 'react-i18next';
 import DFM from '../../components/DFM';
+import RNRestart from 'react-native-restart';
 
 const SpecificDistrict = (props) => {
     const styles = StyleSheet.create({
@@ -246,7 +247,9 @@ const SpecificDistrict = (props) => {
                     props?.redirectBack({ 'status': "success" })
                 } else {
 
-                    NativeModules.DevSettings.reload();
+                    RNRestart.Restart();
+
+                    // NativeModules.DevSettings.reload();
                 }
 
             }, 1000);

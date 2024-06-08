@@ -5,8 +5,8 @@ import axios from 'axios';
 import { Alert, Linking, Platform, PermissionsAndroid } from 'react-native';
 import { retrieveData } from './AsyncStorageHandeler';
 
-// export const BASE_URL = 'http://192.168.10.219:3000/api/v2/';
-export const BASE_URL = 'http://192.168.11.238:3000/api/v2/';
+// export const BASE_URL = 'http://192.168.11.181:3000/api/v2/';
+export const BASE_URL = 'http://192.168.0.108:3000/api/v2/';
 // export const BASE_URL = 'https://viridian-slug-sari.cyclic.app/api/v2/';
 
 // const api={};

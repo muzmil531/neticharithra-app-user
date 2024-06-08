@@ -39,12 +39,12 @@ const NewsContainer = (props) => {
             padding: 10,
         },
         title: {
-            fontSize: scaleFont(14), // Increase font size for title
+            fontSize: scaleFont(16), // Increase font size for title
             fontWeight: 'bold', color: '#666',
             // marginBottom: 5,
         },
         sub_title: {
-            fontSize: scaleFont(12), // Increase font size for subTitle
+            fontSize: scaleFont(14), // Increase font size for subTitle
             // color: '#dcc', // Change color for subtitle
             fontWeight: 'bold', // Make subtitle bold
             marginBottom: 5,
@@ -96,6 +96,7 @@ const NewsContainer = (props) => {
             color: '#007AFF',
             fontWeight: 'bold',
             fontSize: scaleFont(12),
+            textAlign:'right'
         },
     });
 

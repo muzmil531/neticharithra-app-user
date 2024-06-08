@@ -71,7 +71,7 @@ const HomeScreen = () => {
                         scrollEnabled: true,
                         tabBarLabelStyle: {
                             fontWeight: 'bold',
-                            fontSize: scaleFont(12)
+                            fontSize: scaleFont(14)
                         },
                     }}>
                     {screens.map(screen => (

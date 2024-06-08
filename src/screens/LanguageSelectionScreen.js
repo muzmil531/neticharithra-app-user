@@ -125,7 +125,6 @@ const LanguageSelectionScreen = ({ }) => {
     );
 };
 
-const screenHeight = Dimensions.get('window').height;
 
 const styles = StyleSheet.create({
     container: {

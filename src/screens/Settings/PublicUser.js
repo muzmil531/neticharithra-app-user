@@ -274,7 +274,9 @@ const PublicUser = ({ }) => {
                             </View>
                         </View>
                     }
-
+ <TouchableOpacity style={publicUserStyles.logoutButton} onPress={()=>{navigation.navigate('MainScreen')}}>
+                            <Text style={publicUserStyles.logoutButtonText}>Change Language</Text>
+                        </TouchableOpacity>
 
                     {
                         userLoggedInfo &&
@@ -324,8 +326,7 @@ const PublicUser = ({ }) => {
                             }}
                             name="close"
                         />
-                        {/*  */}
-
+                      
                     </TouchableOpacity>
                 </View>
             </Modal>

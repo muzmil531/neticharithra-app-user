@@ -18,7 +18,7 @@ let screenBuilderRegistry = new Map<ScreenName, ScreenBuilderType>();
  * Returns a function for lazily loading a screen.
  */
 export function getScreenBuilder(screen: ScreenName, parent: any): ScreenBuilderType {
-    console.log(screen)
+    // console.log(screen)
     if (!screenBuilderRegistry.has(screen)) {
         let cached: ScreenType | null = null;
         const builder = () => {
@@ -53,8 +53,18 @@ function getScreen(screenName: any, parent: any): ScreenType {
             return require('./../screenHandelers/IndexScreen').default;
         case 'HomeScreen':
             return require('./../screenHandelers/HomeScreen').default;      
+        case 'HomePageScreens':
+            return require('./../screenHandelers/HomePageScreens').default;      
         case 'SearchScreen':
             return require('./../screenHandelers/SearchScreen').default;
+        case 'SearchScreenV2':
+            return require('./../screens/Search/SearchScreenV2').default;
+        case 'AllNews':
+            return require('./../screens/HomePage/AllNews').default;
+        case 'Categorised':
+            return require('./../screens/HomePage/Categorised').default;
+        case 'NewsContainerV2':
+            return require('./../components/NewsContainerV2').default;
         case 'News':
             return require('./../screens/News/News').default;
         case 'SpecificDistrict':

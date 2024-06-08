@@ -37,7 +37,7 @@ export default function Main() {
     }, []);
 
 
-    const screens = ['IndexScreen','MainScreen', 'HomeScreen', 'SearchScreen','DetailedNewsInfo']
+    const screens = ['IndexScreen','MainScreen', 'HomeScreen', 'SearchScreen','DetailedNewsInfo','NewsContainerV2']
 
 
     return (
