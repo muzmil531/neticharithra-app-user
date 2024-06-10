@@ -1,4 +1,4 @@
-import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, StyleSheet, Text, View, useColorScheme } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { getScreenBuilder } from '../route/ScreenRegistry';
@@ -6,6 +6,7 @@ import { post } from '../handelers/APIHandeler';
 import EndPointConfig from '../handelers/EndPointConfig';
 import { useFocusEffect } from '@react-navigation/native';
 import { retrieveData } from '../handelers/AsyncStorageHandeler';
+import Colors from '../colors/Colors';
 
 const Tab = createMaterialTopTabNavigator();
 let height = Dimensions.get('screen').height;
@@ -14,6 +15,7 @@ const HomePageScreens = () => {
 
     let [listOfCategories, setListOfCategories] = useState([]);
     let [userLanguage, setUserLanguage] = useState('label');
+    const colors=Colors[useColorScheme()]
 
     useFocusEffect(
         React.useCallback(() => {
@@ -58,7 +60,7 @@ const HomePageScreens = () => {
                 screenOptions={{
                     tabBarActiveTintColor: '#e91e63',
                     tabBarLabelStyle: { fontSize: 16, color: 'black', textTransform: 'none' },
-                    tabBarStyle: { backgroundColor: 'white', padding: 0, margin: 0 },
+                    tabBarStyle: { backgroundColor: colors.headerThemeBg, color:colors.headerThemeText      , padding: 0, margin: 0 },
                     tabBarIndicatorStyle: { backgroundColor: '#B61F24' },
                     tabBarScrollEnabled: true, // Enable scrolling
                     tabBarItemStyle: { width: 100, margin: 0, padding: 0 }, 

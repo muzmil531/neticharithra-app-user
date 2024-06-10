@@ -104,7 +104,7 @@ const AllNews = () => {
   };
 
   return (
-    <View style={{ backgroundColor: '#f4f3f38f', flex: 1}}>
+    <View style={{  flex: 1 }}>
       <ExampleParallaxCarousel newsItems={topPriorityNews} />
       {initalLoading && 
       

@@ -9,6 +9,7 @@ const colorTheme = {
     activeColor: "#442EB7",
     black: "black",
 
+    greyColor:"#f7f7f7",
 
 
     // darkmode
@@ -22,7 +23,9 @@ const colorTheme = {
 };
 
 const light = {
-    navColor: colorTheme.white,
+    navColor: colorTheme.greyColor,
+    headerThemeBg:colorTheme.white,
+    headerThemeText:colorTheme.black,
     heading: colorTheme.black,
     textColor: colorTheme.grey,
     borderColor: colorTheme.grey,
@@ -42,7 +45,8 @@ const light = {
     subChipActiveBackground: colorTheme.grey,
     subChipText: colorTheme.pallateColor5,
     subChipActiveText:colorTheme.white,
-    bottomNavbarItemsopacity:0
+    bottomNavbarItemsopacity:0,
+    surface:colorTheme.white
     
 };
 
