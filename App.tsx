@@ -17,7 +17,7 @@ import Main from './src/route/Main';
 import Colors from './src/colors/Colors';
 
 import i18next from './services/i18next'
-import { foreGroundNotification, requestUserPermission } from './src/services/NotificationServices';
+// import { foreGroundNotification, requestUserPermission } from './src/services/NotificationServices';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -35,14 +35,14 @@ function App(): React.JSX.Element {
   };
 
   useEffect(() => {
-    
-    requestUserPermission()
-    foreGroundNotification()
+
+    // requestUserPermission()
+    // foreGroundNotification()
     return () => {
-      
+
     }
   }, [])
-  
+
   return (
     <SafeAreaProvider>
       <GestureHandlerRootView >
@@ -57,7 +57,7 @@ function App(): React.JSX.Element {
 }
 
 const styles = StyleSheet.create({
- 
+
 });
 
 export default App;

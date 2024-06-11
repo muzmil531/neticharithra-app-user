@@ -34,9 +34,9 @@ const NewsContainerV2 = () => {
                     style={styles.image}
                 />
                 <View style={[styles.textContainer]}>
-                    <TouchableOpacity onPress={()=>{navigation.goBack()}}>
+                    <TouchableOpacity onPress={() => { navigation.goBack() }}>
 
-                    <Ionicons name={'chevron-back'} color={"#fff"} style={[{ fontSize: 30, fontWeight: 'bold2' }, styles.textStyleShadowLeft, styles.textStyleShadowRight, styles.textStyleShadowTop, styles.textStyleShadowBottom]} />
+                        <Ionicons name={'chevron-back'} color={"#fff"} style={[{ fontSize: 30, fontWeight: 'bold2' }, styles.textStyleShadowLeft, styles.textStyleShadowRight, styles.textStyleShadowTop, styles.textStyleShadowBottom]} />
                     </TouchableOpacity>
                     <Ionicons name={'share-social-sharp'} color={"#fff"} style={[{ fontSize: 25, paddingHorizontal: 10 }, styles.textStyleShadowLeft, styles.textStyleShadowRight, styles.textStyleShadowTop, styles.textStyleShadowBottom]} />
                     {/* <Text>HU</Text> */}
@@ -64,8 +64,8 @@ const NewsContainerV2 = () => {
                 />
                 <View style={styles.overlayText}>
                     <ScrollView>
-                        <Text style={{fontSize:30, color:'#000', borderLeftWidth:3, borderLeftColor:"#B61F24", paddingLeft:20, fontWeight:'bold'}}>{route?.params?.data?.title}</Text>
-                        <Text style={{fontSize:14, color:'#000',paddingLeft:0, marginTop:15}}>{route?.params?.data?.description}</Text>
+                        <Text style={{ fontSize: 30, color: '#000', borderLeftWidth: 3, borderLeftColor: "#B61F24", paddingLeft: 20, fontWeight: 'bold' }}>{route?.params?.data?.title}</Text>
+                        <Text style={{ fontSize: 14, color: '#000', paddingLeft: 0, marginTop: 15 }}>{route?.params?.data?.description}</Text>
 
                     </ScrollView>
                 </View>
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: 'black',
         // textAlign: 'center',
-        top: 0, left: 0, width: '100%', height: "85%", paddingHorizontal:20
+        top: 0, left: 0, width: '100%', height: "85%", paddingHorizontal: 20
     },
     image: {
         width: "100%",

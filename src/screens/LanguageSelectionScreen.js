@@ -17,8 +17,9 @@ export const languageList = [
         "name": "English",
         "nativeName": "English",
         "code": "en",
-        "styles":{
-            fontWeight:"bold", fontSize: scaleFont(30)
+        'letter': "A",
+        "styles": {
+            fontWeight: "bold", fontSize: scaleFont(30)
         }
     },
     {
@@ -26,12 +27,14 @@ export const languageList = [
         "color": "#FF6969",
         "name": "Telugu",
         "nativeName": "తెలుగు",
-        "code": "te"
+        "code": "te",
+
+        letter: "అ"
     }
 ];
 
 const LanguageSelectionScreen = ({ }) => {
-    const [selectedLanguage, setSelectedLanguage] = useState(null);
+    const [selectedLanguage, setSelectedLanguage] = useState("te");
 
     const { t } = useTranslation();
 
@@ -45,7 +48,7 @@ const LanguageSelectionScreen = ({ }) => {
             const fetchData = async () => {
                 try {
                     let language = await retrieveData('userLanguageSaved', 'string');
-                    setSelectedLanguage(language);
+                    // setSelectedLanguage(language);
                 } catch (error) {
                     console.error('Error retrieving user language:', error);
                 }
@@ -68,37 +71,37 @@ const LanguageSelectionScreen = ({ }) => {
 
     return (
         <View style={styles.container}>
-            <Appbar.Header style={styles.header}>
+            <View style={styles.header}>
                 <CustomHeader />
-            </Appbar.Header>
+            </View>
             <View style={styles.content}>
+                <Text style={styles.title}>All Languages</Text>
                 {languageList.map((lang, index) => (
                     <TouchableOpacity key={index} onPress={() => setSelectedLanguage(lang.code)} activeOpacity={0.8}>
-                        <Card style={[styles.card, { borderBottomColor: lang.color, borderBottomWidth: 2 }]} elevation={4}>
-                            <Card.Content style={styles.cardContent}>
-                                <View style={styles.logo}>
-                                    {lang.imageName && <Avatar.Image size={48} source={lang.imageName} />}
-                                </View>
-                                <View style={styles.textContainer}>
-                                    <View style={styles.textRow}>
-                                        <Text style={[styles.nativeNameText, { color: lang.color }, lang.styles || {}]}>{lang.nativeName}</Text>
-                                        <Text style={styles.nameText}>{lang.name}</Text>
-                                    </View>
-                                </View>
-                                <View style={styles.checkboxContainer}>
-                                    <Checkbox status={selectedLanguage === lang?.code ? "checked" : "unchecked"}
 
-                                        onPress={() => {
-
-                                            console.log(lang.code)
-                                            // setSelectedLanguage(lang.code)
-                                        }}
-
-                                    />
+                        <View style={{ margin: 10, padding: 10, borderRadius: 50, backgroundColor: selectedLanguage === lang?.code ? '#3AA2DB' : '#fff', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <View style={{ flexDirection: 'row' }}>
+                                <View style={{ backgroundColor: selectedLanguage === lang?.code ? 'white' : '#3AA2DB', padding: 5, borderRadius: 50, width: 40, height: 40, justifyContent: 'center', alignItems: 'center' }}>
+                                    <Text style={{ fontSize: 20, color: selectedLanguage === lang?.code ? '#000' : '#fff' }}>{lang?.letter}</Text>
                                 </View>
-                            </Card.Content>
-                            <View style={styles.colorBar} />
-                        </Card>
+                                <View style={{ padding: 5, justifyContent: 'center', alignItems: 'center' }}>
+                                    <Text style={{ fontSize: 20, color: selectedLanguage === lang?.code ? '#fff' : '#000' }}>{lang?.nativeName}</Text>
+                                </View>
+                            </View>
+                            <View style={{ marginRight: 10 }}>
+                                <View style={{ width: 14, height: 14, borderRadius: 50, justifyContent: 'center', alignItems: 'center', borderColor: selectedLanguage === lang?.code ? 'white' : 'black', borderWidth: 1 }}>
+
+                                    {
+                                        selectedLanguage === lang?.code &&
+
+                                        <View style={{ width: 8, height: 8, backgroundColor: 'white', borderRadius: 50 }}>
+
+                                        </View>
+                                    }
+                                </View>
+                            </View>
+                        </View>
+
                     </TouchableOpacity>
                 ))}
                 <Button mode="contained" onPress={async () => {
@@ -128,7 +131,7 @@ const LanguageSelectionScreen = ({ }) => {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flex: 1
     },
     header: {
         // height: 'auto',
@@ -143,7 +146,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     headerTitle: {
-        fontSize: scaleFont(20)
+        fontSize: scaleFont(14)
     },
     content: {
         flex: 1,
@@ -189,6 +192,9 @@ const styles = StyleSheet.create({
         marginTop: 20,
         backgroundColor: '#000B49', // or any color you prefer
     },
+    title: {
+        fontSize: scaleFont(14), fontWeight: 'bold'
+    }
 });
 
 export default LanguageSelectionScreen;

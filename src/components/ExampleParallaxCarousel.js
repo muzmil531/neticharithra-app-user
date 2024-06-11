@@ -21,11 +21,16 @@ const ExampleParallaxCarousel = (props) => {
         />
         {
           item?.approvedOn &&
-          <Text style={styles.title2}>
-            {timeAgo(new Date(item?.approvedOn))}
-          </Text>
+          <View style={styles.titleContianerV2}>
+            <Text style={styles.title2}>
+              {timeAgo(new Date(item?.approvedOn))}
+            </Text>
+          </View>
         }
-        <Text style={styles.title}>{item?.newsId} {item?.title}</Text>
+        <View style={styles.titleContianer}>
+
+          <Text style={styles.title}>{item?.title}</Text>
+        </View>
       </View>
     );
   };
@@ -66,37 +71,49 @@ const styles = StyleSheet.create({
   },
   item: {
     width: screenWidth - 60,
-    height: 200
+    height: 200, borderRadius: 30
   },
   imageContainer: {
     flex: 1,
     marginBottom: Platform.select({ ios: 0, android: 1 }),
     backgroundColor: 'white',
-    borderRadius: 8,
+    borderRadius: 8, borderRadius: 15
   },
   image: {
     resizeMode: 'cover',
   },
-  title: {
+  titleContianer: {
+
     backgroundColor: '#0000007d',
     position: 'absolute',
     bottom: 0,
     left: 0,
-    padding: 20, paddingTop: 2,
+    width: "100%",
+    padding: 15,
+    borderBottomLeftRadius: 15,
+    borderBottomRightRadius: 15
+  },
+  title: {
+
     color: 'white',
-    fontSize: 20,
-    width: '100%',
+    fontSize: 16,
+    // width: '100%',
 
   },
-  title2: {
+  titleContianerV2: {
+
     position: 'absolute',
     top: 0,
     left: 0,
-    padding: 20,
-    color: 'white',
+    padding: 15,
     width: '100%',
+    backgroundColor: '#0000007d',
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15
+  },
+  title2: {
+    color: 'white',
     fontSize: 14,
-    backgroundColor: '#0000007d'
   },
   paginationContainer: {
     paddingVertical: 10,

@@ -11,6 +11,7 @@ import EndPointConfig from '../../handelers/EndPointConfig'
 import { ActivityIndicator } from 'react-native-paper'
 import EmptyListComponent from '../../components/EmptyListComponent'
 import LoadingScreen from '../../components/LoadingScreen'
+import TabScreenWrapper from '../../components/TabScreenWrapper'
 
 const Categorised = () => {
   let [topPriorityNews, setTopPriorityNews] = useState([])
@@ -53,8 +54,8 @@ const Categorised = () => {
     try {
       // const metaList = ['NEWS_CATEGORIES_REGIONAL'];
       let payload = { ...paginationMetaData, ...{ language: lang } }
-      payload = {...payload, ...{category:route?.params?.mainProp?.label}}
-      post(EndPointConfig.getNewsInfoV2,payload)
+      payload = { ...payload, ...{ category: route?.params?.mainProp?.label } }
+      post(EndPointConfig.getNewsInfoV2, payload)
         .then(function (response) {
           if (response?.status === 'success') {
             setTopPriorityNews(response?.data || []);
@@ -76,7 +77,7 @@ const Categorised = () => {
       if (!additionalPayload) {
         additionalPayload = paginationMetaData
       }
-      additionalPayload = {...additionalPayload, ...{category:route?.params?.mainProp?.label}}
+      additionalPayload = { ...additionalPayload, ...{ category: route?.params?.mainProp?.label } }
 
       post(EndPointConfig.getLatestNewsV2, { ...{ language: lang }, ...additionalPayload || {} })
         .then(function (response) {
@@ -113,58 +114,60 @@ const Categorised = () => {
   };
 
   return (
-    <View style={{ backgroundColor: '#f4f3f38f', flex: 1 }}>
+    <TabScreenWrapper>
       <ExampleParallaxCarousel newsItems={topPriorityNews} />
-      {initalLoading && 
-      
-      <LoadingScreen message={"Fetching Latest News"}/>
+      {initalLoading &&
+
+        <LoadingScreen message={"Fetching Latest News"} />
       }
       {
         !initalLoading &&
-<>
+        <>
 
-<Text style={styles.latestNews}>Latest news</Text>
-<FlatList
-  data={latestNews}
-  renderItem={({ item }) => (
-    <View style={styles.item}>
-      <NewsTitleCard item={item} />
-    </View>
-  )}
-  keyExtractor={item => item.id}
-  onEndReached={() => {
-    if (!paginationMetaData?.endOfRecords) {
-      getLatestNews({ ...paginationMetaData, page: paginationMetaData.page + 1 })
-      setPaginationMetaData((prev) => {
-        return {
-          ...prev,
-          page: prev.page + 1
-        }
-      })
+          <Text style={styles.latestNews}>Latest news</Text>
+          <View style={{ height: Platform.OS === 'ios' ? "68%" : '75%' }}>
+            <FlatList
+              data={latestNews}
+              renderItem={({ item }) => (
+                <View style={styles.item}>
+                  <NewsTitleCard item={item} />
+                </View>
+              )}
+              keyExtractor={item => item.id}
+              onEndReached={() => {
+                if (!paginationMetaData?.endOfRecords) {
+                  getLatestNews({ ...paginationMetaData, page: paginationMetaData.page + 1 })
+                  setPaginationMetaData((prev) => {
+                    return {
+                      ...prev,
+                      page: prev.page + 1
+                    }
+                  })
 
-    }
-  }}
-  onEndReachedThreshold={0.5}
-  ListEmptyComponent={()=>{
-    return(<EmptyListComponent/>)
-  }} // Add the empty component here
+                }
+              }}
+              onEndReachedThreshold={0.5}
+              ListEmptyComponent={() => {
+                return (<EmptyListComponent />)
+              }} // Add the empty component here
 
-  ListFooterComponent={() => {
+              ListFooterComponent={() => {
 
-    // const renderFooter = () => {
-    if (!loading) return null;
-    return (
-      <View style={styles.footer}>
-        <ActivityIndicator size="small"  />
-      </View>
-    );
-    // };
-  }}
-/>
-</>
+                // const renderFooter = () => {
+                if (!loading) return null;
+                return (
+                  <View style={styles.footer}>
+                    <ActivityIndicator size="small" />
+                  </View>
+                );
+                // };
+              }}
+            />
+          </View>
+        </>
 
       }
-    </View>
+    </TabScreenWrapper>
   )
 }
 
