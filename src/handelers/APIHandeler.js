@@ -5,18 +5,23 @@ import axios from 'axios';
 import { Alert, Linking, Platform, PermissionsAndroid } from 'react-native';
 import { retrieveData } from './AsyncStorageHandeler';
 
-export const BASE_URL = Platform.OS === 'ios' ? 'http://localhost:3000/api/v2/' : 'http://192.168.11.231:3000/api/v2/';
-// export const BASE_URL = 'http://192.168.11.181:3000/api/v2/';
-// export const BASE_URL = 'http://192.168.0.108:3000/api/v2/';
+// export const BASE_URL = Platform.OS === 'ios' ? 'http://localhost:3000/api/v2/' : 'http://192.168.11.231:3000/api/v2/';
+// export const BASE_URL = Platform.OS === 'ios' ? 'http://localhost:3000/api/v2/' : 'http://192.168.11.231:3000/api/v2/';
+// export const BASE_URL = 'https://nc-media-management-app-be-neti-charithras-projects.vercel.app/api/v2/';
+export const BASE_URL = 'https://us-central1-neticharithra-ncmedia.cloudfunctions.net/api/api/v2/';
+// export const BASE_URL = 'http://192.168.0.103:3000/api/v2/';
+// export const BASE_URL = 'http://192.168.10.185:3000/api/v2/';
 // export const BASE_URL = 'https://viridian-slug-sari.cyclic.app/api/v2/';
 
 // const api={};
 const api = axios.create({
     baseURL: BASE_URL,
-    timeout: 5000, // Adjust the timeout as needed
+    timeout: 15000, // Adjust the timeout as needed
     headers: {
         'Content-Type': 'application/json',
     },
+    withCredentials: false // Disable if not needed
+
 });
 
 const handleError = (error) => {

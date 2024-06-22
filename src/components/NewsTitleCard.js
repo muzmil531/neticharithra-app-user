@@ -13,7 +13,7 @@ const NewsTitleCard = (props) => {
             <View style={{ display: 'flex', flexDirection: 'row', minHeight: 10, margin: 5, marginLeft: 20 }}>
                 {/* <View> */}
                 <Image
-                    source={{ uri: props?.item?.images?.[0]?.tempURL || 'https://upload.wikimedia.org/wikipedia/commons/3/32/Googleplex_HQ_%28cropped%29.jpg' }}
+                    source={{ uri: props?.item?.images?.[0]?.externalURL || props?.item?.images?.[0]?.tempURL || 'https://upload.wikimedia.org/wikipedia/commons/3/32/Googleplex_HQ_%28cropped%29.jpg' }}
 
                     style={styles.image}
                 />
@@ -23,7 +23,7 @@ const NewsTitleCard = (props) => {
                 <View style={styles.card}>
 
                     <View style={styles.textContainer}>
-                        <Text style={styles.title}>{props?.item?.title}</Text>
+                        <Text style={styles.title} numberOfLines={2}>{props?.item?.title}</Text>
                         {
                             props?.item?.approvedOn &&
                             <Text style={styles.time}>
@@ -72,7 +72,8 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: 'black'
+        color: 'black',
+        width: "95%"
     },
     time: {
         fontSize: 12,

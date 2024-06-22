@@ -12,11 +12,13 @@ import { ActivityIndicator } from 'react-native-paper'
 import EmptyListComponent from '../../components/EmptyListComponent'
 import LoadingScreen from '../../components/LoadingScreen'
 import TabScreenWrapper from '../../components/TabScreenWrapper'
+import { useTranslation } from 'react-i18next'
 
 const Categorised = () => {
   let [topPriorityNews, setTopPriorityNews] = useState([])
   let [latestNews, setlatestNews] = useState([]);
   let [initalLoading, setInitialLoading] = useState(true)
+  const { t } = useTranslation();
 
   let route = useRoute()
   // let [endOfRecords, setEndOfRecords] = useState(true)
@@ -54,6 +56,16 @@ const Categorised = () => {
     try {
       // const metaList = ['NEWS_CATEGORIES_REGIONAL'];
       let payload = { ...paginationMetaData, ...{ language: lang } }
+      if (route?.params?.newsType) {
+
+        console.log("HIIIII", route?.params)
+        payload = { ...payload, ...{ newsType: route?.params?.mainProp?.value } }
+
+      } else {
+        payload = { ...payload, ...{ category: route?.params?.mainProp?.label } }
+
+      }
+
       payload = { ...payload, ...{ category: route?.params?.mainProp?.label } }
       post(EndPointConfig.getNewsInfoV2, payload)
         .then(function (response) {
@@ -77,7 +89,16 @@ const Categorised = () => {
       if (!additionalPayload) {
         additionalPayload = paginationMetaData
       }
-      additionalPayload = { ...additionalPayload, ...{ category: route?.params?.mainProp?.label } }
+      if (route?.params?.newsType) {
+
+        console.log("HIIIII", route?.params)
+        additionalPayload = { ...additionalPayload, ...{ newsType: route?.params?.mainProp?.value } }
+
+        console.log(additionalPayload)
+      } else {
+        additionalPayload = { ...additionalPayload, ...{ category: route?.params?.mainProp?.label } }
+
+      }
 
       post(EndPointConfig.getLatestNewsV2, { ...{ language: lang }, ...additionalPayload || {} })
         .then(function (response) {
@@ -124,7 +145,9 @@ const Categorised = () => {
         !initalLoading &&
         <>
 
-          <Text style={styles.latestNews}>Latest news</Text>
+          <Text style={styles.latestNews}>
+            {t('latestNews')}
+          </Text>
           <View style={{ height: Platform.OS === 'ios' ? "68%" : '75%' }}>
             <FlatList
               data={latestNews}
@@ -175,7 +198,8 @@ export default Categorised
 
 const styles = StyleSheet.create({
   latestNews: {
-    fontSize: 20, marginLeft: 20, color: 'black', marginBottom: 10, fontFamily: 'Inter', fontWeight: 'bold'
+    fontSize: 20, marginLeft: 20, color: 'black', marginBottom: 10, fontFamily: 'Inter', fontWeight: 'bold',
+    backgroundColor: '#00272C', width: 125, padding: 7, color: '#fff'
   },
   footer: {
     padding: 20,

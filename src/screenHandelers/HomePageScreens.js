@@ -14,6 +14,7 @@ let height = Dimensions.get('screen').height;
 const HomePageScreens = () => {
 
   let [listOfCategories, setListOfCategories] = useState([]);
+  let [listOfNEWSTYPE, setListOfNewsType] = useState([]);
   let [userLanguage, setUserLanguage] = useState('label');
   const colors = Colors[useColorScheme()]
 
@@ -37,11 +38,12 @@ const HomePageScreens = () => {
 
   const getMetaData = () => {
     try {
-      const metaList = ['NEWS_CATEGORIES_REGIONAL'];
+      const metaList = ['NEWS_CATEGORIES_REGIONAL', 'NEWS_TYPE_REGIONAL'];
       post(EndPointConfig.getMetaData, { metaList })
         .then(function (response) {
           if (response?.status === 'success') {
-            setListOfCategories(response?.data?.['NEWS_CATEGORIES_REGIONAL']);
+            setListOfCategories(response?.data?.['NEWS_CATEGORIES_REGIONAL'] || []);
+            setListOfNewsType(response?.data?.['NEWS_TYPE_REGIONAL'] || []);
           }
         })
         .catch(function (error) {
@@ -75,7 +77,6 @@ const HomePageScreens = () => {
           initialParams={{ exampleProp: 'exampleValue1' }} // Pass props here
         />
 
-        {/* item?.[userLanguage || 'label'] */}
         {listOfCategories?.map((element, index) => (
           <Tab.Screen
             key={index}
@@ -83,6 +84,15 @@ const HomePageScreens = () => {
             getComponent={getScreenBuilder('Categorised')}
             options={{ tabBarLabel: element?.[userLanguage || 'label'] }}
             initialParams={{ mainProp: element }} // Pass props here
+          />
+        ))}
+        {listOfNEWSTYPE?.map((element, index) => (
+          <Tab.Screen
+            key={index}
+            name={element?.[userLanguage || 'label']}
+            getComponent={getScreenBuilder('Categorised')}
+            options={{ tabBarLabel: element?.[userLanguage || 'label'] }}
+            initialParams={{ mainProp: element, newsType: true }} // Pass props here
           />
         ))}
       </Tab.Navigator>

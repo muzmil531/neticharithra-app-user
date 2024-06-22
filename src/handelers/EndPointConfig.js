@@ -16,8 +16,10 @@ const EndPointConfig = {
     listPublicUserNews: 'public/listPublicUserNews',
     updateUserInfo: 'public/updateUserInfo',
     getUserNewsCount: 'public/getUserNewsCount',
-    getNewsInfoV2:'public/getNewsInfoV2',
-    getLatestNewsV2:'public/getLatestNewsV2'
+    getNewsInfoV2: 'public/getNewsInfoV2',
+    getLatestNewsV2: 'public/getLatestNewsV2',
+    searchNewsV2: 'public/searchNewsV2',
+    getIndividualNewsInfo: 'public/getNewsInfo'
     // Add more endpoints as needed
 };
 

@@ -13,7 +13,7 @@ const ExampleParallaxCarousel = (props) => {
     return (
       <View style={styles.item}>
         <ParallaxImage
-          source={{ uri: item.images[0].tempURL }}
+          source={{ uri: item.images?.[0]['externalURL'] || item.images[0].tempURL || 'https://upload.wikimedia.org/wikipedia/commons/3/32/Googleplex_HQ_%28cropped%29.jpg' }}
           containerStyle={styles.imageContainer}
           style={styles.image}
           parallaxFactor={0.4}
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginBottom: Platform.select({ ios: 0, android: 1 }),
     backgroundColor: 'white',
-    borderRadius: 8, borderRadius: 15
+    borderRadius: 8, borderRadius: 5
   },
   image: {
     resizeMode: 'cover',
@@ -90,8 +90,8 @@ const styles = StyleSheet.create({
     left: 0,
     width: "100%",
     padding: 15,
-    borderBottomLeftRadius: 15,
-    borderBottomRightRadius: 15
+    borderBottomLeftRadius: 5,
+    borderBottomRightRadius: 5
   },
   title: {
 
@@ -108,8 +108,8 @@ const styles = StyleSheet.create({
     padding: 15,
     width: '100%',
     backgroundColor: '#0000007d',
-    borderTopLeftRadius: 15,
-    borderTopRightRadius: 15
+    borderTopLeftRadius: 5,
+    borderTopRightRadius: 5
   },
   title2: {
     color: 'white',

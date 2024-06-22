@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react'
 import { Button, FlatList, Modal, StyleSheet, Text, TouchableOpacity, View, useColorScheme, useTheme } from 'react-native'
-import { Searchbar } from 'react-native-paper'
+import { ActivityIndicator, Searchbar } from 'react-native-paper'
 import debounce from 'lodash/debounce'
 import Colors from '../../colors/Colors'
 import { useFocusEffect } from '@react-navigation/native'
@@ -9,6 +9,7 @@ import { post } from '../../handelers/APIHandeler'
 import EndPointConfig from '../../handelers/EndPointConfig'
 import EmptyListComponent from '../../components/EmptyListComponent'
 import AntDesign from 'react-native-vector-icons/AntDesign'
+import NewsTitleCard from '../../components/NewsTitleCard'
 
 const SearchScreenV2 = () => {
   const [searchQuery, setSearchQuery] = useState('')
@@ -18,15 +19,33 @@ const SearchScreenV2 = () => {
 
   const [modalVisible, setModalVisible] = useState(false);
   let [userLanguage, setUserLanguage] = useState('label');
-  let [listOfCategories, setListOfCategories] = useState([])
-
+  let [listOfCategories, setListOfCategories] = useState([]);
+  let [listOfNews, setListOfNews] = useState([])
+  let [loading, setLoading] = useState(false)
+  let [paginationMetaData, setPaginationMetaData] = useState({
+    "count": 5,
+    "page": 0,
+    endOfRecords: false
+  })
   // Debounced function to log search query
   const logSearchQuery = useCallback(
     debounce((query) => {
       console.log('Search value:', query)
+      setPaginationMetaData({
+        "count": 5,
+        "page": 0,
+        endOfRecords: true
+      })
+      getSearchedData({
+        ...{ search: query }, ...{
+          "count": 5,
+          "page": 0
+        }
+      }, true)
     }, 500),
     []
   )
+
 
   useFocusEffect(
     React.useCallback(() => {
@@ -68,9 +87,56 @@ const SearchScreenV2 = () => {
       console.error(error);
     }
   };
+  const getSearchedData = (payloadP1, newSearch) => {
+    try {
+      setLoading(true)
+      let payload = { ...payloadP1 }
+      console.log(payload)
+      if (selectedCategory && !newSearch) {
+        payload['category'] = selectedCategory?.label
+      }
+      post(EndPointConfig.searchNewsV2, payload)
+        .then(function (response) {
+          if (response?.status === 'success') {
+            if (newSearch) {
+              setListOfNews(response?.data || [])
+              console.log(response?.data?.length)
+            } else {
+              setListOfNews((prev) => {
+                return [...prev, ...response?.data || []]
+              })
+
+            }
+            setPaginationMetaData((prev) => {
+              return {
+                ...prev,
+                endOfRecords: response?.endOfRecords
+              }
+            })
+
+          }
+          setLoading(false)
+        })
+        .catch(function (error) {
+          console.error(error); setLoading(false)
+
+        });
+
+    } catch (error) {
+      console.error(error); setLoading(false)
+
+    }
+  };
   const changeOfCategory = (param1) => {
     console.log(param1)
     setSelectedCategory(param1);
+
+    getSearchedData({
+      ...{ search: searchQuery, category: param1.label }, ...{
+        "count": 5,
+        "page": 0
+      }
+    }, true)
     setTimeout(() => {
 
       setModalVisible(false)
@@ -80,38 +146,62 @@ const SearchScreenV2 = () => {
     <View style={styles.container}>
       <View style={styles.searchContainer}>
         <Searchbar
-          placeholder="Search with Title | Location "
+          placeholder="Search with Title | Location"
           onChangeText={onChangeSearch}
           value={searchQuery}
           style={[styles.searchbar, { backgroundColor: colors.surface }]} // Set background color from theme
         />
       </View>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
-        {/* <View><Text>Select Category</Text></View> */}
-        <TouchableOpacity onPress={() => { setModalVisible(true) }}>
-
-
-          <View><Text style={{}}>{selectedCategory ? '' : 'Select'} Category
-            {
-              selectedCategory &&
-              <Text> : {selectedCategory?.[userLanguage || 'label']} &nbsp;
-                <AntDesign name="caretdown" size={15} />
-
-
-              </Text>
-            }
-
-          </Text>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginBottom: 10 }} >
+        <TouchableOpacity onPress={() => setModalVisible(true)}>
+          <View >
+            <Text>
+              {selectedCategory ? '' : 'Select'} Category
+              {selectedCategory && (
+                <Text>
+                  : {selectedCategory?.[userLanguage || 'label']} &nbsp;
+                  <AntDesign name="caretdown" size={15} />
+                </Text>
+              )}
+            </Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => { setModalVisible(true) }}>
-
-
-          <View><Text style={{}}>Select Date</Text></View>
-        </TouchableOpacity>
+        {/* <TouchableOpacity onPress={() => setModalVisible(true)}>
+          <View>
+            <Text>Select Date</Text>
+          </View>
+        </TouchableOpacity> */}
       </View>
       <View style={styles.content}>
-        <Text>SearchScreenV2</Text>
+        <FlatList
+          data={listOfNews}
+          renderItem={({ item }) => (
+            <View style={styles.item}>
+              <NewsTitleCard item={item} />
+            </View>
+          )}
+          keyExtractor={(item) => item.id}
+          onEndReached={() => {
+            console.log("EDN REACHED22", paginationMetaData?.endOfRecords)
+            if (!(paginationMetaData?.endOfRecords)) {
+              console.log("END", searchQuery)
+              getSearchedData({ search: searchQuery, ...paginationMetaData, page: paginationMetaData.page + 1 });
+              setPaginationMetaData((prev) => ({
+                ...prev,
+                page: prev.page + 1
+              }));
+            }
+          }}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={() => {
+            if (!loading) return (<></>);
+            return (
+              <View style={styles.footer}>
+                <ActivityIndicator size="small" />
+              </View>
+            );
+          }}
+        />
       </View>
 
 
@@ -167,7 +257,14 @@ const SearchScreenV2 = () => {
 
             <Button
               title="Cancel"
-              onPress={() => { setSelectedCategory(); setModalVisible(!modalVisible) }}
+              onPress={() => {
+                getSearchedData({
+                  ...{ search: searchQuery }, ...{
+                    "count": 5,
+                    "page": 0
+                  }
+                }, true); setSelectedCategory(); setModalVisible(!modalVisible)
+              }}
             />
           </View>
         </View>
@@ -181,7 +278,7 @@ export default SearchScreenV2
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    borderWidth: 1,
+    // borderWidth: 1,
     backgroundColor: '#f4f3f38f'
   },
   searchContainer: {
@@ -198,10 +295,15 @@ const styles = StyleSheet.create({
   searchbar: {
     // margin: 16, // You can remove this margin if not needed
   },
+  footer: {
+    padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   content: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center'
+    // alignItems: 'center',
+    // justifyContent: 'center'
   }
 })
 

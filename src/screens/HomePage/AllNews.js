@@ -10,9 +10,12 @@ import { ActivityIndicator } from 'react-native-paper'
 import LoaderScreen from '../../components/LoaderScreen'
 import LoadingScreen from '../../components/LoadingScreen'
 import TabScreenWrapper from '../../components/TabScreenWrapper'
+import { useTranslation } from 'react-i18next'
 
 let screenHeight = Dimensions.get('screen').height;
 const AllNews = () => {
+  const { t } = useTranslation();
+
   let [topPriorityNews, setTopPriorityNews] = useState([])
   let [latestNews, setlatestNews] = useState([]);
   let [initalLoading, setInitialLoading] = useState(true)
@@ -72,10 +75,13 @@ const AllNews = () => {
       if (!additionalPayload) {
         additionalPayload = paginationMetaData
       }
+
+      console.log("A2")
       post(EndPointConfig.getLatestNewsV2, { ...{ language: lang }, ...additionalPayload || {} })
         .then(function (response) {
           setLoading(false);
           setInitialLoading(false)
+          console.log("RRR2", response)
           if (response?.status === 'success') {
             if (payload) {
               setlatestNews((prev) => {
@@ -117,7 +123,13 @@ const AllNews = () => {
 
         <View
         >
-          <Text style={styles.latestNews}>Latest news</Text>
+          {/* <View style={{ width: '100%' }}> */}
+
+          <Text style={styles.latestNews}>
+            {t('latestNews')}
+            {/* {'latestNews' | translate} */}
+          </Text>
+          {/* </View> */}
           <View style={{ height: Platform.OS === 'ios' ? "68%" : '75%' }}>
 
 
@@ -166,7 +178,8 @@ export default AllNews
 
 const styles = StyleSheet.create({
   latestNews: {
-    fontSize: 20, marginLeft: 20, color: 'black', marginBottom: 10, fontFamily: 'Inter', fontWeight: 'bold'
+    fontSize: 20, marginLeft: 20, color: 'black', marginBottom: 10, fontFamily: 'Inter', fontWeight: 'bold',
+    backgroundColor: '#00272C', width: 125, padding: 7, color: '#fff'
   },
   footer: {
     padding: 20,
