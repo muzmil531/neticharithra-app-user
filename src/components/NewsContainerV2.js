@@ -1,4 +1,4 @@
-import { Dimensions, Image, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Clipboard, Dimensions, Image, Linking, Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
 import React, { useState } from 'react';
 import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -33,7 +33,29 @@ const NewsContainerV2 = () => {
     );
 
 
+    const handleShare = async () => {
+        try {
 
+            const url = `https://neticharithra-ncmedia.web.app/#/view-news/${newsInfo.language}/${newsInfo.newsId}`;  // Replace with your actual URL
+            console.log(url)
+            const imageUrl = newsInfo?.images?.[0]?.['externalURL'] ||
+                newsInfo?.images?.[0]?.tempURL;  // Replace with your actual image URL
+            const subtitle = 'Neti Charithra';
+
+            // Copy URL to clipboard
+            await Clipboard.setString(url);
+
+            // Share content
+            await Share.share({
+                message: subtitle,
+                url: imageUrl,
+                title: newsInfo.title,  // Optional title for Android
+            });
+
+        } catch (error) {
+            Alert.alert('Error', 'Failed to share content');
+        }
+    };
 
     const openSourceLink = () => {
         if (newsInfo?.source !== 'Neti Charithra' && newsInfo?.sourceLink) {
@@ -85,13 +107,16 @@ const NewsContainerV2 = () => {
                                     }, styles.textStyleShadowLeft, styles.textStyleShadowRight, styles.textStyleShadowTop, styles.textStyleShadowBottom]}
                                 />
                             </TouchableOpacity>
-                            <Ionicons
-                                name={'share-social-sharp'}
-                                color={'#fff'}
-                                style={[{
-                                    fontSize: 25, padding: 5, backgroundColor: '#0000007d',
-                                }, styles.textStyleShadowLeft, styles.textStyleShadowRight, styles.textStyleShadowTop, styles.textStyleShadowBottom]}
-                            />
+                            <TouchableOpacity onPress={handleShare}>
+
+                                <Ionicons
+                                    name={'share-social-sharp'}
+                                    color={'#fff'}
+                                    style={[{
+                                        fontSize: 25, padding: 5, backgroundColor: '#0000007d',
+                                    }, styles.textStyleShadowLeft, styles.textStyleShadowRight, styles.textStyleShadowTop, styles.textStyleShadowBottom]}
+                                />
+                            </TouchableOpacity>
                         </View>
                         <View style={[styles.textContainer, { position: 'absolute', bottom: 0, width: '100%', padding: 0, marginBottom: 10 }]}>
                             {newsInfo?.approvedOn && (
@@ -105,9 +130,12 @@ const NewsContainerV2 = () => {
                         <Image source={imageBg} style={styles.backgroundImage} />
                         <View style={styles.overlayText}>
                             <ScrollView>
-                                <Text style={{ fontSize: 18, color: '#000', borderLeftWidth: 3, borderLeftColor: '#B61F24', fontWeight: 'bold' }}>
-                                    {newsInfo?.title}
-                                </Text>
+                                <View style={{ borderLeftWidth: 3, borderLeftColor: '#B61F24', paddingLeft: 10 }}>
+
+                                    <Text style={{ fontSize: 18, color: '#000', fontWeight: 'bold' }}>
+                                        {newsInfo?.title}
+                                    </Text>
+                                </View>
                                 <Text style={{ fontSize: 14, color: '#000', paddingLeft: 0, marginTop: 15 }}>
                                     {newsInfo?.description}
                                 </Text>
@@ -130,8 +158,8 @@ const NewsContainerV2 = () => {
 
                                     borderRadius: 5,
                                     shadowColor: '#000',
-                                    shadowOffset: { width: 0, height: 2 },
-                                    shadowOpacity: 0.8,
+                                    shadowOffset: { width: 0, height: 1 },
+                                    shadowOpacity: 0.5,
                                     shadowRadius: 2,
                                     elevation: 1,
                                 }}>

@@ -31,7 +31,7 @@ export default function Main() {
         fetchData();
     }, []);
 
-    const screens = ['IndexScreen', 'MainScreen', 'HomeScreen', 'SearchScreen', 'DetailedNewsInfo', 'NewsContainerV2'];
+    const screens = ['IndexScreen', 'MainScreen', 'HomeScreen', 'SearchScreen', 'DetailedNewsInfo', 'NewsContainerV2', 'HelpScreen'];
 
     return (
         <>

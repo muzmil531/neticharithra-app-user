@@ -25,7 +25,7 @@ const SearchScreenV2 = () => {
   let [paginationMetaData, setPaginationMetaData] = useState({
     "count": 5,
     "page": 0,
-    endOfRecords: false
+    endOfRecords: true
   })
   // Debounced function to log search query
   const logSearchQuery = useCallback(
@@ -110,7 +110,7 @@ const SearchScreenV2 = () => {
             setPaginationMetaData((prev) => {
               return {
                 ...prev,
-                endOfRecords: response?.endOfRecords
+                endOfRecords: response?.endOfRecords || false
               }
             })
 
@@ -263,7 +263,7 @@ const SearchScreenV2 = () => {
                     "count": 5,
                     "page": 0
                   }
-                }, true); setSelectedCategory(); setModalVisible(!modalVisible)
+                }, true); setSelectedCategory(); setModalVisible(!modalVisible); setListOfNews([])
               }}
             />
           </View>

@@ -2,13 +2,13 @@ import React from 'react';
 
 type ScreenName =
     | 'News'
-    // | 'OnBoarding'
-    // | 'Login'
-    // | 'SignUp'
-    // | 'Sidebar'
-    // | 'Dashboard'
-    // | 'LeaveManagement'
-    // | 'Summary'
+// | 'OnBoarding'
+// | 'Login'
+// | 'SignUp'
+// | 'Sidebar'
+// | 'Dashboard'
+// | 'LeaveManagement'
+// | 'Summary'
 
 type ScreenType = React.ComponentType<any>;
 type ScreenBuilderType = () => ScreenType;
@@ -52,13 +52,15 @@ function getScreen(screenName: any, parent: any): ScreenType {
         case 'IndexScreen':
             return require('./../screenHandelers/IndexScreen').default;
         case 'HomeScreen':
-            return require('./../screenHandelers/HomeScreen').default;      
+            return require('./../screenHandelers/HomeScreen').default;
         case 'HomePageScreens':
-            return require('./../screenHandelers/HomePageScreens').default;      
+            return require('./../screenHandelers/HomePageScreens').default;
         case 'SearchScreen':
             return require('./../screenHandelers/SearchScreen').default;
         case 'SearchScreenV2':
             return require('./../screens/Search/SearchScreenV2').default;
+        case 'HelpScreen':
+            return require('./../screens/HelpScreen').default;
         case 'AllNews':
             return require('./../screens/HomePage/AllNews').default;
         case 'Categorised':
@@ -79,7 +81,7 @@ function getScreen(screenName: any, parent: any): ScreenType {
             return require('./../screens/Post/PostIndex').default;
         case 'PostIndex/OTPRequest':
             return require('./../screens/Post/PublicUserLogin/OTPRequest').default;
-       
+
         case 'PostIndex/PublicUserSummary':
             return require('./../screens/Post/PublicUserPost/PublicUserSummary').default;
         case 'PostIndex/PublicNewsPost':
@@ -90,7 +92,7 @@ function getScreen(screenName: any, parent: any): ScreenType {
         //     return require('./../screens/Post/PublicUserLogin/OTPValidate').default;
         // case 'PostIndex/PublicUserInfoRequest':
         //     return require('./../screens/Post/PublicUserLogin/PublicUserInfoRequest').default;
-        
+
     }
     return assertUnreachableScreen(screenName);
 }

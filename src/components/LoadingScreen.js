@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import PropTypes from 'prop-types';
-import logoImage from '../assets/branding/logo.png';
+import logoImage from '../assets/branding/logo_size.png';
 
 const LoadingScreen = (props) => {
   const [loadingText, setLoadingText] = useState(props.message || 'Loading');

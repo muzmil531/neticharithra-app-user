@@ -1,8 +1,8 @@
-import { formatDistanceToNow } from 'date-fns'
+import { formatDistanceToNow, format } from 'date-fns'
 
 export function epochToDate(epoch) {
     // Convert epoch to milliseconds
-    const date = new Date(epoch );
+    const date = new Date(epoch);
 
     // Array of month names
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -27,9 +27,9 @@ export const { width, height } = Dimensions.get('window');
 const guidelineBaseWidth = 350;
 
 export const scaleFont = (fontSize) => {
-  const scaleFactor = width / guidelineBaseWidth;
-  const scaledFontSize = fontSize * scaleFactor;
-  return Math.round(scaledFontSize);
+    const scaleFactor = width / guidelineBaseWidth;
+    const scaledFontSize = fontSize * scaleFactor;
+    return Math.round(scaledFontSize);
 };
 
 
@@ -45,5 +45,8 @@ export const calculateNumberOfLines = (percentageHeight, fontSize) => {
 
 
 export function timeAgo(date) {
-    return formatDistanceToNow(new Date(date), { addSuffix: true })
+    // return formatDistanceToNow(new Date(date), { addSuffix: true })
+    // return formatDistanceToNow(new Date(date), "MMMM d, yyyy")
+    return format(new Date(date), 'MMMM d, yyyy');
+
 }

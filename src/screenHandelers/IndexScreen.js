@@ -12,6 +12,8 @@ import i18next from './../../services/i18next';
 import { retrieveData } from '../handelers/AsyncStorageHandeler';
 import Toast from 'react-native-toast-message';
 import GeneralHeader from '../components/GeneralHeader';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -52,14 +54,33 @@ export default function IndexScreen() {
                 activeColor="#B61F24"
                 shifting={false}
                 inactiveColor="#ccc"
-                barStyle={{ backgroundColor: 'white', height: 70 }}
+                barStyle={{ backgroundColor: 'white', height: 65 }}
+                tabBarOptions={{
+                    // style: {
+                    //     backgroundColor: 'white',
+                    //     borderTopLeftRadius: 20,
+                    //     borderTopRightRadius: 20,
+                    //     height: 65,
+                    // },
+                    // labelStyle: {
+                    //     marginBottom: 10, // Adjust as needed
+                    // },
+                    // Remove any background color applied to the tab icons
+                    tabStyle: {
+                        backgroundColor: 'transparent', // Make the background transparent
+                    },
+                }}
+
             >
                 <Tab.Screen
                     name="Home"
                     options={{
                         tabBarLabel: 'Home',
                         tabBarIcon: ({ color }) => (
-                            <MaterialCommunityIcons name="home" color={color} size={26} />
+                            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                                <MaterialCommunityIcons name="home" size={24} color={color} />
+                            </View>
+                            // <MaterialCommunityIcons name="home" color={color} size={26} />
                         ),
                     }}
                     getComponent={getScreenBuilder('HomePageScreens')}
@@ -74,7 +95,7 @@ export default function IndexScreen() {
                     }}
                     getComponent={getScreenBuilder('SearchScreenV2')}
                 />
-            </Tab.Navigator>
+            </Tab.Navigator >
         </>
     );
 }

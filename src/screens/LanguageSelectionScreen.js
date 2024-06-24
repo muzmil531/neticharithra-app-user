@@ -11,17 +11,17 @@ import { retrieveData, saveData } from '../handelers/AsyncStorageHandeler';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import ToasterService from '../components/ToasterService';
 export const languageList = [
-    {
-        "imageName": require('./../assets/languageImages/telugu.jpg'),
-        "color": "#000B49",
-        "name": "English",
-        "nativeName": "English",
-        "code": "en",
-        'letter': "A",
-        "styles": {
-            fontWeight: "bold", fontSize: scaleFont(30)
-        }
-    },
+    // {
+    //     "imageName": require('./../assets/languageImages/telugu.jpg'),
+    //     "color": "#000B49",
+    //     "name": "English",
+    //     "nativeName": "English",
+    //     "code": "en",
+    //     'letter': "A",
+    //     "styles": {
+    //         fontWeight: "bold", fontSize: scaleFont(30)
+    //     }
+    // },
     {
         "imageName": require('./../assets/languageImages/telugu.jpg'),
         "color": "#FF6969",

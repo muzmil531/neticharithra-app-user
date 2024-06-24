@@ -44,15 +44,15 @@ function App(): React.JSX.Element {
   }, [])
 
   return (
-    <SafeAreaProvider>
-      <GestureHandlerRootView >
-        <SafeAreaView style={{ flex: 1 }}>
-          <NavigationContainer theme={navTheme}>
-            <Main />
-          </NavigationContainer>
-        </SafeAreaView>
-      </GestureHandlerRootView>
-    </SafeAreaProvider>
+    // <SafeAreaProvider>
+    <GestureHandlerRootView >
+      <SafeAreaView style={{ flex: 1 }}>
+        <NavigationContainer theme={navTheme}>
+          <Main />
+        </NavigationContainer>
+      </SafeAreaView>
+    </GestureHandlerRootView>
+    // </SafeAreaProvider>
   );
 }
 

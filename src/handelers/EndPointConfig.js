@@ -19,7 +19,8 @@ const EndPointConfig = {
     getNewsInfoV2: 'public/getNewsInfoV2',
     getLatestNewsV2: 'public/getLatestNewsV2',
     searchNewsV2: 'public/searchNewsV2',
-    getIndividualNewsInfo: 'public/getNewsInfo'
+    getIndividualNewsInfo: 'public/getNewsInfo',
+    getHelpTeam: 'public/getHelpTeam'
     // Add more endpoints as needed
 };
 

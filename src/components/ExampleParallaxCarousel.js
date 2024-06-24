@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, Platform, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Platform, Dimensions, TouchableOpacity } from 'react-native';
 import Carousel, { ParallaxImage, Pagination } from 'react-native-snap-carousel';
 import { timeAgo } from '../handelers/ReusableHandeler';
+import { useNavigation } from '@react-navigation/native';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -9,9 +10,11 @@ const ExampleParallaxCarousel = (props) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const carouselRef = useRef(null);
 
+  const navigation = useNavigation()
   const renderItem = ({ item, index }, parallaxProps) => {
     return (
-      <View style={styles.item}>
+
+      <TouchableOpacity style={styles.item} onPress={() => { navigation.navigate('NewsContainerV2', { data: item }) }}>
         <ParallaxImage
           source={{ uri: item.images?.[0]['externalURL'] || item.images[0].tempURL || 'https://upload.wikimedia.org/wikipedia/commons/3/32/Googleplex_HQ_%28cropped%29.jpg' }}
           containerStyle={styles.imageContainer}
@@ -31,7 +34,7 @@ const ExampleParallaxCarousel = (props) => {
 
           <Text style={styles.title}>{item?.title}</Text>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
