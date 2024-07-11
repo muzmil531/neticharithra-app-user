@@ -114,12 +114,13 @@ const AllNews = () => {
   return (
     <TabScreenWrapper>
       <ExampleParallaxCarousel newsItems={topPriorityNews} />
-      {initalLoading &&
+      {/* {initalLoading &&
 
         <LoadingScreen message={"Fetching Latest News"} />
-      }
+      } */}
       {
-        !initalLoading &&
+        true &&
+        // !initalLoading &&
 
         <View
         >
@@ -129,44 +130,51 @@ const AllNews = () => {
             {t('latestNews')}
             {/* {'latestNews' | translate} */}
           </Text>
-          {/* </View> */}
-          <View style={{ height: Platform.OS === 'ios' ? "68%" : '75%' }}>
 
 
-            <FlatList
-              data={latestNews}
-              renderItem={({ item }) => (
-                <View style={styles.item}>
-                  <NewsTitleCard item={item} />
-                </View>
-              )}
-              keyExtractor={item => item.id}
-              onEndReached={() => {
-                if (!paginationMetaData?.endOfRecords) {
-                  getLatestNews({ ...paginationMetaData, page: paginationMetaData.page + 1 })
-                  setPaginationMetaData((prev) => {
-                    return {
-                      ...prev,
-                      page: prev.page + 1
-                    }
-                  })
-
-                }
-              }}
-              onEndReachedThreshold={0.5}
-              ListFooterComponent={() => {
-
-                // const renderFooter = () => {
-                if (!loading) return null;
-                return (
-                  <View style={styles.footer}>
-                    <ActivityIndicator size="small" />
-                  </View>
-                );
-                // };
-              }}
-            />
+          <View style={{ borderWidth: 1, flex: 1 }}>
+            <Text>hi</Text>
           </View>
+          {/* </View> */}
+          {false &&
+            <View style={{ height: Platform.OS === 'ios' ? "68%" : '75%' }}>
+
+
+              <FlatList
+                data={latestNews}
+                renderItem={({ item }) => (
+                  <View style={styles.item}>
+                    <NewsTitleCard item={item} />
+                  </View>
+                )}
+                keyExtractor={item => item.id}
+                onEndReached={() => {
+                  if (!paginationMetaData?.endOfRecords) {
+                    getLatestNews({ ...paginationMetaData, page: paginationMetaData.page + 1 })
+                    setPaginationMetaData((prev) => {
+                      return {
+                        ...prev,
+                        page: prev.page + 1
+                      }
+                    })
+
+                  }
+                }}
+                onEndReachedThreshold={0.5}
+                ListFooterComponent={() => {
+
+                  // const renderFooter = () => {
+                  if (!loading) return null;
+                  return (
+                    <View style={styles.footer}>
+                      <ActivityIndicator size="small" />
+                    </View>
+                  );
+                  // };
+                }}
+              />
+            </View>
+          }
 
         </View>
       }
