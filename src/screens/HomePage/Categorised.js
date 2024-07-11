@@ -13,6 +13,7 @@ import EmptyListComponent from '../../components/EmptyListComponent'
 import LoadingScreen from '../../components/LoadingScreen'
 import TabScreenWrapper from '../../components/TabScreenWrapper'
 import { useTranslation } from 'react-i18next'
+import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
 
 const Categorised = () => {
   let [topPriorityNews, setTopPriorityNews] = useState([])
@@ -148,7 +149,7 @@ const Categorised = () => {
           <Text style={styles.latestNews}>
             {t('latestNews')}
           </Text>
-          <View style={{ height: Platform.OS === 'ios' ? "68%" : '75%' }}>
+          <View style={{ height: Platform.OS === 'ios' ? "68%" : hp('36%') }}>
             <FlatList
               data={latestNews}
               renderItem={({ item }) => (

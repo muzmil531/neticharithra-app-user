@@ -11,7 +11,7 @@ import LoaderScreen from '../../components/LoaderScreen'
 import LoadingScreen from '../../components/LoadingScreen'
 import TabScreenWrapper from '../../components/TabScreenWrapper'
 import { useTranslation } from 'react-i18next'
-
+import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
 let screenHeight = Dimensions.get('screen').height;
 const AllNews = () => {
   const { t } = useTranslation();
@@ -114,13 +114,13 @@ const AllNews = () => {
   return (
     <TabScreenWrapper>
       <ExampleParallaxCarousel newsItems={topPriorityNews} />
-      {/* {initalLoading &&
+      {initalLoading &&
 
         <LoadingScreen message={"Fetching Latest News"} />
-      } */}
+      }
       {
-        true &&
-        // !initalLoading &&
+        // true &&
+        !initalLoading &&
 
         <View
         >
@@ -132,12 +132,12 @@ const AllNews = () => {
           </Text>
 
 
-          <View style={{ borderWidth: 1, flex: 1 }}>
+          {/* <View style={{ borderWidth: 1, height:hp("36%")}}>
             <Text>hi</Text>
-          </View>
+          </View> */}
           {/* </View> */}
-          {false &&
-            <View style={{ height: Platform.OS === 'ios' ? "68%" : '75%' }}>
+          {true &&
+            <View style={{ height: Platform.OS === 'ios' ? "68%" : hp('36%') }}>
 
 
               <FlatList
