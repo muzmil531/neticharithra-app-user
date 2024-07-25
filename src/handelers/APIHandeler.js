@@ -8,7 +8,7 @@ import { retrieveData } from './AsyncStorageHandeler';
 // export const BASE_URL = Platform.OS === 'ios' ? 'http://localhost:3000/api/v2/' : 'http://192.168.11.231:3000/api/v2/';
 // export const BASE_URL = Platform.OS === 'ios' ? 'http://localhost:3000/api/v2/' : 'http://192.168.11.231:3000/api/v2/';
 // export const BASE_URL = 'https://nc-media-management-app-be-neti-charithras-projects.vercel.app/api/v2/';
-export const BASE_URL = 'https://apiservices.neticharithra.com/api/v2/';
+export const BASE_URL = 'https://api.neticharithra.com/api/api/v2/';
 // export const BASE_URL = 'https://us-central1-neticharithra-ncmedia.cloudfunctions.net/api/api/v2/';
 // export const BASE_URL = 'http://192.168.0.103:3000/api/v2/';
 // export const BASE_URL = 'http://192.168.10.185:3000/api/v2/';
