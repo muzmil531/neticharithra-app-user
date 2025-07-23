@@ -1,7 +1,23 @@
-import { Clipboard, Dimensions, Image, Linking, Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
-import React, { useState } from 'react';
+import { 
+    Clipboard, 
+    Dimensions, 
+    Image, 
+    Linking, 
+    Pressable, 
+    ScrollView, 
+    Share, 
+    StyleSheet, 
+    Text, 
+    View,
+    StatusBar,
+    SafeAreaView,
+    Alert,
+    Animated
+} from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
 import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import LinearGradient from 'react-native-linear-gradient';
 
 import imageBg from '../assets/branding/logo.png';
 import { timeAgo } from '../handelers/ReusableHandeler';
@@ -10,25 +26,43 @@ import { Avatar, Card } from 'react-native-paper';
 import { post } from '../handelers/APIHandeler';
 import EndPointConfig from '../handelers/EndPointConfig';
 
-const height = Dimensions.get('screen').height;
+const { height, width } = Dimensions.get('screen');
 
 const NewsContainerV2 = () => {
     let route = useRoute();
-    let [newsInfo, setNewsInfo] = useState()
+    let [newsInfo, setNewsInfo] = useState();
+    let [loading, setLoading] = useState(true);
     let navigation = useNavigation();
+    const fadeAnim = useRef(new Animated.Value(0)).current;
+    const slideAnim = useRef(new Animated.Value(50)).current;
 
     useFocusEffect(
         React.useCallback(() => {
             const fetchData = async () => {
                 try {
-                    // console.log(route.params);
-                    getnewsInfo(route.params.data)
+                    setLoading(true);
+                    await getnewsInfo(route.params.data);
+                    
+                    // Animate content in
+                    Animated.parallel([
+                        Animated.timing(fadeAnim, {
+                            toValue: 1,
+                            duration: 800,
+                            useNativeDriver: true,
+                        }),
+                        Animated.timing(slideAnim, {
+                            toValue: 0,
+                            duration: 600,
+                            useNativeDriver: true,
+                        })
+                    ]).start();
                 } catch (error) {
                     console.error('Error fetching data:', error);
+                    setLoading(false);
                 }
             };
 
-            fetchData(); // Call the async function when the screen gains focus
+            fetchData();
         }, [route.params])
     );
 
@@ -63,33 +97,43 @@ const NewsContainerV2 = () => {
         }
     };
 
-    const getnewsInfo = (payload) => {
+    const getnewsInfo = async (payload) => {
         try {
-            console.log("payload", payload)
-            post(EndPointConfig.getIndividualNewsInfo, payload)
-                .then(function (response) {
-                    console.log("response", response)
-                    if (response?.status === 'success') {
-
-                        setNewsInfo(response?.data?.[0] || {})
-                        console.log(response?.data?.[0])
-                    }
-                })
-                .catch(function (error) {
-                    console.error(error);
-                });
-
+            console.log("payload", payload);
+            const response = await post(EndPointConfig.getIndividualNewsInfo, payload);
+            console.log("response", response);
+            
+            if (response?.status === 'success') {
+                setNewsInfo(response?.data?.[0] || {});
+                console.log(response?.data?.[0]);
+            }
+            setLoading(false);
         } catch (error) {
             console.error(error);
+            setLoading(false);
         }
     };
-    return (
+    if (loading) {
+        return (
+            <SafeAreaView style={styles.loadingContainer}>
+                <StatusBar barStyle="light-content" backgroundColor="#1a1a1a" />
+                <View style={styles.loadingContent}>
+                    <Animated.View style={[styles.loadingSpinner, { opacity: fadeAnim }]}>
+                        <Text style={styles.loadingText}>Loading...</Text>
+                    </Animated.View>
+                </View>
+            </SafeAreaView>
+        );
+    }
 
-        <>
+    return (
+        <SafeAreaView style={styles.container}>
+            <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
             {
                 newsInfo &&
-                <View style={styles.container}>
-                    <View style={{ height: height * 0.35 }}>
+                <Animated.View style={[styles.mainContainer, { opacity: fadeAnim }]}>
+                    {/* Hero Image Section */}
+                    <View style={styles.heroSection}>
                         <Image
                             source={{
                                 uri:
@@ -97,128 +141,127 @@ const NewsContainerV2 = () => {
                                     newsInfo?.images?.[0]?.tempURL ||
                                     'https://upload.wikimedia.org/wikipedia/commons/3/32/Googleplex_HQ_%28cropped%29.jpg',
                             }}
-                            style={styles.image}
+                            style={styles.heroImage}
+                            resizeMode="cover"
                         />
-                        <View style={[styles.textContainer]}>
-                            <TouchableOpacity onPress={() => { navigation.goBack(); }}>
-                                <Ionicons
-                                    name={'chevron-back'}
-                                    color={'#fff'}
-                                    style={[{
-                                        fontSize: 30, fontWeight: 'bold2', backgroundColor: '#0000007d', padding: 5,
-                                    }, styles.textStyleShadowLeft, styles.textStyleShadowRight, styles.textStyleShadowTop, styles.textStyleShadowBottom]}
-                                />
+                        
+                        {/* Gradient Overlay */}
+                        <LinearGradient
+                            colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.7)']}
+                            style={styles.gradientOverlay}
+                        />
+                        
+                        {/* Header Actions */}
+                        <View style={styles.headerActions}>
+                            <TouchableOpacity 
+                                style={styles.actionButton}
+                                onPress={() => navigation.goBack()}
+                                activeOpacity={0.8}
+                            >
+                                <Ionicons name="chevron-back" size={24} color="#fff" />
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={handleShare}>
-
-                                <Ionicons
-                                    name={'share-social-sharp'}
-                                    color={'#fff'}
-                                    style={[{
-                                        fontSize: 25, padding: 5, backgroundColor: '#0000007d',
-                                    }, styles.textStyleShadowLeft, styles.textStyleShadowRight, styles.textStyleShadowTop, styles.textStyleShadowBottom]}
-                                />
+                            
+                            <TouchableOpacity 
+                                style={styles.actionButton}
+                                onPress={handleShare}
+                                activeOpacity={0.8}
+                            >
+                                <Ionicons name="share-social" size={20} color="#fff" />
                             </TouchableOpacity>
                         </View>
-                        <View style={[styles.textContainer, { position: 'absolute', bottom: 0, width: '100%', padding: 0, marginBottom: 10 }]}>
-                            {newsInfo?.approvedOn && (
-                                <Text style={[styles.textStyle, styles.textStyleShadowLeft, styles.textStyleShadowRight, styles.textStyleShadowTop, styles.textStyleShadowBottom]}>
+                        
+                        {/* Time Badge */}
+                        {newsInfo?.approvedOn && (
+                            <View style={styles.timeBadge}>
+                                <Text style={styles.timeText}>
                                     {timeAgo(new Date(newsInfo?.approvedOn))}
                                 </Text>
-                            )}
-                        </View>
+                            </View>
+                        )}
                     </View>
-                    <View style={{ height: height * 0.65, justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
-                        <Image source={imageBg} style={styles.backgroundImage} />
-                        <View style={styles.overlayText}>
-                            <ScrollView>
-                                <View style={{ borderLeftWidth: 3, borderLeftColor: '#B61F24', paddingLeft: 10 }}>
+                    {/* Content Section */}
+                    <Animated.View 
+                        style={[
+                            styles.contentSection, 
+                            { transform: [{ translateY: slideAnim }] }
+                        ]}
+                    >
+                        <ScrollView 
+                            style={styles.scrollContainer}
+                            showsVerticalScrollIndicator={false}
+                            bounces={false}
+                        >
+                            {/* Title */}
+                            <View style={styles.titleContainer}>
+                                <Text style={styles.newsTitle}>
+                                    {newsInfo?.title}
+                                </Text>
+                            </View>
 
-                                    <Text style={{ fontSize: 18, color: '#000', fontWeight: 'bold' }}>
-                                        {newsInfo?.title}
-                                    </Text>
-                                </View>
-                                <Text style={{ fontSize: 14, color: '#000', paddingLeft: 0, marginTop: 15 }}>
+                            {/* Description */}
+                            <View style={styles.descriptionContainer}>
+                                <Text style={styles.newsDescription}>
                                     {newsInfo?.description}
                                 </Text>
-                                {
-                                    newsInfo?.source === 'Neti Charithra'
-                                    &&
+                            </View>
 
-                                    <Text style={{ marginTop: 10, color: '#cccddd' }}>Reported By</Text>
-
-                                }
-                                <View style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    padding: 10,
-                                    borderBottomWidth: 1,
-                                    borderBottomColor: '#ccc',
-                                    backgroundColor: '#fff',
-                                    margin: 10,
-                                    marginBottom: 20,
-
-                                    borderRadius: 5,
-                                    shadowColor: '#000',
-                                    shadowOffset: { width: 0, height: 1 },
-                                    shadowOpacity: 0.5,
-                                    shadowRadius: 2,
-                                    elevation: 1,
-                                }}>
-
-
-                                    {
-                                        newsInfo?.source === 'Neti Charithra'
-                                        &&
-
-                                        <Image source={{ uri: newsInfo?.reportedBy?.['profilePicture']?.['tempURL'] }} style={{
-                                            width: 50,
-                                            height: 50,
-                                            borderRadius: 25,
-                                            marginRight: 10,
-                                        }} />
-                                    }
-                                    <View style={{ flex: 1 }}>
+                            {/* Author/Source Card */}
+                            <View style={styles.authorCard}>
+                                <View style={styles.authorInfo}>
+                                    <View style={styles.avatarContainer}>
                                         {
-                                            newsInfo?.source === 'Neti Charithra'
-                                            &&
-
-                                            <View>
-                                                <Text style={{
-                                                    fontSize: 14,
-                                                    fontWeight: 'bold',
-                                                    color: '#333',
-                                                }}>{newsInfo?.reportedBy?.name}
-
-                                                </Text>
-                                                <Text style={{
-                                                    fontSize: 12,
-                                                    color: '#ccc',
-                                                }}>{newsInfo?.reportedBy?.role}</Text>
-
-                                            </View>
+                                            newsInfo?.reportedBy?.profilePic
+                                                ?
+                                                <Avatar.Image
+                                                    size={48}
+                                                    source={{
+                                                        uri: newsInfo?.reportedBy?.profilePic?.externalURL ||
+                                                            newsInfo?.reportedBy?.profilePic?.tempURL
+                                                    }}
+                                                />
+                                                :
+                                                <Avatar.Text
+                                                    size={48}
+                                                    label={newsInfo?.reportedBy?.name?.charAt(0) || 'N'}
+                                                    style={styles.avatarText}
+                                                />
                                         }
-                                        <Pressable onPress={openSourceLink}>
-
-                                            <Text style={{
-                                                fontSize: 12,
-                                                marginTop: newsInfo?.source === 'Neti Charithra' ? 10 : 'auto',
-                                                color: '#aaa',
-                                            }}>Source / Credits: &nbsp;
+                                    </View>
+                                    
+                                    <View style={styles.authorDetails}>
+                                        {
+                                            newsInfo?.source === 'Neti Charithra' && (
+                                                <View style={styles.reporterInfo}>
+                                                    <Text style={styles.authorName}>
+                                                        {newsInfo?.reportedBy?.name}
+                                                    </Text>
+                                                    <Text style={styles.authorRole}>
+                                                        {newsInfo?.reportedBy?.role}
+                                                    </Text>
+                                                </View>
+                                            )
+                                        }
+                                        
+                                        <Pressable onPress={openSourceLink} style={styles.sourceContainer}>
+                                            <Text style={styles.sourceLabel}>Source:</Text>
+                                            <Text style={styles.sourceName}>
                                                 {newsInfo?.source}
                                             </Text>
+                                            {newsInfo?.source !== 'Neti Charithra' && newsInfo?.sourceLink && (
+                                                <Ionicons name="open-outline" size={14} color="#007bff" style={styles.externalIcon} />
+                                            )}
                                         </Pressable>
                                     </View>
                                 </View>
-
-                            </ScrollView>
-                        </View>
-                    </View>
-
-
-                </View>
+                            </View>
+                            
+                            {/* Bottom Spacing */}
+                            <View style={styles.bottomSpacing} />
+                        </ScrollView>
+                    </Animated.View>
+                </Animated.View>
             }
-        </>
+        </SafeAreaView>
     );
 };
 
@@ -227,7 +270,180 @@ export default NewsContainerV2;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#f8f9fa',
     },
+    loadingContainer: {
+        flex: 1,
+        backgroundColor: '#1a1a1a',
+    },
+    loadingContent: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    loadingSpinner: {
+        padding: 20,
+    },
+    loadingText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: '500',
+    },
+    mainContainer: {
+        flex: 1,
+    },
+    heroSection: {
+        height: height * 0.45,
+        position: 'relative',
+    },
+    heroImage: {
+        width: '100%',
+        height: '100%',
+        position: 'absolute',
+    },
+    gradientOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+    },
+    headerActions: {
+        position: 'absolute',
+        top: 50,
+        left: 0,
+        right: 0,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingHorizontal: 20,
+        zIndex: 10,
+    },
+    actionButton: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backdropFilter: 'blur(10px)',
+    },
+    timeBadge: {
+        position: 'absolute',
+        bottom: 20,
+        left: 20,
+        backgroundColor: 'rgba(0,0,0,0.7)',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 16,
+    },
+    timeText: {
+        color: '#fff',
+        fontSize: 12,
+        fontWeight: '500',
+    },
+    contentSection: {
+        flex: 1,
+        backgroundColor: '#f8f9fa',
+        borderTopLeftRadius: 24,
+        borderTopRightRadius: 24,
+        marginTop: -24,
+        paddingTop: 8,
+    },
+    scrollContainer: {
+        flex: 1,
+        paddingHorizontal: 20,
+    },
+    titleContainer: {
+        marginTop: 20,
+        marginBottom: 16,
+    },
+    newsTitle: {
+        fontSize: 28,
+        fontWeight: 'bold',
+        color: '#1a1a1a',
+        lineHeight: 36,
+        letterSpacing: -0.5,
+    },
+    descriptionContainer: {
+        marginBottom: 24,
+    },
+    newsDescription: {
+        fontSize: 16,
+        color: '#4a4a4a',
+        lineHeight: 26,
+        textAlign: 'justify',
+        letterSpacing: 0.2,
+    },
+    authorCard: {
+        backgroundColor: '#fff',
+        borderRadius: 16,
+        padding: 20,
+        marginBottom: 20,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.08,
+        shadowRadius: 8,
+        elevation: 4,
+    },
+    authorInfo: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+    },
+    avatarContainer: {
+        marginRight: 16,
+    },
+    avatarText: {
+        backgroundColor: '#007bff',
+    },
+    authorDetails: {
+        flex: 1,
+    },
+    reporterInfo: {
+        marginBottom: 12,
+    },
+    authorName: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#1a1a1a',
+        marginBottom: 2,
+    },
+    authorRole: {
+        fontSize: 14,
+        color: '#6c757d',
+        fontStyle: 'italic',
+    },
+    sourceContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        backgroundColor: '#f8f9fa',
+        borderRadius: 8,
+        borderLeftWidth: 3,
+        borderLeftColor: '#007bff',
+    },
+    sourceLabel: {
+        fontSize: 12,
+        color: '#6c757d',
+        fontWeight: '500',
+        marginRight: 6,
+    },
+    sourceName: {
+        fontSize: 14,
+        color: '#007bff',
+        fontWeight: '600',
+        flex: 1,
+    },
+    externalIcon: {
+        marginLeft: 4,
+    },
+    bottomSpacing: {
+        height: 40,
+    },
+    // Legacy styles (keeping for compatibility)
     backgroundImage: {
         width: '50%',
         height: '50%',
@@ -245,62 +461,5 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '85%',
         paddingHorizontal: 20,
-    },
-    image: {
-        width: '100%',
-        height: '100%',
-        borderBottomLeftRadius: 30,
-        borderBottomRightRadius: 30,
-        position: 'absolute',
-        borderWidth: 3,
-        top: -15,
-        zIndex: 999,
-    },
-    textContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        zIndex: 9999,
-        padding: 5,
-    },
-    textStyle: {
-        backgroundColor: '#0000007d',
-        width: "100%",
-        paddingHorizontal: 10,
-        paddingVertical: 5,
-        fontSize: 16,
-        color: '#fff',
-        textShadowColor: '#000',
-        textShadowOffset: { width: 3, height: 3 },
-        textShadowRadius: 1,
-    },
-    textStyleShadowLeft: {
-        textShadowColor: '#000',
-        textShadowOffset: { width: -3, height: 0 },
-        textShadowRadius: 1,
-    },
-    textStyleShadowRight: {
-        textShadowColor: '#000',
-        textShadowOffset: { width: 3, height: 0 },
-        textShadowRadius: 1,
-    },
-    textStyleShadowTop: {
-        textShadowColor: '#000',
-        textShadowOffset: { width: 0, height: -3 },
-        textShadowRadius: 1,
-    },
-    textStyleShadowBottom: {
-        textShadowColor: '#000',
-        textShadowOffset: { width: 0, height: 3 },
-        textShadowRadius: 1,
-    },
-    card: {
-        // margin: 10,
-        zIndex: 999999, marginBottom: 15
-    },
-    credits: {
-        fontSize: 12,
-        color: '#888',
-        // marginTop: 5,
     },
 });
