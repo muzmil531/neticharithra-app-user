@@ -1,7 +1,19 @@
 // HelpScreen.js
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Linking, Image, FlatList } from 'react-native';
+import { 
+    View, 
+    Text, 
+    StyleSheet, 
+    TouchableOpacity, 
+    Linking, 
+    Image, 
+    FlatList,
+    ScrollView,
+    StatusBar,
+    Platform,
+    SafeAreaView
+} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import te from './../assets/branding/te.png'
@@ -105,167 +117,459 @@ const HelpScreen = () => {
     };
 
     return (
-        <View style={styles.container}>
-            <View style={[styles.textContainer]}>
-                <TouchableOpacity onPress={() => { navigation.goBack(); }}>
-                    <Ionicons
-                        name={'chevron-back'}
-                        color={'#000'}
-                        style={[{
-                            fontSize: 30, fontWeight: 'bold2'
-                        }, styles.textStyleShadowLeft, styles.textStyleShadowRight, styles.textStyleShadowTop, styles.textStyleShadowBottom]}
-                    />
+        <SafeAreaView style={styles.container}>
+            <StatusBar barStyle="dark-content" backgroundColor="#f8f9fa" />
+            
+            {/* Header */}
+            <View style={styles.header}>
+                <TouchableOpacity 
+                    style={styles.backButton}
+                    onPress={() => navigation.goBack()}
+                >
+                    <Ionicons name="chevron-back" size={24} color="#1a1a1a" />
                 </TouchableOpacity>
-
+                <Text style={styles.headerTitle}>Help & Support</Text>
+                <View style={styles.headerSpacer} />
             </View>
-            <Image source={t('languageCode') === 'te' ? te : en} style={styles.logo} />
+            
+            <ScrollView 
+                style={styles.scrollContainer}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.scrollContent}
+            >
+                {/* App Logo Section */}
+                <View style={styles.logoSection}>
+                    <View style={styles.logoContainer}>
+                        <Image source={t('languageCode') === 'te' ? te : en} style={styles.logo} />
+                    </View>
+                    <Text style={styles.appTitle}>Neti Charithra</Text>
+                    <Text style={styles.appSubtitle}>Your trusted news source</Text>
+                </View>
 
-            <Text style={styles.heading}>Help & Contact Us</Text>
-            <View style={styles.contactInfo}>
-                <Text style={styles.infoItem}>Email: netichatithra@gmail.com</Text>
-                <Text style={styles.infoItem}>Phone: +91 63629 23 654</Text>
-                <Text style={[styles.infoItem, { marginBottom: 0 }]}>Website: neticharithra.com</Text>
-            </View>
+                {/* Contact Information */}
+                <View style={styles.section}>
+                    <View style={styles.sectionHeader}>
+                        <Ionicons name="call-outline" size={20} color="#007bff" />
+                        <Text style={styles.sectionTitle}>Contact Information</Text>
+                    </View>
+                    
+                    <View style={styles.contactCard}>
+                        <TouchableOpacity 
+                            style={styles.contactItem}
+                            onPress={() => Linking.openURL('tel:+916362923654')}
+                        >
+                            <View style={styles.contactIcon}>
+                                <Ionicons name="call" size={18} color="#007bff" />
+                            </View>
+                            <View style={styles.contactDetails}>
+                                <Text style={styles.contactLabel}>Phone</Text>
+                                <Text style={styles.contactValue}>+91 6362923654</Text>
+                            </View>
+                            <Ionicons name="chevron-forward" size={16} color="#ccc" />
+                        </TouchableOpacity>
+                        
+                        <TouchableOpacity 
+                            style={styles.contactItem}
+                            onPress={handleEmail}
+                        >
+                            <View style={styles.contactIcon}>
+                                <Ionicons name="mail" size={18} color="#007bff" />
+                            </View>
+                            <View style={styles.contactDetails}>
+                                <Text style={styles.contactLabel}>Email</Text>
+                                <Text style={styles.contactValue}>netichatithra@gmail.com</Text>
+                            </View>
+                            <Ionicons name="chevron-forward" size={16} color="#ccc" />
+                        </TouchableOpacity>
+                        
+                        <TouchableOpacity 
+                            style={styles.contactItem}
+                            onPress={handleWebsite}
+                        >
+                            <View style={styles.contactIcon}>
+                                <Ionicons name="globe" size={18} color="#007bff" />
+                            </View>
+                            <View style={styles.contactDetails}>
+                                <Text style={styles.contactLabel}>Website</Text>
+                                <Text style={styles.contactValue}>neticharithra.com</Text>
+                            </View>
+                            <Ionicons name="chevron-forward" size={16} color="#ccc" />
+                        </TouchableOpacity>
+                    </View>
+                </View>
 
-            <Text style={{ fontSize: 16, fontWeight: 'bold', fontFamily: 'Inter', paddingVertical: 5 }}>TEAM</Text>
-            <FlatList
-                data={teamInfo}
-                renderItem={renderTeamMember}
+                {/* Team Section */}
+                {teamInfo.length > 0 && (
+                    <View style={styles.section}>
+                        <View style={styles.sectionHeader}>
+                            <Ionicons name="people-outline" size={20} color="#007bff" />
+                            <Text style={styles.sectionTitle}>Our Team</Text>
+                        </View>
+                        
+                        <View style={styles.teamGrid}>
+                            {teamInfo.map((item, index) => (
+                                <View key={index} style={styles.teamCard}>
+                                    <Image 
+                                        source={{ uri: item?.tempURLProfile || 'https://via.placeholder.com/80' }} 
+                                        style={styles.teamImage} 
+                                    />
+                                    <Text style={styles.teamName}>{item.name}</Text>
+                                    <Text style={styles.teamRole}>{item.role}</Text>
+                                    <TouchableOpacity 
+                                        onPress={() => Linking.openURL(`mailto:${item.email}`)}
+                                        style={styles.emailButton}
+                                    >
+                                        <Ionicons name="mail-outline" size={14} color="#007bff" />
+                                        <Text style={styles.emailText}>Contact</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            ))}
+                        </View>
+                    </View>
+                )}
 
-                keyExtractor={(item, index) => index.toString()}
-                numColumns={2} // Adjusted to 2 columns for smaller cards
-                contentContainerStyle={styles.teamList}
-            />
+                {/* Quick Actions */}
+                <View style={styles.section}>
+                    <View style={styles.sectionHeader}>
+                        <Ionicons name="flash-outline" size={20} color="#007bff" />
+                        <Text style={styles.sectionTitle}>Quick Actions</Text>
+                    </View>
+                    
+                    <View style={styles.actionsGrid}>
+                        <TouchableOpacity style={styles.actionCard} onPress={handleWhatsAppMessage}>
+                            <View style={styles.actionIcon}>
+                                <Ionicons name="logo-whatsapp" size={24} color="#25D366" />
+                            </View>
+                            <Text style={styles.actionTitle}>WhatsApp</Text>
+                            <Text style={styles.actionSubtitle}>Message us directly</Text>
+                        </TouchableOpacity>
+                        
+                        <TouchableOpacity style={styles.actionCard} onPress={handleEmail}>
+                            <View style={styles.actionIcon}>
+                                <Ionicons name="mail-outline" size={24} color="#007bff" />
+                            </View>
+                            <Text style={styles.actionTitle}>Email</Text>
+                            <Text style={styles.actionSubtitle}>Send us an email</Text>
+                        </TouchableOpacity>
+                        
+                        <TouchableOpacity style={styles.actionCard} onPress={handleWebsite}>
+                            <View style={styles.actionIcon}>
+                                <Ionicons name="globe-outline" size={24} color="#007bff" />
+                            </View>
+                            <Text style={styles.actionTitle}>Website</Text>
+                            <Text style={styles.actionSubtitle}>Visit our site</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
 
-            <Text style={styles.disclaimer}>
-                We do not charge for publishing news articles. Contact us via email, WhatsApp, or visit our website to publish your news.
-            </Text>
-            <View style={styles.actionsContainer}>
-                <TouchableOpacity style={styles.actionButton} onPress={handleWhatsAppMessage}>
-                    <Text style={styles.actionText}>Message us on WhatsApp</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.actionButton} onPress={handleEmail}>
-                    <Text style={styles.actionText}>Contact us via Email</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.actionButton} onPress={handleWebsite}>
-                    <Text style={styles.actionText}>Visit our Website</Text>
-                </TouchableOpacity>
-            </View>
-        </View>
+                {/* Disclaimer */}
+                <View style={styles.disclaimerCard}>
+                    <View style={styles.disclaimerHeader}>
+                        <Ionicons name="information-circle-outline" size={20} color="#28a745" />
+                        <Text style={styles.disclaimerTitle}>Free News Publishing</Text>
+                    </View>
+                    <Text style={styles.disclaimerText}>
+                        We do not charge for publishing news articles. Contact us via email, WhatsApp, or visit our website to publish your news for free.
+                    </Text>
+                </View>
+                
+            </ScrollView>
+        </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: '#f8f9fa',
+    },
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        backgroundColor: '#fff',
+        borderBottomWidth: 1,
+        borderBottomColor: '#f0f0f0',
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: {
+                    width: 0,
+                    height: 1,
+                },
+                shadowOpacity: 0.05,
+                shadowRadius: 2,
+            },
+            android: {
+                elevation: 2,
+            },
+        }),
+    },
+    backButton: {
+        padding: 8,
+        marginLeft: -8,
+    },
+    headerTitle: {
+        fontSize: 18,
+        fontWeight: '700',
+        color: '#1a1a1a',
+        letterSpacing: -0.2,
+    },
+    headerSpacer: {
+        width: 40,
+    },
+    scrollContainer: {
+        flex: 1,
+    },
+    scrollContent: {
+        paddingBottom: 20,
+    },
+    logoSection: {
+        alignItems: 'center',
+        paddingVertical: 32,
+        backgroundColor: '#fff',
+        marginBottom: 16,
+    },
+    logoContainer: {
+        width: 80,
+        height: 80,
+        borderRadius: 20,
+        backgroundColor: '#f8f9fa',
         justifyContent: 'center',
         alignItems: 'center',
-        paddingHorizontal: 20,
-        backgroundColor: '#f0f0f0', // Optional: Set a background color
+        marginBottom: 16,
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: {
+                    width: 0,
+                    height: 2,
+                },
+                shadowOpacity: 0.1,
+                shadowRadius: 4,
+            },
+            android: {
+                elevation: 3,
+            },
+        }),
     },
     logo: {
-        width: 200,
-        height: 60,
+        width: 60,
+        height: 40,
         resizeMode: 'contain',
-        // marginBottom: 20,
     },
-    heading: {
+    appTitle: {
         fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 10,
-        // marginTop: 10, // Adjusted top margin for spacing
+        fontWeight: '800',
+        color: '#1a1a1a',
+        marginBottom: 4,
+        letterSpacing: -0.3,
     },
-    contactInfo: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        padding: 20,
-        borderRadius: 10,
-        marginBottom: 20,
-        backgroundColor: '#fff', // Optional: Add background color for contact info box
-        width: '100%', // Ensure full width
-        alignItems: 'center',
-    },
-    infoItem: {
-        fontSize: 14, // Adjusted font size
-        marginBottom: 10,
-    },
-    disclaimer: {
-        fontSize: 12, // Adjusted font size
-        textAlign: 'center',
+    appSubtitle: {
+        fontSize: 14,
         color: '#666',
-        marginBottom: 20,
+        fontWeight: '500',
     },
-    actionsContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        flexWrap: 'wrap',
-        width: '100%',
-        marginBottom: 20,
-    },
-    actionButton: {
-        backgroundColor: '#007bff',
-        paddingVertical: 12,
-        paddingHorizontal: 10,
-        borderRadius: 5,
-        width: "48%", marginTop: 5
-    },
-    actionText: {
-        color: '#fff',
-        fontSize: 10, // Adjusted font size
-        fontWeight: 'bold',
-        textAlign: 'center',
-    },
-    teamList: {
-        marginTop: 0,
-        width: '100%', justifyContent: 'space-between'
-    },
-    card: {
+    section: {
         backgroundColor: '#fff',
-        borderRadius: 10,
-        padding: 10,
-        margin: 5,
+        marginHorizontal: 16,
+        marginBottom: 16,
+        borderRadius: 12,
+        overflow: 'hidden',
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: {
+                    width: 0,
+                    height: 1,
+                },
+                shadowOpacity: 0.05,
+                shadowRadius: 3,
+            },
+            android: {
+                elevation: 2,
+            },
+        }),
+    },
+    sectionHeader: {
+        flexDirection: 'row',
         alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5,
-        width: 150, // Adjusted card width
+        paddingHorizontal: 16,
+        paddingVertical: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f0f0f0',
     },
-    personnelImage: {
-        width: 80, // Adjusted image width
-        height: 80, // Adjusted image height
-        borderRadius: 40,
-        marginBottom: 10,
+    sectionTitle: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: '#1a1a1a',
+        marginLeft: 8,
+        letterSpacing: -0.1,
     },
-    personnelName: {
-        fontSize: 12, // Adjusted font size
-        fontWeight: 'bold',
-        marginBottom: 5,
+    contactCard: {
+        paddingVertical: 8,
+    },
+    contactItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+    },
+    contactIcon: {
+        width: 36,
+        height: 36,
+        borderRadius: 8,
+        backgroundColor: '#f8f9fa',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
+    },
+    contactDetails: {
+        flex: 1,
+    },
+    contactLabel: {
+        fontSize: 12,
+        color: '#666',
+        fontWeight: '500',
+        marginBottom: 2,
+    },
+    contactValue: {
+        fontSize: 14,
+        color: '#1a1a1a',
+        fontWeight: '600',
+    },
+    teamGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        padding: 16,
+        justifyContent: 'space-between',
+    },
+    teamCard: {
+        width: '48%',
+        alignItems: 'center',
+        paddingVertical: 16,
+        marginBottom: 16,
+    },
+    teamImage: {
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        marginBottom: 8,
+        backgroundColor: '#f0f0f0',
+    },
+    teamName: {
+        fontSize: 14,
+        fontWeight: '700',
+        color: '#1a1a1a',
         textAlign: 'center',
+        marginBottom: 2,
     },
-    personnelRole: {
-        fontSize: 10, // Adjusted font size
-        marginBottom: 5,
+    teamRole: {
+        fontSize: 12,
+        color: '#666',
         textAlign: 'center',
+        marginBottom: 8,
     },
-    personnelEmail: {
-        fontSize: 12, // Adjusted font size
+    emailButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+    },
+    emailText: {
+        fontSize: 12,
         color: '#007bff',
-        textDecorationLine: 'underline',
+        fontWeight: '600',
+        marginLeft: 4,
+    },
+    actionsGrid: {
+        flexDirection: 'row',
+        padding: 16,
+        justifyContent: 'space-between',
+    },
+    actionCard: {
+        flex: 1,
+        alignItems: 'center',
+        paddingVertical: 16,
+        marginHorizontal: 4,
+        backgroundColor: '#f8f9fa',
+        borderRadius: 8,
+    },
+    actionIcon: {
+        width: 48,
+        height: 48,
+        borderRadius: 12,
+        backgroundColor: '#fff',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 8,
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: {
+                    width: 0,
+                    height: 1,
+                },
+                shadowOpacity: 0.05,
+                shadowRadius: 2,
+            },
+            android: {
+                elevation: 1,
+            },
+        }),
+    },
+    actionTitle: {
+        fontSize: 12,
+        fontWeight: '700',
+        color: '#1a1a1a',
+        marginBottom: 2,
+    },
+    actionSubtitle: {
+        fontSize: 10,
+        color: '#666',
         textAlign: 'center',
     },
-    textContainer: {
-        // flexDirection: 'row',
-        // justifyContent: 'space-between',
-        // alignItems: 'center',
-        zIndex: 9999,
-        padding: 5,
-        position: 'absolute', top: 0, left: 0
-    }
+    disclaimerCard: {
+        backgroundColor: '#fff',
+        marginHorizontal: 16,
+        marginBottom: 16,
+        padding: 16,
+        borderRadius: 12,
+        borderLeftWidth: 4,
+        borderLeftColor: '#28a745',
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: {
+                    width: 0,
+                    height: 1,
+                },
+                shadowOpacity: 0.05,
+                shadowRadius: 3,
+            },
+            android: {
+                elevation: 2,
+            },
+        }),
+    },
+    disclaimerHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 8,
+    },
+    disclaimerTitle: {
+        fontSize: 14,
+        fontWeight: '700',
+        color: '#28a745',
+        marginLeft: 8,
+    },
+    disclaimerText: {
+        fontSize: 13,
+        color: '#666',
+        lineHeight: 18,
+    },
 });
 
 export default HelpScreen;

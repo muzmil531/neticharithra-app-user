@@ -1,21 +1,27 @@
 import React, { useState, useCallback } from 'react'
-import { Button, FlatList, Modal, StyleSheet, Text, TouchableOpacity, View, useColorScheme, useTheme } from 'react-native'
+import { FlatList, Modal, StyleSheet, Text, TouchableOpacity, View, useColorScheme, SafeAreaView, StatusBar, RefreshControl } from 'react-native'
 import { ActivityIndicator, Searchbar } from 'react-native-paper'
 import debounce from 'lodash/debounce'
 import Colors from '../../colors/Colors'
-import { useFocusEffect } from '@react-navigation/native'
+import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { retrieveData } from '../../handelers/AsyncStorageHandeler'
 import { post } from '../../handelers/APIHandeler'
 import EndPointConfig from '../../handelers/EndPointConfig'
 import EmptyListComponent from '../../components/EmptyListComponent'
-import AntDesign from 'react-native-vector-icons/AntDesign'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import NewsTitleCard from '../../components/NewsTitleCard'
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen'
 
 const SearchScreenV2 = () => {
+  const navigation = useNavigation()
   const [searchQuery, setSearchQuery] = useState('')
   const colors = Colors[useColorScheme()];
   let [selectedCategory, setSelectedCategory] = useState()
   let [selectedDate, setSelectedDate] = useState()
+  const [refreshing, setRefreshing] = useState(false)
 
   const [modalVisible, setModalVisible] = useState(false);
   let [userLanguage, setUserLanguage] = useState('label');
@@ -27,21 +33,32 @@ const SearchScreenV2 = () => {
     "page": 0,
     endOfRecords: true
   })
-  // Debounced function to log search query
+  // Debounced function to handle search query
   const logSearchQuery = useCallback(
     debounce((query) => {
       console.log('Search value:', query)
-      setPaginationMetaData({
-        "count": 5,
-        "page": 0,
-        endOfRecords: true
-      })
-      getSearchedData({
-        ...{ search: query }, ...{
+      
+      // Only search if query has content
+      if (query.trim().length > 0) {
+        setPaginationMetaData({
           "count": 5,
-          "page": 0
-        }
-      }, true)
+          "page": 0,
+          endOfRecords: false
+        })
+        getSearchedData({
+          search: query.trim(),
+          count: 5,
+          page: 0
+        }, true)
+      } else {
+        // Clear results if search is empty
+        setListOfNews([])
+        setPaginationMetaData({
+          "count": 5,
+          "page": 0,
+          endOfRecords: true
+        })
+      }
     }, 500),
     []
   )
@@ -89,187 +106,333 @@ const SearchScreenV2 = () => {
   };
   const getSearchedData = (payloadP1, newSearch) => {
     try {
+      // Don't make API calls if there's no search query and no category selected
+      if (!payloadP1.search && !payloadP1.category && !selectedCategory) {
+        setLoading(false)
+        return
+      }
+
       setLoading(true)
       let payload = { ...payloadP1 }
-      console.log(payload)
+      console.log('Search payload:', payload)
+      
       if (selectedCategory && !newSearch) {
         payload['category'] = selectedCategory?.label
       }
+      
       post(EndPointConfig.searchNewsV2, payload)
         .then(function (response) {
           if (response?.status === 'success') {
             if (newSearch) {
               setListOfNews(response?.data || [])
-              console.log(response?.data?.length)
+              console.log('Search results count:', response?.data?.length || 0)
+              // Reset pagination for new search
+              setPaginationMetaData({
+                count: 5,
+                page: 0,
+                endOfRecords: response?.endOfRecords || false
+              })
             } else {
               setListOfNews((prev) => {
                 return [...prev, ...response?.data || []]
               })
-
+              // Update pagination for load more
+              setPaginationMetaData((prev) => {
+                return {
+                  ...prev,
+                  page: prev.page + 1,
+                  endOfRecords: response?.endOfRecords || false
+                }
+              })
             }
-            setPaginationMetaData((prev) => {
-              return {
-                ...prev,
-                endOfRecords: response?.endOfRecords || false
-              }
-            })
-
+          } else {
+            console.log('Search API error:', response)
           }
           setLoading(false)
         })
         .catch(function (error) {
-          console.error(error); setLoading(false)
-
+          console.error('Search API error:', error)
+          setLoading(false)
         });
 
     } catch (error) {
-      console.error(error); setLoading(false)
-
+      console.error('Search function error:', error)
+      setLoading(false)
     }
   };
+
   const changeOfCategory = (param1) => {
-    console.log(param1)
     setSelectedCategory(param1);
 
-    getSearchedData({
-      ...{ search: searchQuery, category: param1.label }, ...{
+    // Only search if we have a search query or the selected category
+    if (searchQuery.trim() || param1) {
+      setPaginationMetaData({
         "count": 5,
-        "page": 0
-      }
-    }, true)
+        "page": 0,
+        endOfRecords: false
+      })
+      getSearchedData({
+        search: searchQuery.trim(),
+        category: param1.label,
+        count: 5,
+        page: 0
+      }, true)
+    }
+    
     setTimeout(() => {
-
       setModalVisible(false)
     }, 300);
   }
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true)
+    
+    // Only refresh if we have a search query or category
+    if (searchQuery.trim() || selectedCategory) {
+      setPaginationMetaData({
+        "count": 5,
+        "page": 0,
+        endOfRecords: false
+      })
+      getSearchedData({
+        search: searchQuery.trim(),
+        ...(selectedCategory && { category: selectedCategory.label }),
+        count: 5,
+        page: 0
+      }, true)
+    }
+    
+    setTimeout(() => setRefreshing(false), 1000)
+  }, [searchQuery, selectedCategory])
+
+  const clearSearch = () => {
+    setSearchQuery('')
+    setSelectedCategory(null)
+    setListOfNews([])
+    setPaginationMetaData({
+      "count": 5,
+      "page": 0,
+      endOfRecords: true
+    })
+  }
+
   return (
-    <View style={styles.container}>
-      <View style={styles.searchContainer}>
-        <Searchbar
-          placeholder="Search with Title | Location"
-          onChangeText={onChangeSearch}
-          value={searchQuery}
-          style={[styles.searchbar, { backgroundColor: colors.surface }]} // Set background color from theme
-        />
-      </View>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginBottom: 10 }} >
-        <TouchableOpacity onPress={() => setModalVisible(true)}>
-          <View >
-            <Text>
-              {selectedCategory ? '' : 'Select'} Category
-              {selectedCategory && (
-                <Text>
-                  : {selectedCategory?.[userLanguage || 'label']} &nbsp;
-                  <AntDesign name="caretdown" size={15} />
-                </Text>
-              )}
-            </Text>
-          </View>
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
+
+      {/* Professional Header */}
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="arrow-back" size={24} color="#1a1a1a" />
         </TouchableOpacity>
-        {/* <TouchableOpacity onPress={() => setModalVisible(true)}>
-          <View>
-            <Text>Select Date</Text>
-          </View>
-        </TouchableOpacity> */}
+        <View style={styles.headerContent}>
+          <Ionicons name="search" size={24} color="#007bff" />
+          <Text style={styles.headerTitle}>Search News</Text>
+        </View>
+        <View style={styles.headerSpacer} />
       </View>
-      <View style={styles.content}>
+
+      {/* Modern Search Section */}
+      <View style={styles.searchSection}>
+        <View style={styles.searchContainer}>
+          <Searchbar
+            placeholder="Search by title, location, or keyword..."
+            onChangeText={onChangeSearch}
+            value={searchQuery}
+            style={styles.searchbar}
+            inputStyle={styles.searchInput}
+            iconColor="#007bff"
+            placeholderTextColor="#666"
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity
+              style={styles.clearButton}
+              onPress={clearSearch}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="close-circle" size={20} color="#666" />
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {/* Category Filter */}
+        <TouchableOpacity
+          style={styles.categoryButton}
+          onPress={() => setModalVisible(true)}
+          activeOpacity={0.8}
+        >
+          <Ionicons name="filter" size={18} color="#007bff" />
+          <Text style={styles.categoryButtonText}>
+            {selectedCategory ? selectedCategory?.[userLanguage || 'label'] : 'All Categories'}
+          </Text>
+          <Ionicons name="chevron-down" size={16} color="#007bff" />
+        </TouchableOpacity>
+      </View>
+
+      {/* Search Results */}
+      <View style={styles.resultsContainer}>
+        {searchQuery.length > 0 && (
+          <View style={styles.resultsHeader}>
+            <Text style={styles.resultsText}>
+              {listOfNews.length > 0 ? `${listOfNews.length} results found` : 'No results found'}
+            </Text>
+            {selectedCategory && (
+              <TouchableOpacity
+                onPress={() => {
+                  setSelectedCategory(null)
+                  getSearchedData({
+                    ...{ search: searchQuery }, ...{
+                      "count": 5,
+                      "page": 0
+                    }
+                  }, true)
+                }}
+                style={styles.clearFilterButton}
+              >
+                <Text style={styles.clearFilterText}>Clear filter</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
+
         <FlatList
           data={listOfNews}
-          renderItem={({ item }) => (
-            <View style={styles.item}>
-              <NewsTitleCard item={item} />
-            </View>
-          )}
-          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => <NewsTitleCard item={item} />}
+          keyExtractor={(item, index) => item.newsId?.toString() || item._id?.toString() || item.id?.toString() || index.toString()}
           onEndReached={() => {
-            console.log("EDN REACHED22", paginationMetaData?.endOfRecords)
-            if (!(paginationMetaData?.endOfRecords)) {
-              console.log("END", searchQuery)
-              getSearchedData({ search: searchQuery, ...paginationMetaData, page: paginationMetaData.page + 1 });
-              setPaginationMetaData((prev) => ({
-                ...prev,
-                page: prev.page + 1
-              }));
+            // Only trigger pagination if we have a search query or category selected
+            if (!paginationMetaData?.endOfRecords && !loading && (searchQuery.trim() || selectedCategory)) {
+              getSearchedData({
+                count: paginationMetaData.count,
+                page: paginationMetaData.page + 1,
+                search: searchQuery,
+                ...(selectedCategory && { category: selectedCategory.label })
+              }, false)
             }
           }}
-          onEndReachedThreshold={0.5}
-          ListFooterComponent={() => {
-            if (!loading) return (<></>);
-            return (
-              <View style={styles.footer}>
-                <ActivityIndicator size="small" />
-              </View>
-            );
+          onEndReachedThreshold={0.3}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={['#007bff']}
+              tintColor="#007bff"
+            />
+          }
+          ListEmptyComponent={() => {
+            if (searchQuery.length === 0) {
+              return (
+                <View style={styles.emptyState}>
+                  <Ionicons name="search" size={64} color="#ccc" />
+                  <Text style={styles.emptyStateTitle}>Search for News</Text>
+                  <Text style={styles.emptyStateText}>
+                    Enter keywords to find relevant news articles
+                  </Text>
+                </View>
+              )
+            } else if (listOfNews.length === 0 && !loading) {
+              return (
+                <View style={styles.emptyState}>
+                  <Ionicons name="document-text-outline" size={64} color="#ccc" />
+                  <Text style={styles.emptyStateText}>
+                    Try different keywords or remove filters
+                  </Text>
+                </View>
+              )
+            }
+            return null
           }}
+          ListFooterComponent={() => {
+            if (loading && listOfNews.length > 0) {
+              return (
+                <View style={styles.loadingFooter}>
+                  <ActivityIndicator size="small" color="#007bff" />
+                  <Text style={styles.loadingText}>Loading more...</Text>
+                </View>
+              )
+            }
+            return null
+          }}
+          showsVerticalScrollIndicator={true}
+          contentContainerStyle={listOfNews.length === 0 ? styles.emptyListContent : styles.listContent}
+          style={styles.flatListStyle}
         />
       </View>
 
-
-
+      {/* Modern Category Selection Modal */}
       <Modal
         animationType="slide"
         transparent={true}
-        // visible={true}
         visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(!modalVisible);
-        }}
+        onRequestClose={() => setModalVisible(false)}
       >
-        <View style={stylesModal.centeredView}>
-          <View style={stylesModal.modalView}>
-            <Text style={stylesModal.modalText}>Select Category</Text>
-
-            <View style={{ width: "100%" }}>
-
-
-              {listOfCategories?.map((element, index) => {
-                return (
-                  <TouchableOpacity key={index} onPress={() => { changeOfCategory(element) }} activeOpacity={0.8}>
-
-                    <View style={{ margin: 5, padding: 5, borderRadius: 20, backgroundColor: selectedCategory?.label === element?.label ? '#3AA2DB' : '#fff', flexDirection: 'row', alignItems: 'center' }}>
-
-                      <View style={{}}>
-                        <View style={{ width: 14, height: 14, borderRadius: 50, justifyContent: 'center', alignItems: 'center', borderColor: selectedCategory?.label === element?.label ? 'white' : 'black', borderWidth: 1 }}>
-
-                          {
-                            selectedCategory?.label === element?.label &&
-
-                            <View style={{ width: 8, height: 8, backgroundColor: 'white', borderRadius: 50 }}>
-
-                            </View>
-                          }
-                        </View>
-                      </View>
-                      <View style={{}}>
-
-                        <View style={{ padding: 5, justifyContent: 'center', alignItems: 'center' }}>
-                          <Text style={{ fontSize: 20, color: selectedCategory?.label === element?.label ? '#fff' : '#000' }}>{element?.[userLanguage || 'label']}</Text>
-                        </View>
-                      </View>
-
-                    </View>
-
-                  </TouchableOpacity>
-                  // <View style={{ borderWidth: 1, borderColor: "#ccc", borderRadius: 10, padding: 10, paddingHorizontal: 30, margin: 5 }}><Text>{element?.[userLanguage || 'label']}</Text></View>
-                )
-              })}
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Select Category</Text>
+              <TouchableOpacity
+                onPress={() => setModalVisible(false)}
+                style={styles.modalCloseButton}
+              >
+                <Ionicons name="close" size={24} color="#666" />
+              </TouchableOpacity>
             </View>
 
-            <Button
-              title="Cancel"
+            <FlatList
+              data={listOfCategories}
+              keyExtractor={(item, index) => item.label || index.toString()}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={[
+                    styles.categoryItem,
+                    selectedCategory?.label === item?.label && styles.categoryItemSelected
+                  ]}
+                  onPress={() => changeOfCategory(item)}
+                  activeOpacity={0.8}
+                >
+                  <View style={[
+                    styles.radioButton,
+                    selectedCategory?.label === item?.label && styles.radioButtonSelected
+                  ]}>
+                    {selectedCategory?.label === item?.label && (
+                      <View style={styles.radioButtonInner} />
+                    )}
+                  </View>
+                  <Text style={[
+                    styles.categoryItemText,
+                    selectedCategory?.label === item?.label && styles.categoryItemTextSelected
+                  ]}>
+                    {item?.[userLanguage || 'label']}
+                  </Text>
+                </TouchableOpacity>
+              )}
+              showsVerticalScrollIndicator={false}
+            />
+
+            <TouchableOpacity
+              style={styles.clearCategoryButton}
               onPress={() => {
+                setSelectedCategory(null)
                 getSearchedData({
                   ...{ search: searchQuery }, ...{
                     "count": 5,
                     "page": 0
                   }
-                }, true); setSelectedCategory(); setModalVisible(!modalVisible); setListOfNews([])
+                }, true)
+                setModalVisible(false)
               }}
-            />
+              activeOpacity={0.8}
+            >
+              <Text style={styles.clearCategoryButtonText}>Show All Categories</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
-    </View>
+    </SafeAreaView>
   )
 }
 
@@ -278,65 +441,241 @@ export default SearchScreenV2
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // borderWidth: 1,
-    backgroundColor: '#f4f3f38f'
+    backgroundColor: '#f8f9fa',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: wp('4%'),
+    paddingVertical: hp('1.2%'),
+    backgroundColor: '#ffffff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  backButton: {
+    padding: wp('2%'),
+    marginRight: wp('3%'),
+  },
+  headerContent: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerTitle: {
+    fontSize: wp('4.5%'),
+    fontWeight: '600',
+    color: '#1a1a1a',
+    marginLeft: wp('2%'),
+  },
+  headerSpacer: {
+    width: wp('10%'),
+  },
+  searchSection: {
+    backgroundColor: '#ffffff',
+    paddingHorizontal: wp('4%'),
+    paddingVertical: hp('1.2%'),
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
   },
   searchContainer: {
-    margin: 16,
-    elevation: 3, // Set elevation here
-    shadowColor: '#000', // Set shadow color if needed
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    position: 'relative',
+    marginBottom: hp('1%'),
   },
   searchbar: {
-    // margin: 16, // You can remove this margin if not needed
+    backgroundColor: '#f8f9fa',
+    borderRadius: wp('3%'),
+    elevation: 0,
+    shadowOpacity: 0,
+    borderWidth: 1,
+    borderColor: '#e9ecef',
   },
-  footer: {
-    padding: 20,
+  searchInput: {
+    fontSize: wp('4%'),
+    color: '#1a1a1a',
+  },
+  clearButton: {
+    position: 'absolute',
+    right: wp('4%'),
+    top: '50%',
+    transform: [{ translateY: -10 }],
+    padding: wp('1%'),
+  },
+  categoryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f8f9fa',
+    paddingHorizontal: wp('4%'),
+    paddingVertical: hp('1.2%'),
+    borderRadius: wp('2%'),
+    borderWidth: 1,
+    borderColor: '#e9ecef',
+  },
+  categoryButtonText: {
+    flex: 1,
+    fontSize: wp('3.8%'),
+    color: '#007bff',
+    fontWeight: '500',
+    marginLeft: wp('2%'),
+    marginRight: wp('2%'),
+  },
+  resultsContainer: {
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+  },
+  resultsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: wp('4%'),
+    paddingVertical: hp('1%'),
+    backgroundColor: '#ffffff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
+  },
+  resultsText: {
+    fontSize: wp('3.5%'),
+    color: '#666',
+    fontWeight: '500',
+  },
+  clearFilterButton: {
+    paddingHorizontal: wp('3%'),
+    paddingVertical: hp('0.5%'),
+  },
+  clearFilterText: {
+    fontSize: wp('3.5%'),
+    color: '#007bff',
+    fontWeight: '500',
+  },
+  listContent: {
+    paddingBottom: hp('2%'),
+    flexGrow: 1,
+  },
+  emptyListContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+  },
+  flatListStyle: {
+    flex: 1,
+  },
+  emptyState: {
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: wp('8%'),
+    paddingVertical: hp('10%'),
+    minHeight: hp('50%'),
   },
-  content: {
-    flex: 1,
-    // alignItems: 'center',
-    // justifyContent: 'center'
-  }
-})
-
-
-const stylesModal = StyleSheet.create({
-  container: {
-    flex: 1,
+  emptyStateTitle: {
+    fontSize: wp('5%'),
+    fontWeight: '600',
+    color: '#1a1a1a',
+    marginTop: hp('2%'),
+    marginBottom: hp('1%'),
+    textAlign: 'center',
+  },
+  emptyStateText: {
+    fontSize: wp('3.8%'),
+    color: '#666',
+    textAlign: 'center',
+    lineHeight: wp('5.5%'),
+  },
+  loadingFooter: {
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    paddingVertical: hp('1.5%'),
   },
-  centeredView: {
+  loadingText: {
+    fontSize: wp('3.5%'),
+    color: '#666',
+    marginLeft: wp('2%'),
+  },
+  modalOverlay: {
     flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContainer: {
+    backgroundColor: '#ffffff',
+    borderTopLeftRadius: wp('5%'),
+    borderTopRightRadius: wp('5%'),
+    maxHeight: '80%',
+    paddingBottom: hp('2%'),
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: wp('5%'),
+    paddingVertical: hp('2%'),
+    borderBottomWidth: 1,
+    borderBottomColor: '#e9ecef',
+  },
+  modalTitle: {
+    fontSize: wp('4.5%'),
+    fontWeight: '600',
+    color: '#1a1a1a',
+  },
+  modalCloseButton: {
+    padding: wp('1%'),
+  },
+  categoryItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: wp('5%'),
+    paddingVertical: hp('1.8%'),
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f3f4',
+  },
+  categoryItemSelected: {
+    backgroundColor: '#f0f8ff',
+  },
+  radioButton: {
+    width: wp('5%'),
+    height: wp('5%'),
+    borderRadius: wp('2.5%'),
+    borderWidth: 2,
+    borderColor: '#ccc',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 22,
+    marginRight: wp('3%'),
   },
-  modalView: {
-    margin: 20,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 35,
+  radioButtonSelected: {
+    borderColor: '#007bff',
+  },
+  radioButtonInner: {
+    width: wp('2.5%'),
+    height: wp('2.5%'),
+    borderRadius: wp('1.25%'),
+    backgroundColor: '#007bff',
+  },
+  categoryItemText: {
+    fontSize: wp('4%'),
+    color: '#1a1a1a',
+    flex: 1,
+  },
+  categoryItemTextSelected: {
+    color: '#007bff',
+    fontWeight: '500',
+  },
+  clearCategoryButton: {
+    marginHorizontal: wp('5%'),
+    marginTop: hp('2%'),
+    paddingVertical: hp('1.5%'),
+    backgroundColor: '#f8f9fa',
+    borderRadius: wp('2%'),
+    borderWidth: 1,
+    borderColor: '#007bff',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
   },
-  modalText: {
-    marginBottom: 15,
-    textAlign: 'center', fontWeight: 'bold', fontSize: 16
+  clearCategoryButtonText: {
+    fontSize: wp('4%'),
+    color: '#007bff',
+    fontWeight: '500',
   },
 });
