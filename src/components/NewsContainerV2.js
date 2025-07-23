@@ -65,12 +65,14 @@ const NewsContainerV2 = () => {
 
     const getnewsInfo = (payload) => {
         try {
+            console.log("payload", payload)
             post(EndPointConfig.getIndividualNewsInfo, payload)
                 .then(function (response) {
+                    console.log("response", response)
                     if (response?.status === 'success') {
 
-                        setNewsInfo(response?.data?.specificRecord?.[0] || {})
-                        console.log(response?.data?.specificRecord?.[0])
+                        setNewsInfo(response?.data?.[0] || {})
+                        console.log(response?.data?.[0])
                     }
                 })
                 .catch(function (error) {

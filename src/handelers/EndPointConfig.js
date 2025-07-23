@@ -3,7 +3,6 @@
 
 const EndPointConfig = {
     uploadFilesS3: 'uploadFiles',
-    getMetaData: 'getMetaData',
     getHomeData: 'public/getNewsList',
     getNewsInfo: 'public/getNewsInfo',
     getAllNews: 'public/getAllNews',
@@ -16,12 +15,20 @@ const EndPointConfig = {
     listPublicUserNews: 'public/listPublicUserNews',
     updateUserInfo: 'public/updateUserInfo',
     getUserNewsCount: 'public/getUserNewsCount',
-    getNewsInfoV2: 'public/getNewsInfoV2',
-    getLatestNewsV2: 'public/getLatestNewsV2',
-    searchNewsV2: 'public/searchNewsV2',
-    getIndividualNewsInfo: 'public/getNewsInfo',
-    getHelpTeam: 'public/getHelpTeam'
+    
+    
+    
+    
     // Add more endpoints as needed
+    
+    getNewsInfoV2: 'getPriorityNews',
+    getIndividualNewsInfo: 'getIndividualNewsInfo',
+    getLatestNewsV2: 'getLatestNews',
+    searchNewsV2: 'searchNews',
+    
+    getHelpTeam: 'getHelpTeam',
+    getMetaData: 'getMetaData'
+
 };
 
 export default EndPointConfig;

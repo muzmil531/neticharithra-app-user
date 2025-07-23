@@ -8,7 +8,8 @@ import { retrieveData } from './AsyncStorageHandeler';
 // export const BASE_URL = Platform.OS === 'ios' ? 'http://localhost:3000/api/v2/' : 'http://192.168.11.231:3000/api/v2/';
 // export const BASE_URL = Platform.OS === 'ios' ? 'http://localhost:3000/api/v2/' : 'http://192.168.11.231:3000/api/v2/';
 // export const BASE_URL = 'https://nc-media-management-app-be-neti-charithras-projects.vercel.app/api/v2/';
-export const BASE_URL = 'https://api.neticharithra.com/api/api/v2/';
+export const BASE_URL = 'http://10.0.2.2:3000/api/v3/mobile/';
+// export const BASE_URL = 'https://api.neticharithra.com/api/api/v2/';
 // export const BASE_URL = 'https://us-central1-neticharithra-ncmedia.cloudfunctions.net/api/api/v2/';
 // export const BASE_URL = 'http://192.168.0.103:3000/api/v2/';
 // export const BASE_URL = 'http://192.168.10.185:3000/api/v2/';
@@ -65,6 +66,7 @@ export const post = async (endpoint, data = {}) => {
 
 
 
+        console.log("API"-endpoint );
         // console.log(endpoint + ' Request Payload : ', JSON.stringify(requestPayLoad, null, 4));
 
         const response = await api.post(endpoint, requestPayLoad);
@@ -79,6 +81,7 @@ export const post = async (endpoint, data = {}) => {
 
         // console.log(' Error : ', JSON.stringify(error, null, 4));
 
+        console.log("ErrorAPI ",endpoint );
 
         // ToastService.showError('Something went wrong..! Try after some time..!'); // Use the reusable ToastService
         handleError(error);

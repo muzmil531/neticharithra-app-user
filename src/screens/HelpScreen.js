@@ -44,7 +44,7 @@ const HelpScreen = () => {
     };
 
     const handleWebsite = () => {
-        Linking.openURL('https://neticharithra-ncmedia.web.app/');
+        Linking.openURL('https://neticharithra.com/');
     };
 
     const [teamInfo, setTeamInfo] = useState([])
@@ -89,6 +89,7 @@ const HelpScreen = () => {
             // const metaList = ['NEWS_CATEGORIES_REGIONAL'];
             post(EndPointConfig.getHelpTeam, {})
                 .then(function (response) {
+                    console.log("response", response)
                     if (response?.status === 'success') {
                         console.log(response.data)
                         setTeamInfo(response?.data || []);
@@ -123,7 +124,7 @@ const HelpScreen = () => {
             <View style={styles.contactInfo}>
                 <Text style={styles.infoItem}>Email: netichatithra@gmail.com</Text>
                 <Text style={styles.infoItem}>Phone: +91 63629 23 654</Text>
-                <Text style={[styles.infoItem, { marginBottom: 0 }]}>Website: neticharithra-ncmedia.web.app</Text>
+                <Text style={[styles.infoItem, { marginBottom: 0 }]}>Website: neticharithra.com</Text>
             </View>
 
             <Text style={{ fontSize: 16, fontWeight: 'bold', fontFamily: 'Inter', paddingVertical: 5 }}>TEAM</Text>

@@ -34,7 +34,7 @@ const AllNews = () => {
           let lang = await retrieveData('userLanguageSaved', 'string');
           if (lang) {
             // setUserLanguage(lang);
-            getMetaData(lang);
+            getPriorityNews(lang);
             setPaginationMetaData({
               "count": 5,
               "page": 0,
@@ -50,9 +50,10 @@ const AllNews = () => {
       fetchData(); // Call the async function when the screen gains focus
     }, [])
   );
-  const getMetaData = (lang) => {
+  const getPriorityNews = (lang) => {
     try {
       // const metaList = ['NEWS_CATEGORIES_REGIONAL'];
+    
       post(EndPointConfig.getNewsInfoV2, { ...paginationMetaData, ...{ language: lang } })
         .then(function (response) {
           if (response?.status === 'success') {
