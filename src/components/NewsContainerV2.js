@@ -17,7 +17,7 @@ import {
 import React, { useState, useEffect, useRef } from 'react';
 import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import LinearGradient from 'react-native-linear-gradient';
+// import LinearGradient from 'react-native-linear-gradient'; // Removed to fix runtime error
 
 import imageBg from '../assets/branding/logo.png';
 import { timeAgo } from '../handelers/ReusableHandeler';
@@ -146,10 +146,7 @@ const NewsContainerV2 = () => {
                         />
                         
                         {/* Gradient Overlay */}
-                        <LinearGradient
-                            colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.7)']}
-                            style={styles.gradientOverlay}
-                        />
+                        <View style={styles.gradientOverlay} />
                         
                         {/* Header Actions */}
                         <View style={styles.headerActions}>
@@ -307,6 +304,7 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         bottom: 0,
+        backgroundColor: 'rgba(0,0,0,0.4)',
     },
     headerActions: {
         position: 'absolute',

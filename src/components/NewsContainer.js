@@ -1,102 +1,155 @@
 import React from 'react';
-import { View, Image, Text, StyleSheet, Dimensions, TouchableOpacity, Platform, ScrollView } from 'react-native';
+import { 
+    View, 
+    Image, 
+    Text, 
+    StyleSheet, 
+    Dimensions, 
+    TouchableOpacity, 
+    Platform, 
+    ScrollView,
+    SafeAreaView
+} from 'react-native';
 import { calculateNumberOfLines, epochToDate, scaleFont } from '../handelers/ReusableHandeler';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import logo from './../assets/branding/logo.png'; // Import your logo image
+import logo from './../assets/branding/logo.png';
 
-const { height } = Dimensions.get('window');
-const maxImageHeight = height * 0.35; // Maximum height for the image
-const maxNewsHeight = height * 0.65; // Maximum height for the news content
+const { height, width } = Dimensions.get('window');
+const maxImageHeight = height * 0.4;
+const maxNewsHeight = height * 0.6;
 
 const NewsContainer = (props) => {
     const styles = StyleSheet.create({
         container: {
             backgroundColor: '#ffffff',
-            // borderRadius: 10,
+            borderRadius: 16,
             overflow: 'hidden',
+            marginHorizontal: 16,
+            marginVertical: 8,
             ...Platform.select({
                 ios: {
                     shadowColor: '#000',
                     shadowOffset: {
                         width: 0,
-                        height: 2,
+                        height: 4,
                     },
-                    shadowOpacity: 0.25,
-                    shadowRadius: 3.84,
+                    shadowOpacity: 0.12,
+                    shadowRadius: 8,
                 },
                 android: {
-                    elevation: 5,
+                    elevation: 8,
                 },
             }),
         },
+        imageContainer: {
+            position: 'relative',
+            height: maxImageHeight,
+        },
         image: {
-            flex: 1,
             width: '100%',
+            height: '100%',
             resizeMode: 'cover',
         },
-        textContainer: {
-            padding: 10,
+        imageOverlay: {
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: 'rgba(0,0,0,0.6)',
+            paddingHorizontal: 16,
+            paddingVertical: 12,
         },
-        title: {
-            fontSize: scaleFont(16), // Increase font size for title
-            fontWeight: 'bold', color: '#666',
-            // marginBottom: 5,
+        categoryBadge: {
+            position: 'absolute',
+            top: 12,
+            left: 12,
+            backgroundColor: '#007bff',
+            paddingHorizontal: 12,
+            paddingVertical: 6,
+            borderRadius: 12,
         },
-        sub_title: {
-            fontSize: scaleFont(14), // Increase font size for subTitle
-            // color: '#dcc', // Change color for subtitle
-            fontWeight: 'bold', // Make subtitle bold
-            marginBottom: 5,
-            marginTop: 5,
-        },
-        content: {
-            // fontSize: 16, // Increase font size for content
-            fontSize: scaleFont(12),
-            // lineHeight: 24, // Adjust line height as needed
+        categoryText: {
+            color: '#fff',
+            fontSize: 12,
+            fontWeight: '600',
         },
         userInfo: {
             flexDirection: 'row',
             alignItems: 'center',
-            padding: 10,
-            position: 'absolute',
-            bottom: 0,
-            width: '100%',
-            backgroundColor: '#00000073',
         },
         avatar: {
-            width: 40,
-            height: 40,
-            borderRadius: 20,
+            width: 32,
+            height: 32,
+            borderRadius: 16,
+            borderWidth: 2,
+            borderColor: '#fff',
         },
-        textInfo: {
+        userDetails: {
             marginLeft: 10,
-        },
-        textInfo2: {
             flex: 1,
+        },
+        userName: {
+            fontSize: 13,
+            fontWeight: '600',
+            color: '#fff',
+        },
+        userLocation: {
+            fontSize: 11,
+            color: 'rgba(255,255,255,0.8)',
+            marginTop: 2,
+        },
+        dateContainer: {
             alignItems: 'flex-end',
         },
-        name: {
-            fontSize: scaleFont(10),
-            fontWeight: 'bold',
-            color: 'white',
+        dateText: {
+            fontSize: 11,
+            color: 'rgba(255,255,255,0.8)',
         },
-        location: {
-            fontSize: scaleFont(10),
-            color: 'white',
+        contentContainer: {
+            padding: 20,
+        },
+        title: {
+            fontSize: 20,
+            fontWeight: 'bold',
+            color: '#1a1a1a',
+            lineHeight: 28,
+            marginBottom: 8,
+        },
+        subTitle: {
+            fontSize: 16,
+            fontWeight: '600',
+            color: '#4a4a4a',
+            lineHeight: 22,
+            marginBottom: 12,
+        },
+        content: {
+            fontSize: 15,
+            lineHeight: 24,
+            color: '#666',
+            textAlign: 'justify',
         },
         readMoreContainer: {
-            bottom: 10,
-            right: 10,
-            paddingVertical: 8,
-            paddingHorizontal: 12,
-            borderRadius: 5,
+            marginTop: 16,
+            alignItems: 'flex-end',
+        },
+        readMoreButton: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: '#007bff',
+            paddingHorizontal: 16,
+            paddingVertical: 10,
+            borderRadius: 20,
         },
         readMoreText: {
-            color: '#007AFF',
-            fontWeight: 'bold',
-            fontSize: scaleFont(12),
-            textAlign:'right'
+            color: '#fff',
+            fontWeight: '600',
+            fontSize: 14,
+            marginRight: 6,
+        },
+        readMoreIcon: {
+            marginLeft: 4,
         },
     });
 
@@ -132,35 +185,60 @@ const NewsContainer = (props) => {
     const navigation = useNavigation();
 
     return (
-        <View style={[styles.container, { height: props?.showFullContent ? undefined : (height - 50) }]}>
-            <View style={{ height: maxImageHeight, overflow: 'hidden' }}>
+        <View style={[styles.container, { height: props?.showFullContent ? undefined : (height - 100) }]}>
+            {/* Image Section with Overlay */}
+            <View style={styles.imageContainer}>
                 <Image
                     source={props.imageUrl ? { uri: props.imageUrl } : logo}
-                    style={[styles.image]}
+                    style={styles.image}
                 />
-                <View style={styles.userInfo}>
-                    <Image source={logo} style={styles.avatar} />
-                    <View style={styles.textInfo}>
-                        <Text style={styles.name}>{props?.params?.employeeId || '-'}</Text>
-                        <Text style={styles.location}>{props?.params?.category || '-'}</Text>
+                
+                {/* Category Badge */}
+                {props?.params?.category && (
+                    <View style={styles.categoryBadge}>
+                        <Text style={styles.categoryText}>{String(props.params.category)}</Text>
                     </View>
-                    <View style={styles.textInfo2}>
-                        <Text style={styles.location}>{epochToDate(props?.params?.createdDate) || '-'}</Text>
+                )}
+                
+                {/* User Info Overlay */}
+                <View style={styles.imageOverlay}>
+                    <View style={styles.userInfo}>
+                        <Image source={logo} style={styles.avatar} />
+                        <View style={styles.userDetails}>
+                            <Text style={styles.userName}>{String(props?.params?.employeeId || 'Neti Charithra')}</Text>
+                            <Text style={styles.userLocation}>{String(props?.params?.category || 'News')}</Text>
+                        </View>
+                        <View style={styles.dateContainer}>
+                            <Text style={styles.dateText}>{String(epochToDate(props?.params?.createdDate) || '-')}</Text>
+                        </View>
                     </View>
                 </View>
             </View>
-            <ScrollView style={[styles.textContainer, { height: props?.showFullContent ? undefined : maxNewsHeight, overflow: 'hidden' }]}>
-                <Text style={styles.title}>{props.title}</Text>
-                <Text style={styles.sub_title}>{props.subTitle}</Text>
-
-                {renderContent(props.content)}
-
-                {!props.showFullText && !props.showFullContent && (
-                    <TouchableOpacity onPress={() => navigation.navigate('DetailedNewsInfo', { data: { newsId: props.newsId } })} style={styles.readMoreContainer}>
-                        <Text style={styles.readMoreText}>మరింత సమాచారం చదవడానికి క్లిక్ చేయండి</Text>
-                    </TouchableOpacity>
+            
+            {/* Content Section */}
+            <ScrollView 
+                style={[styles.contentContainer, { height: props?.showFullContent ? undefined : maxNewsHeight }]}
+                showsVerticalScrollIndicator={false}
+            >
+                <Text style={styles.title}>{String(props.title || '')}</Text>
+                {props.subTitle && (
+                    <Text style={styles.subTitle}>{String(props.subTitle)}</Text>
                 )}
-
+                
+                {renderContent(props.content)}
+                
+                {!props.showFullText && !props.showFullContent && (
+                    <View style={styles.readMoreContainer}>
+                        <TouchableOpacity 
+                            onPress={() => navigation.navigate('DetailedNewsInfo', { data: { newsId: props.newsId } })} 
+                            style={styles.readMoreButton}
+                            activeOpacity={0.8}
+                        >
+                            <Text style={styles.readMoreText}>మరింత చదవండి</Text>
+                            <Ionicons name="arrow-forward" size={16} color="#fff" style={styles.readMoreIcon} />
+                        </TouchableOpacity>
+                    </View>
+                )}
             </ScrollView>
         </View>
     );

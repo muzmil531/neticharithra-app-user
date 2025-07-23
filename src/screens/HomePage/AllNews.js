@@ -143,12 +143,12 @@ const AllNews = () => {
 
               <FlatList
                 data={latestNews}
-                renderItem={({ item }) => (
+                renderItem={({ item, index }) => (
                   <View style={styles.item}>
                     <NewsTitleCard item={item} />
                   </View>
                 )}
-                keyExtractor={item => item.id}
+                keyExtractor={(item, index) => item.newsId?.toString() || item._id?.toString() || item.id?.toString() || index.toString()}
                 onEndReached={() => {
                   if (!paginationMetaData?.endOfRecords) {
                     getLatestNews({ ...paginationMetaData, page: paginationMetaData.page + 1 })

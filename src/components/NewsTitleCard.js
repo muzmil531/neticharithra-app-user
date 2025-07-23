@@ -1,37 +1,103 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { 
+    View, 
+    Text, 
+    StyleSheet, 
+    Image, 
+    TouchableOpacity, 
+    Dimensions,
+    Platform 
+} from 'react-native';
 import { timeAgo } from '../handelers/ReusableHandeler';
 import { useNavigation } from '@react-navigation/native';
-// import { Icon } from 'react-native-elements';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
+const { width } = Dimensions.get('window');
 
 const NewsTitleCard = (props) => {
-    let navigation = useNavigation()
+    const navigation = useNavigation();
+    
     return (
-        <TouchableOpacity onPress={() => { navigation.navigate('NewsContainerV2', { data: props.item }) }}>
+        <TouchableOpacity 
+            onPress={() => navigation.navigate('NewsContainerV2', { data: props.item })}
+            style={styles.container}
+            activeOpacity={0.8}
+        >
+            <View style={styles.card}>
+                {/* Image Section */}
+                <View style={styles.imageContainer}>
+                    <Image
+                        source={{ 
+                            uri: props?.item?.images?.[0]?.externalURL || 
+                                 props?.item?.images?.[0]?.tempURL || 
+                                 'https://upload.wikimedia.org/wikipedia/commons/3/32/Googleplex_HQ_%28cropped%29.jpg' 
+                        }}
+                        style={styles.image}
+                        resizeMode="cover"
+                    />
+                    
+                    {/* Category Badge */}
+                    {props?.item?.category && (
+                        <View style={styles.categoryBadge}>
+                            <Text style={styles.categoryText}>{String(props.item.category)}</Text>
+                        </View>
+                    )}
+                </View>
 
-
-            <View style={{ display: 'flex', flexDirection: 'row', minHeight: 10, margin: 5, marginLeft: 20 }}>
-                {/* <View> */}
-                <Image
-                    source={{ uri: props?.item?.images?.[0]?.externalURL || props?.item?.images?.[0]?.tempURL || 'https://upload.wikimedia.org/wikipedia/commons/3/32/Googleplex_HQ_%28cropped%29.jpg' }}
-
-                    style={styles.image}
-                />
-                {/* </View> */}
-
-
-                <View style={styles.card}>
-
+                {/* Content Section */}
+                <View style={styles.contentContainer}>
                     <View style={styles.textContainer}>
-                        <Text style={styles.title} numberOfLines={2}>{props?.item?.title}</Text>
-                        {
-                            props?.item?.approvedOn &&
-                            <Text style={styles.time}>
-                                {timeAgo(new Date(props?.item?.approvedOn))}
+                        <Text style={styles.title} numberOfLines={3}>
+                            {props?.item?.title || 'No Title'}
+                        </Text>
+                        
+                        {props?.item?.sub_title && (
+                            <Text style={styles.subtitle} numberOfLines={2}>
+                                {props.item.sub_title || ''}
                             </Text>
-                        }
+                        )}
+                        
+                        <View style={styles.metaContainer}>
+                            <View style={styles.timeContainer}>
+                                <Ionicons name="time-outline" size={14} color="#666" />
+                                <Text style={styles.timeText}>
+                                    {(() => {
+                                        try {
+                                            if (props?.item?.approvedOn) {
+                                                const timeResult = timeAgo(new Date(props.item.approvedOn));
+                                                return timeResult ? String(timeResult) : 'Just now';
+                                            }
+                                            return 'Just now';
+                                        } catch (error) {
+                                            return 'Just now';
+                                        }
+                                    })()}
+                                </Text>
+                            </View>
+                            
+                            {(() => {
+                                try {
+                                    const viewCount = props?.item?.viewCount;
+                                    if (viewCount !== undefined && viewCount !== null && viewCount !== '') {
+                                        return (
+                                            <View style={styles.viewContainer}>
+                                                <Ionicons name="eye-outline" size={14} color="#666" />
+                                                <Text style={styles.viewText}>{String(viewCount)}</Text>
+                                            </View>
+                                        );
+                                    }
+                                    return null;
+                                } catch (error) {
+                                    return null;
+                                }
+                            })()}
+                        </View>
                     </View>
-
+                    
+                    {/* Read More Arrow */}
+                    <View style={styles.arrowContainer}>
+                        <Ionicons name="chevron-forward" size={20} color="#007bff" />
+                    </View>
                 </View>
             </View>
         </TouchableOpacity>
@@ -39,49 +105,106 @@ const NewsTitleCard = (props) => {
 };
 
 const styles = StyleSheet.create({
+    container: {
+        marginHorizontal: 16,
+        marginVertical: 8,
+    },
     card: {
+        backgroundColor: '#fff',
+        borderRadius: 16,
+        overflow: 'hidden',
         flexDirection: 'row',
-        padding: 10,
-        backgroundColor: 'white',
-        borderRadius: 10,
-        height: 100,
-        width: "99%",
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.2,
-        shadowRadius: 2,
-        elevation: 3,
-        margin: 10, marginRight: 0, borderTopRightRadius: 0, borderBottomRightRadius: 0, marginLeft: 25, marginTop: 15
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: {
+                    width: 0,
+                    height: 2,
+                },
+                shadowOpacity: 0.1,
+                shadowRadius: 8,
+            },
+            android: {
+                elevation: 4,
+            },
+        }),
+    },
+    imageContainer: {
+        width: 120,
+        height: 120,
+        position: 'relative',
     },
     image: {
-        width: 100,
-        height: 100,
-        borderRadius: 10,
+        width: '100%',
+        height: '100%',
+    },
+    categoryBadge: {
         position: 'absolute',
-        zIndex: 99999
+        top: 8,
+        left: 8,
+        backgroundColor: '#007bff',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 8,
+    },
+    categoryText: {
+        color: '#fff',
+        fontSize: 10,
+        fontWeight: '600',
+    },
+    contentContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     textContainer: {
-        flex: 1, flexDirection: 'column',
-        marginLeft: 80, zIndex: -1,
-        justifyContent: 'space-between', // Distribute space evenly between top and bottom text
-        // alignItems: 'center', // Center the text horizontally
-        // paddingVertical: 20, // Add some vertical padding if needed
-        // justifyContent: 'center',
-        // justifyContent:'space-evenly'
+        flex: 1,
+        padding: 16,
+        justifyContent: 'space-between',
+        minHeight: 120,
     },
     title: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: 'black',
-        width: "95%"
+        color: '#1a1a1a',
+        lineHeight: 22,
+        marginBottom: 6,
     },
-    time: {
-        fontSize: 12,
-        color: 'grey', marginBottom: 10
+    subtitle: {
+        fontSize: 14,
+        color: '#666',
+        lineHeight: 20,
+        marginBottom: 8,
     },
-    icon: {
-        justifyContent: 'center',
+    metaContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
+        marginTop: 'auto',
+    },
+    timeContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    timeText: {
+        fontSize: 12,
+        color: '#666',
+        marginLeft: 4,
+        fontWeight: '500',
+    },
+    viewContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    viewText: {
+        fontSize: 12,
+        color: '#666',
+        marginLeft: 4,
+        fontWeight: '500',
+    },
+    arrowContainer: {
+        paddingRight: 16,
+        justifyContent: 'center',
     },
 });
 
