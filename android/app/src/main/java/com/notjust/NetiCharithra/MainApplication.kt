@@ -1,4 +1,4 @@
-package com.neticharithramobileapp
+package com.neticharithrauserapp
 
 import android.app.Application
 import com.facebook.react.PackageList

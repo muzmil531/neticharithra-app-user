@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Alert, Dimensions } from 'react-native';
-import { Appbar, Avatar, Button, Card, Checkbox } from 'react-native-paper';
+import { View, Text, StyleSheet, Dimensions, StatusBar, Animated } from 'react-native';
+import { Button } from 'react-native-paper';
 import { scaleFont } from '../handelers/ReusableHandeler';
-
 import { useTranslation } from 'react-i18next';
 import i18next from './../../services/i18next';
-
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { retrieveData, saveData } from '../handelers/AsyncStorageHandeler';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import ToasterService from '../components/ToasterService';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {
+    widthPercentageToDP as wp,
+    heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
+
 export const languageList = [
-    // {
-    //     "imageName": require('./../assets/languageImages/telugu.jpg'),
-    //     "color": "#000B49",
-    //     "name": "English",
     //     "nativeName": "English",
     //     "code": "en",
     //     'letter': "A",
@@ -24,17 +24,18 @@ export const languageList = [
     // },
     {
         "imageName": require('./../assets/languageImages/telugu.jpg'),
-        "color": "#FF6969",
+        "color": "#007bff",
         "name": "Telugu",
         "nativeName": "తెలుగు",
         "code": "te",
-
-        letter: "అ"
+        letter: "అ",
+        icon: "translate"
     }
 ];
 
 const LanguageSelectionScreen = ({ }) => {
     const [selectedLanguage, setSelectedLanguage] = useState("te");
+    const [scaleAnim] = useState(new Animated.Value(1));
 
     const { t } = useTranslation();
 
@@ -42,13 +43,16 @@ const LanguageSelectionScreen = ({ }) => {
         i18next.changeLanguage(lang);
     }
 
-    const navigation = useNavigation()
+    const navigation = useNavigation();
+    
     useFocusEffect(
         React.useCallback(() => {
             const fetchData = async () => {
                 try {
                     let language = await retrieveData('userLanguageSaved', 'string');
-                    // setSelectedLanguage(language);
+                    if (language) {
+                        setSelectedLanguage(language);
+                    }
                 } catch (error) {
                     console.error('Error retrieving user language:', error);
                 }
@@ -61,68 +65,155 @@ const LanguageSelectionScreen = ({ }) => {
             };
         }, [])
     );
-    const CustomHeader = ({ title, subtitle }) => (
-        <View style={styles.headerContent}>
-            <Text style={styles.headerTitle}>
-                Choose your preferred <Text style={{ fontWeight: 'bold' }}>language</Text> to read the <Text style={{ fontWeight: 'bold' }}>News</Text>
-            </Text>
-        </View>
-    );
+
+    const handleLanguageSelect = (langCode) => {
+        setSelectedLanguage(langCode);
+        // Add subtle animation feedback
+        Animated.sequence([
+            Animated.timing(scaleAnim, {
+                toValue: 0.95,
+                duration: 100,
+                useNativeDriver: true,
+            }),
+            Animated.timing(scaleAnim, {
+                toValue: 1,
+                duration: 100,
+                useNativeDriver: true,
+            }),
+        ]).start();
+    };
+
+    const handleSavePreferences = async () => {
+        if (selectedLanguage) {
+            try {
+                await saveData('userLanguageSaved', selectedLanguage);
+                changeLang(selectedLanguage);
+                navigation.navigate('IndexScreen');
+            } catch (error) {
+                ToasterService.showError("Error saving language preference");
+            }
+        } else {
+            ToasterService.showError("Please select a language to continue");
+        }
+    };
 
     return (
         <View style={styles.container}>
+            <StatusBar barStyle="dark-content" backgroundColor="#f8f9fa" />
+            
+            {/* Modern Header */}
             <View style={styles.header}>
-                <CustomHeader />
+                <View style={styles.headerIconContainer}>
+                    <MaterialCommunityIcons 
+                        name="translate" 
+                        size={wp('8%')} 
+                        color="#007bff" 
+                    />
+                </View>
+                <Text style={styles.headerTitle}>Choose Language</Text>
+                <Text style={styles.headerSubtitle}>
+                    Select your preferred language for reading news
+                </Text>
             </View>
+
+            {/* Content */}
             <View style={styles.content}>
-                <Text style={styles.title}>All Languages</Text>
-                {languageList.map((lang, index) => (
-                    <TouchableOpacity key={index} onPress={() => setSelectedLanguage(lang.code)} activeOpacity={0.8}>
+                <View style={styles.sectionHeader}>
+                    <MaterialCommunityIcons 
+                        name="earth" 
+                        size={wp('5%')} 
+                        color="#6c757d" 
+                    />
+                    <Text style={styles.sectionTitle}>Available Languages</Text>
+                </View>
 
-                        <View style={{ margin: 10, padding: 10, borderRadius: 50, backgroundColor: selectedLanguage === lang?.code ? '#3AA2DB' : '#fff', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <View style={{ flexDirection: 'row' }}>
-                                <View style={{ backgroundColor: selectedLanguage === lang?.code ? 'white' : '#3AA2DB', padding: 5, borderRadius: 50, width: 40, height: 40, justifyContent: 'center', alignItems: 'center' }}>
-                                    <Text style={{ fontSize: 20, color: selectedLanguage === lang?.code ? '#000' : '#fff' }}>{lang?.letter}</Text>
+                {/* Language Cards */}
+                <View style={styles.languageContainer}>
+                    {languageList.map((lang, index) => (
+                        <Animated.View 
+                            key={index} 
+                            style={[styles.languageCardWrapper, { transform: [{ scale: scaleAnim }] }]}
+                        >
+                            <TouchableOpacity 
+                                onPress={() => handleLanguageSelect(lang.code)} 
+                                activeOpacity={0.7}
+                                style={[
+                                    styles.languageCard,
+                                    selectedLanguage === lang.code && styles.selectedCard
+                                ]}
+                            >
+                                {/* Language Icon/Letter */}
+                                <View style={[
+                                    styles.languageIcon,
+                                    selectedLanguage === lang.code && styles.selectedIcon
+                                ]}>
+                                    <Text style={[
+                                        styles.languageIconText,
+                                        selectedLanguage === lang.code && styles.selectedIconText
+                                    ]}>
+                                        {lang.letter}
+                                    </Text>
                                 </View>
-                                <View style={{ padding: 5, justifyContent: 'center', alignItems: 'center' }}>
-                                    <Text style={{ fontSize: 20, color: selectedLanguage === lang?.code ? '#fff' : '#000' }}>{lang?.nativeName}</Text>
+
+                                {/* Language Info */}
+                                <View style={styles.languageInfo}>
+                                    <Text style={[
+                                        styles.languageNativeName,
+                                        selectedLanguage === lang.code && styles.selectedLanguageName
+                                    ]}>
+                                        {lang.nativeName}
+                                    </Text>
+                                    <Text style={[
+                                        styles.languageEnglishName,
+                                        selectedLanguage === lang.code && styles.selectedLanguageSubtext
+                                    ]}>
+                                        {lang.name}
+                                    </Text>
                                 </View>
-                            </View>
-                            <View style={{ marginRight: 10 }}>
-                                <View style={{ width: 14, height: 14, borderRadius: 50, justifyContent: 'center', alignItems: 'center', borderColor: selectedLanguage === lang?.code ? 'white' : 'black', borderWidth: 1 }}>
 
-                                    {
-                                        selectedLanguage === lang?.code &&
-
-                                        <View style={{ width: 8, height: 8, backgroundColor: 'white', borderRadius: 50 }}>
-
-                                        </View>
-                                    }
+                                {/* Selection Indicator */}
+                                <View style={styles.selectionContainer}>
+                                    <View style={[
+                                        styles.radioButton,
+                                        selectedLanguage === lang.code && styles.radioButtonSelected
+                                    ]}>
+                                        {selectedLanguage === lang.code && (
+                                            <View style={styles.radioButtonInner} />
+                                        )}
+                                    </View>
                                 </View>
-                            </View>
-                        </View>
 
+                                {/* Selected Badge */}
+                                {selectedLanguage === lang.code && (
+                                    <View style={styles.selectedBadge}>
+                                        <MaterialCommunityIcons 
+                                            name="check" 
+                                            size={wp('4%')} 
+                                            color="white" 
+                                        />
+                                    </View>
+                                )}
+                            </TouchableOpacity>
+                        </Animated.View>
+                    ))}
+                </View>
+
+                {/* Save Button */}
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity 
+                        style={styles.saveButton} 
+                        onPress={handleSavePreferences}
+                        activeOpacity={0.8}
+                    >
+                        <MaterialCommunityIcons 
+                            name="content-save" 
+                            size={wp('5%')} 
+                            color="white" 
+                            style={styles.saveButtonIcon}
+                        />
+                        <Text style={styles.saveButtonText}>Save Preferences</Text>
                     </TouchableOpacity>
-                ))}
-                <Button mode="contained" onPress={async () => {
-                    console.log("HII", selectedLanguage)
-                    if (selectedLanguage) {
-                        let data = await saveData('userLanguageSaved', selectedLanguage);
-                        changeLang(selectedLanguage)
-                        console.log(data)
-                        navigation.navigate('IndexScreen')
-                    } else {
-                        ToasterService.showError("Kindly select Langauge to Save")
-                        // Alert.alert("Kindly select Langauge to Save")
-                        return
-
-                    }
-
-                }
-
-                } style={styles.saveButton}>
-                    Save Preferences
-                </Button>
+                </View>
             </View>
         </View>
     );
@@ -131,70 +222,205 @@ const LanguageSelectionScreen = ({ }) => {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1
+        flex: 1,
+        backgroundColor: '#f8f9fa',
     },
     header: {
-        // height: 'auto',
-        elevation: 3,
-        paddingVertical: 20,
-        paddingHorizontal: 10,
+        backgroundColor: 'white',
+        paddingTop: hp('6%'),
+        paddingBottom: hp('4%'),
+        paddingHorizontal: wp('6%'),
         alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'white'
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 3.84,
+        borderBottomLeftRadius: wp('6%'),
+        borderBottomRightRadius: wp('6%'),
     },
-    headerContent: {
-        alignItems: 'center',
+    headerIconContainer: {
+        backgroundColor: '#e3f2fd',
+        padding: wp('3%'),
+        borderRadius: wp('6%'),
+        marginBottom: hp('2%'),
     },
     headerTitle: {
-        fontSize: scaleFont(14)
+        fontSize: wp('7%'),
+        fontWeight: '700',
+        color: '#1a1a1a',
+        marginBottom: hp('1%'),
+        textAlign: 'center',
+    },
+    headerSubtitle: {
+        fontSize: wp('3.8%'),
+        color: '#6c757d',
+        textAlign: 'center',
+        lineHeight: wp('5.5%'),
+        paddingHorizontal: wp('4%'),
     },
     content: {
         flex: 1,
-        marginTop: 10,
-        padding: 10,
+        paddingHorizontal: wp('5%'),
+        paddingTop: hp('3%'),
     },
-    card: {
-        marginBottom: 20,
-        backgroundColor: 'white'
-    },
-    cardContent: {
+    sectionHeader: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: 10,
-        paddingVertical: 10
+        marginBottom: hp('2.5%'),
+        paddingHorizontal: wp('2%'),
     },
-    logo: {
-        marginRight: 10,
+    sectionTitle: {
+        fontSize: wp('4.5%'),
+        fontWeight: '600',
+        color: '#495057',
+        marginLeft: wp('2%'),
     },
-    textContainer: {
+    languageContainer: {
+        marginBottom: hp('4%'),
+    },
+    languageCardWrapper: {
+        marginBottom: hp('2%'),
+    },
+    languageCard: {
+        backgroundColor: 'white',
+        borderRadius: wp('4%'),
+        padding: wp('4%'),
+        flexDirection: 'row',
+        alignItems: 'center',
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowOpacity: 0.08,
+        shadowRadius: 2.22,
+        borderWidth: 1,
+        borderColor: '#e9ecef',
+        position: 'relative',
+    },
+    selectedCard: {
+        backgroundColor: '#007bff',
+        borderColor: '#0056b3',
+        elevation: 4,
+        shadowOpacity: 0.15,
+    },
+    languageIcon: {
+        width: wp('12%'),
+        height: wp('12%'),
+        borderRadius: wp('6%'),
+        backgroundColor: '#e3f2fd',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: wp('4%'),
+    },
+    selectedIcon: {
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    },
+    languageIconText: {
+        fontSize: wp('6%'),
+        fontWeight: '600',
+        color: '#007bff',
+    },
+    selectedIconText: {
+        color: '#007bff',
+    },
+    languageInfo: {
         flex: 1,
-        marginRight: 10,
+        marginRight: wp('3%'),
     },
-    textRow: {
-        flexDirection: 'row',
+    languageNativeName: {
+        fontSize: wp('5%'),
+        fontWeight: '600',
+        color: '#1a1a1a',
+        marginBottom: hp('0.5%'),
+    },
+    selectedLanguageName: {
+        color: 'white',
+    },
+    languageEnglishName: {
+        fontSize: wp('3.5%'),
+        color: '#6c757d',
+        fontWeight: '400',
+    },
+    selectedLanguageSubtext: {
+        color: 'rgba(255, 255, 255, 0.8)',
+    },
+    selectionContainer: {
+        marginRight: wp('2%'),
+    },
+    radioButton: {
+        width: wp('5%'),
+        height: wp('5%'),
+        borderRadius: wp('2.5%'),
+        borderWidth: 2,
+        borderColor: '#dee2e6',
+        justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: 'white',
     },
-    nativeNameText: {
-        marginBottom: 5,
-        marginRight: 10,
-        fontSize: scaleFont(35)
+    radioButtonSelected: {
+        borderColor: 'white',
+        backgroundColor: 'white',
     },
-    nameText: {
-        marginRight: 10,
-        fontSize: scaleFont(20),
-        fontWeight: 'bold'
+    radioButtonInner: {
+        width: wp('2.5%'),
+        height: wp('2.5%'),
+        borderRadius: wp('1.25%'),
+        backgroundColor: '#007bff',
     },
-    checkboxContainer: {
-        marginRight: 10,
+    selectedBadge: {
+        position: 'absolute',
+        top: -wp('1%'),
+        right: -wp('1%'),
+        backgroundColor: '#28a745',
+        borderRadius: wp('3%'),
+        width: wp('6%'),
+        height: wp('6%'),
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowOpacity: 0.2,
+        shadowRadius: 1.41,
+    },
+    buttonContainer: {
+        paddingBottom: hp('4%'),
+        paddingHorizontal: wp('2%'),
     },
     saveButton: {
-        marginTop: 20,
-        backgroundColor: '#000B49', // or any color you prefer
+        backgroundColor: '#007bff',
+        borderRadius: wp('3%'),
+        paddingVertical: hp('2%'),
+        paddingHorizontal: wp('6%'),
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.15,
+        shadowRadius: 3.84,
     },
-    title: {
-        fontSize: scaleFont(14), fontWeight: 'bold'
-    }
+    saveButtonIcon: {
+        marginRight: wp('2%'),
+    },
+    saveButtonText: {
+        color: 'white',
+        fontSize: wp('4.2%'),
+        fontWeight: '600',
+    },
 });
 
 export default LanguageSelectionScreen;

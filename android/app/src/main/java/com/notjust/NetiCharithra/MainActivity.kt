@@ -1,4 +1,4 @@
-package com.neticharithramobileapp
+package com.neticharithrauserapp
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
