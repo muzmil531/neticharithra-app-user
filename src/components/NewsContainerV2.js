@@ -41,6 +41,7 @@ const NewsContainerV2 = () => {
             const fetchData = async () => {
                 try {
                     setLoading(true);
+                    console.log(route.params.data)
                     await getnewsInfo(route.params.data);
                     
                     // Animate content in
@@ -101,11 +102,11 @@ const NewsContainerV2 = () => {
         try {
             console.log("payload", payload);
             const response = await post(EndPointConfig.getIndividualNewsInfo, payload);
-            console.log("response", response);
+            console.log("response", response.data);
             
             if (response?.status === 'success') {
-                setNewsInfo(response?.data?.[0] || {});
-                console.log(response?.data?.[0]);
+                setNewsInfo(response?.data || {});
+                console.log(response?.data);
             }
             setLoading(false);
         } catch (error) {

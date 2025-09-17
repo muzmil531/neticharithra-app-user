@@ -14,6 +14,7 @@ const ExampleParallaxCarousel = (props) => {
   const renderItem = ({ item, index }, parallaxProps) => {
     return (
 
+      // <TouchableOpacity style={styles.item} onPress={() => { console.log(item) }}>
       <TouchableOpacity style={styles.item} onPress={() => { navigation.navigate('NewsContainerV2', { data: item }) }}>
         <ParallaxImage
           source={{ uri: item.images?.[0]?.externalURL || item.images?.[0]?.tempURL || 'https://upload.wikimedia.org/wikipedia/commons/3/32/Googleplex_HQ_%28cropped%29.jpg' }}

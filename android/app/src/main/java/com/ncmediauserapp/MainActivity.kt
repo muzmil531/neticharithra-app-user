@@ -1,4 +1,4 @@
-package com.neticharithrauserapp
+package com.ncmediauserapp
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
