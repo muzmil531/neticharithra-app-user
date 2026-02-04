@@ -2,7 +2,6 @@ import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import React, { useEffect } from 'react';
 import type { PropsWithChildren } from 'react';
 import {
-  SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -11,7 +10,7 @@ import {
   View,
 } from 'react-native';
 
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Main from './src/route/Main';
 import Colors from './src/colors/Colors';
@@ -24,7 +23,7 @@ type SectionProps = PropsWithChildren<{
 }>;
 
 function App(): React.JSX.Element {
-  const colors = Colors[useColorScheme()]
+  const colors = Colors[useColorScheme() || 'light']
   const navTheme = {
     ...DefaultTheme,
     colors: {
@@ -44,15 +43,15 @@ function App(): React.JSX.Element {
   }, [])
 
   return (
-    // <SafeAreaProvider>
-    <GestureHandlerRootView >
-      <SafeAreaView style={{ flex: 1 }}>
-        <NavigationContainer theme={navTheme}>
-          <Main />
-        </NavigationContainer>
-      </SafeAreaView>
-    </GestureHandlerRootView>
-    // </SafeAreaProvider>
+    <SafeAreaProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1 }} edges={['top', 'right', 'bottom', 'left']}>
+          <NavigationContainer theme={navTheme}>
+            <Main />
+          </NavigationContainer>
+        </SafeAreaView>
+      </GestureHandlerRootView>
+    </SafeAreaProvider>
   );
 }
 
