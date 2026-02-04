@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import PropTypes from 'prop-types';
 import logoImage from '../assets/branding/logo_size.png';
+import { useTheme } from '../context/ThemeContext';
 
 const LoadingScreen = (props) => {
   const [loadingText, setLoadingText] = useState(props.message || 'Loading');
+  const { colors, isDark } = useTheme();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -20,9 +22,9 @@ const LoadingScreen = (props) => {
   }, [props.message]);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.backgroundColor }]}>
       <Image source={logoImage} style={styles.image} />
-      <Text style={styles.text}>{loadingText}</Text>
+      <Text style={[styles.text, { color: colors.textSecondary }]}>{loadingText}</Text>
     </View>
   );
 };
@@ -36,7 +38,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
   },
   image: {
     width: 200,

@@ -12,7 +12,7 @@ import { retrieveData } from './AsyncStorageHandeler';
 // export const BASE_URL = 'https://ho6nistug6promwrubxbyinjhy0ttskw.lambda-url.ap-south-1.on.aws/api/v3/mobile/';
 export const BASE_URL = 'https://api.neticharithra.com/api/v3/mobile/';
 // export const BASE_URL = 'https://us-central1-neticharithra-ncmedia.cloudfunctions.net/api/api/v2/';
-// export const BASE_URL = 'http://192.168.0.103:3000/api/v2/';
+// export const BASE_URL = 'http://9.109.221.245:3000/api/v3/mobile/';
 // export const BASE_URL = 'http://192.168.10.185:3000/api/v2/';
 // export const BASE_URL = 'https://viridian-slug-sari.cyclic.app/api/v2/';
 

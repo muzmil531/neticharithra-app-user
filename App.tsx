@@ -1,4 +1,4 @@
-import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import React, { useEffect } from 'react';
 import type { PropsWithChildren } from 'react';
 import {
@@ -13,30 +13,31 @@ import {
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Main from './src/route/Main';
-import Colors from './src/colors/Colors';
+import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 
 import i18next from './services/i18next'
-// import { foreGroundNotification, requestUserPermission } from './src/services/NotificationServices';
 
 type SectionProps = PropsWithChildren<{
   title: string;
 }>;
 
-function App(): React.JSX.Element {
-  const colors = Colors[useColorScheme() || 'light']
+function AppContent(): React.JSX.Element {
+  const { colors, isDark } = useTheme();
+  
   const navTheme = {
-    ...DefaultTheme,
+    ...(isDark ? DarkTheme : DefaultTheme),
     colors: {
-      ...DefaultTheme.colors,
+      ...(isDark ? DarkTheme.colors : DefaultTheme.colors),
       background: colors.navColor,
-      text: colors.heading
+      text: colors.heading,
+      card: colors.cardBackground,
+      border: colors.borderColor,
+      primary: colors.brandPrimary,
     },
   };
 
   useEffect(() => {
 
-    // requestUserPermission()
-    // foreGroundNotification()
     return () => {
 
     }
@@ -45,13 +46,25 @@ function App(): React.JSX.Element {
   return (
     <SafeAreaProvider>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <SafeAreaView style={{ flex: 1 }} edges={['top', 'right', 'bottom', 'left']}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: colors.backgroundColor }} edges={['top', 'right', 'bottom', 'left']}>
+          <StatusBar 
+            barStyle={isDark ? 'light-content' : 'dark-content'} 
+            backgroundColor={colors.headerThemeBg}
+          />
           <NavigationContainer theme={navTheme}>
             <Main />
           </NavigationContainer>
         </SafeAreaView>
       </GestureHandlerRootView>
     </SafeAreaProvider>
+  );
+}
+
+function App(): React.JSX.Element {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 }
 

@@ -6,7 +6,7 @@ import { post } from '../handelers/APIHandeler';
 import EndPointConfig from '../handelers/EndPointConfig';
 import { useFocusEffect } from '@react-navigation/native';
 import { retrieveData } from '../handelers/AsyncStorageHandeler';
-import Colors from '../colors/Colors';
+import { useTheme } from '../context/ThemeContext';
 
 const Tab = createMaterialTopTabNavigator();
 let height = Dimensions.get('screen').height;
@@ -16,7 +16,21 @@ const HomePageScreens = () => {
   let [listOfCategories, setListOfCategories] = useState([]);
   let [listOfNEWSTYPE, setListOfNewsType] = useState([]);
   let [userLanguage, setUserLanguage] = useState('label');
-  const colors = Colors[useColorScheme()]
+  const themeData = useTheme();
+  console.log('HomePageScreens theme data:', { 
+    hasColors: !!themeData?.colors,
+    themeData: themeData
+  });
+  
+  // Ensure we always have valid colors with all required properties
+  const colors = themeData?.colors || {
+    tabBarActive: '#e91e63',
+    heading: '#000',
+    headerThemeBg: '#fff',
+    headerThemeText: '#000',
+    tabIndicator: '#B61F24'
+  };
+  const isDark = themeData?.isDark || false;
 
   useFocusEffect(
     React.useCallback(() => {
@@ -60,11 +74,11 @@ const HomePageScreens = () => {
       <Tab.Navigator
         initialRouteName="All News"
         screenOptions={{
-          tabBarActiveTintColor: '#e91e63',
-          tabBarLabelStyle: { fontSize: 16, color: 'black', textTransform: 'none' },
-          tabBarStyle: { backgroundColor: colors.headerThemeBg, color: colors.headerThemeText, padding: 0, margin: 0 },
-          tabBarIndicatorStyle: { backgroundColor: '#B61F24' },
-          tabBarScrollEnabled: true, // Enable scrolling
+          tabBarActiveTintColor: colors?.tabBarActive || '#e91e63',
+          tabBarLabelStyle: { fontSize: 16, color: colors?.heading || '#000', textTransform: 'none' },
+          tabBarStyle: { backgroundColor: colors?.headerThemeBg || '#fff', color: colors?.headerThemeText || '#000', padding: 0, margin: 0 },
+          tabBarIndicatorStyle: { backgroundColor: colors?.tabIndicator || '#B61F24' },
+          tabBarScrollEnabled: true,
           tabBarItemStyle: { width: 100, margin: 0, padding: 0 },
 
 

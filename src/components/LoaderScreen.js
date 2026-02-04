@@ -2,13 +2,15 @@
 
 import React from 'react';
 import { Modal, ActivityIndicator, View, StyleSheet } from 'react-native';
+import { useTheme } from '../context/ThemeContext';
 
 const LoaderScreen = ({ loading }) => {
+    const { colors } = useTheme();
     return (
         <Modal transparent animationType="none" visible={loading}>
             <View style={styles.modalBackground}>
                 <View style={styles.activityIndicatorWrapper}>
-                    <ActivityIndicator animating={loading} size="large" color="#fff" />
+                    <ActivityIndicator animating={loading} size="large" color={colors.brandSecondary} />
                 </View>
             </View>
         </Modal>

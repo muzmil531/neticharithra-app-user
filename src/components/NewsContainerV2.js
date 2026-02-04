@@ -17,7 +17,7 @@ import {
 import React, { useState, useEffect, useRef } from 'react';
 import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-// import LinearGradient from 'react-native-linear-gradient'; // Removed to fix runtime error
+import { useTheme } from '../context/ThemeContext';
 
 import imageBg from '../assets/branding/logo.png';
 import { timeAgo } from '../handelers/ReusableHandeler';
@@ -35,6 +35,7 @@ const NewsContainerV2 = () => {
     let navigation = useNavigation();
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const slideAnim = useRef(new Animated.Value(50)).current;
+    const { colors, isDark } = useTheme();
 
     useFocusEffect(
         React.useCallback(() => {
@@ -116,11 +117,11 @@ const NewsContainerV2 = () => {
     };
     if (loading) {
         return (
-            <SafeAreaView style={styles.loadingContainer}>
-                <StatusBar barStyle="light-content" backgroundColor="#1a1a1a" />
+            <SafeAreaView style={[styles.loadingContainer, { backgroundColor: colors.backgroundColor }]}>
+                <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.headerThemeBg} />
                 <View style={styles.loadingContent}>
                     <Animated.View style={[styles.loadingSpinner, { opacity: fadeAnim }]}>
-                        <Text style={styles.loadingText}>Loading...</Text>
+                        <Text style={[styles.loadingText, { color: colors.textPrimary }]}>Loading...</Text>
                     </Animated.View>
                 </View>
             </SafeAreaView>
@@ -128,8 +129,8 @@ const NewsContainerV2 = () => {
     }
 
     return (
-        <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
+        <SafeAreaView style={[styles.container, { backgroundColor: colors.screenBackground }]}>
+            <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.headerThemeBg} />
             {
                 newsInfo &&
                 <Animated.View style={[styles.mainContainer, { opacity: fadeAnim }]}>
@@ -180,7 +181,8 @@ const NewsContainerV2 = () => {
                     {/* Content Section */}
                     <Animated.View 
                         style={[
-                            styles.contentSection, 
+                            styles.contentSection,
+                            { backgroundColor: colors.screenBackground },
                             { transform: [{ translateY: slideAnim }] }
                         ]}
                     >
@@ -191,20 +193,20 @@ const NewsContainerV2 = () => {
                         >
                             {/* Title */}
                             <View style={styles.titleContainer}>
-                                <Text style={styles.newsTitle}>
+                                <Text style={[styles.newsTitle, { color: colors.textPrimary }]}>
                                     {newsInfo?.title}
                                 </Text>
                             </View>
 
                             {/* Description */}
                             <View style={styles.descriptionContainer}>
-                                <Text style={styles.newsDescription}>
+                                <Text style={[styles.newsDescription, { color: colors.textSecondary }]}>
                                     {newsInfo?.description}
                                 </Text>
                             </View>
 
                             {/* Author/Source Card */}
-                            <View style={styles.authorCard}>
+                            <View style={[styles.authorCard, { backgroundColor: colors.cardBackground }]}>
                                 <View style={styles.authorInfo}>
                                     <View style={styles.avatarContainer}>
                                         {
@@ -230,23 +232,23 @@ const NewsContainerV2 = () => {
                                         {
                                             newsInfo?.source === 'Neti Charithra' && (
                                                 <View style={styles.reporterInfo}>
-                                                    <Text style={styles.authorName}>
+                                                    <Text style={[styles.authorName, { color: colors.textPrimary }]}>
                                                         {newsInfo?.reportedBy?.name}
                                                     </Text>
-                                                    <Text style={styles.authorRole}>
+                                                    <Text style={[styles.authorRole, { color: colors.textSecondary }]}>
                                                         {newsInfo?.reportedBy?.role}
                                                     </Text>
                                                 </View>
                                             )
                                         }
                                         
-                                        <Pressable onPress={openSourceLink} style={styles.sourceContainer}>
-                                            <Text style={styles.sourceLabel}>Source:</Text>
-                                            <Text style={styles.sourceName}>
+                                        <Pressable onPress={openSourceLink} style={[styles.sourceContainer, { backgroundColor: colors.backgroundColor, borderLeftColor: colors.brandSecondary }]}>
+                                            <Text style={[styles.sourceLabel, { color: colors.textSecondary }]}>Source:</Text>
+                                            <Text style={[styles.sourceName, { color: colors.brandSecondary }]}>
                                                 {newsInfo?.source}
                                             </Text>
                                             {newsInfo?.source !== 'Neti Charithra' && newsInfo?.sourceLink && (
-                                                <Ionicons name="open-outline" size={14} color="#007bff" style={styles.externalIcon} />
+                                                <Ionicons name="open-outline" size={14} color={colors.brandSecondary} style={styles.externalIcon} />
                                             )}
                                         </Pressable>
                                     </View>
@@ -268,11 +270,9 @@ export default NewsContainerV2;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f8f9fa',
     },
     loadingContainer: {
         flex: 1,
-        backgroundColor: '#1a1a1a',
     },
     loadingContent: {
         flex: 1,
@@ -283,7 +283,6 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     loadingText: {
-        color: '#fff',
         fontSize: 16,
         fontWeight: '500',
     },
@@ -305,7 +304,6 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: 'rgba(0,0,0,0.4)',
     },
     headerActions: {
         position: 'absolute',
@@ -321,7 +319,6 @@ const styles = StyleSheet.create({
         width: 44,
         height: 44,
         borderRadius: 22,
-        backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'center',
         alignItems: 'center',
         backdropFilter: 'blur(10px)',
@@ -330,19 +327,16 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 20,
         left: 20,
-        backgroundColor: 'rgba(0,0,0,0.7)',
         paddingHorizontal: 12,
         paddingVertical: 6,
         borderRadius: 16,
     },
     timeText: {
-        color: '#fff',
         fontSize: 12,
         fontWeight: '500',
     },
     contentSection: {
         flex: 1,
-        backgroundColor: '#f8f9fa',
         borderTopLeftRadius: 24,
         borderTopRightRadius: 24,
         marginTop: -24,
@@ -359,7 +353,6 @@ const styles = StyleSheet.create({
     newsTitle: {
         fontSize: 28,
         fontWeight: 'bold',
-        color: '#1a1a1a',
         lineHeight: 36,
         letterSpacing: -0.5,
     },
@@ -368,13 +361,11 @@ const styles = StyleSheet.create({
     },
     newsDescription: {
         fontSize: 16,
-        color: '#4a4a4a',
         lineHeight: 26,
         textAlign: 'justify',
         letterSpacing: 0.2,
     },
     authorCard: {
-        backgroundColor: '#fff',
         borderRadius: 16,
         padding: 20,
         marginBottom: 20,
@@ -395,7 +386,6 @@ const styles = StyleSheet.create({
         marginRight: 16,
     },
     avatarText: {
-        backgroundColor: '#007bff',
     },
     authorDetails: {
         flex: 1,
@@ -406,12 +396,10 @@ const styles = StyleSheet.create({
     authorName: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#1a1a1a',
         marginBottom: 2,
     },
     authorRole: {
         fontSize: 14,
-        color: '#6c757d',
         fontStyle: 'italic',
     },
     sourceContainer: {
@@ -419,20 +407,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 8,
         paddingHorizontal: 12,
-        backgroundColor: '#f8f9fa',
         borderRadius: 8,
         borderLeftWidth: 3,
-        borderLeftColor: '#007bff',
     },
     sourceLabel: {
         fontSize: 12,
-        color: '#6c757d',
         fontWeight: '500',
         marginRight: 6,
     },
     sourceName: {
         fontSize: 14,
-        color: '#007bff',
         fontWeight: '600',
         flex: 1,
     },
@@ -454,7 +438,6 @@ const styles = StyleSheet.create({
         position: 'absolute',
         fontSize: 20,
         fontWeight: 'bold',
-        color: 'black',
         top: 0,
         left: 0,
         width: '100%',

@@ -11,11 +11,13 @@ import {
 import { timeAgo } from '../handelers/ReusableHandeler';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useTheme } from '../context/ThemeContext';
 
 const { width } = Dimensions.get('window');
 
 const NewsTitleCard = (props) => {
     const navigation = useNavigation();
+    const { colors, isDark } = useTheme();
     
     return (
         <TouchableOpacity 
@@ -25,7 +27,7 @@ const NewsTitleCard = (props) => {
             }}
             activeOpacity={0.95}
         >
-            <View style={styles.card}>
+            <View style={[styles.card, { backgroundColor: colors.cardBackground, borderColor: colors.divider }]}>
                 {/* Main Content */}
                 <View style={styles.mainContent}>
                     {/* Text Content */}
@@ -33,16 +35,16 @@ const NewsTitleCard = (props) => {
                         {/* Category & Meta Row */}
                         <View style={styles.topRow}>
                             {props?.item?.category && (
-                                <View style={styles.categoryChip}>
-                                    <Text style={styles.categoryText}>
+                                <View style={[styles.categoryChip, { backgroundColor: isDark ? colors.backgroundColor : '#f8f9fa', borderLeftColor: colors.brandSecondary }]}>
+                                    <Text style={[styles.categoryText, { color: colors.brandSecondary }]}>
                                         {String(props?.item?.category || 'News').toUpperCase()}
                                     </Text>
                                 </View>
                             )}
                             
                             <View style={styles.metaInfo}>
-                                <Ionicons name="time-outline" size={12} color="#999" />
-                                <Text style={styles.timeText}>
+                                <Ionicons name="time-outline" size={12} color={colors.textTertiary} />
+                                <Text style={[styles.timeText, { color: colors.textTertiary }]}>
                                     {(() => {
                                         try {
                                             if (props?.item?.approvedOn) {
@@ -59,20 +61,20 @@ const NewsTitleCard = (props) => {
                         </View>
                         
                         {/* Title */}
-                        <Text style={styles.title} numberOfLines={2}>
+                        <Text style={[styles.title, { color: colors.textPrimary }]} numberOfLines={2}>
                             {String(props?.item?.title || 'No Title Available')}
                         </Text>
                         
                         {/* Subtitle */}
                         {props?.item?.subTitle && (
-                            <Text style={styles.subtitle} numberOfLines={1}>
+                            <Text style={[styles.subtitle, { color: colors.textSecondary }]} numberOfLines={1}>
                                 {String(props?.item?.subTitle)}
                             </Text>
                         )}
                     </View>
                     
                     {/* Image */}
-                    <View style={styles.imageContainer}>
+                    <View style={[styles.imageContainer, { backgroundColor: colors.backgroundColor }]}>
                         <Image 
                             source={{
                                 uri: props?.item?.images?.[0]?.externalURL || 
@@ -98,14 +100,12 @@ const styles = StyleSheet.create({
         marginVertical: 0,
     },
     card: {
-        backgroundColor: '#fff',
         marginHorizontal: 16,
         marginVertical: 3,
         paddingHorizontal: 14,
         paddingVertical: 12,
         borderRadius: 8,
         borderWidth: 1,
-        borderColor: '#f0f0f0',
         ...Platform.select({
             ios: {
                 shadowColor: '#000',
@@ -136,15 +136,12 @@ const styles = StyleSheet.create({
         marginBottom: 6,
     },
     categoryChip: {
-        backgroundColor: '#f8f9fa',
         paddingHorizontal: 6,
         paddingVertical: 2,
         borderRadius: 3,
         borderLeftWidth: 2,
-        borderLeftColor: '#007bff',
     },
     categoryText: {
-        color: '#007bff',
         fontSize: 9,
         fontWeight: '600',
         letterSpacing: 0.3,
@@ -155,36 +152,31 @@ const styles = StyleSheet.create({
     },
     timeText: {
         fontSize: 10,
-        color: '#999',
         fontWeight: '500',
         marginLeft: 3,
     },
     title: {
         fontSize: 15,
         fontWeight: '700',
-        color: '#1a1a1a',
         lineHeight: 20,
         marginBottom: 4,
         letterSpacing: -0.1,
     },
     subtitle: {
         fontSize: 12,
-        color: '#666',
         lineHeight: 16,
         fontWeight: '400',
     },
     imageContainer: {
-        width: 60,
+        width: 80,
         height: 60,
         borderRadius: 4,
         overflow: 'hidden',
-        backgroundColor: '#f8f9fa',
     },
     image: {
         width: '100%',
         height: '100%',
     },
-
 });
 
 export default NewsTitleCard;

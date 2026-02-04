@@ -3,12 +3,14 @@ import { View, Text, StyleSheet, Platform, Dimensions, TouchableOpacity } from '
 import Carousel, { ParallaxImage, Pagination } from 'react-native-snap-carousel';
 import { timeAgo } from '../handelers/ReusableHandeler';
 import { useNavigation } from '@react-navigation/native';
+import { useTheme } from '../context/ThemeContext';
 
 const { width: screenWidth } = Dimensions.get('window');
 
 const ExampleParallaxCarousel = (props) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const carouselRef = useRef(null);
+  const { colors } = useTheme();
 
   const navigation = useNavigation()
   const renderItem = ({ item, index }, parallaxProps) => {
@@ -18,20 +20,20 @@ const ExampleParallaxCarousel = (props) => {
       <TouchableOpacity style={styles.item} onPress={() => { navigation.navigate('NewsContainerV2', { data: item }) }}>
         <ParallaxImage
           source={{ uri: item.images?.[0]?.externalURL || item.images?.[0]?.tempURL || 'https://upload.wikimedia.org/wikipedia/commons/3/32/Googleplex_HQ_%28cropped%29.jpg' }}
-          containerStyle={styles.imageContainer}
+          containerStyle={[styles.imageContainer, { backgroundColor: colors.cardBackground }]}
           style={styles.image}
           parallaxFactor={0.4}
           {...parallaxProps}
         />
         {
           item?.approvedOn &&
-          <View style={styles.titleContianerV2}>
+          <View style={[styles.titleContianerV2, { backgroundColor: colors.overlayDark }]}>
             <Text style={styles.title2}>
               {timeAgo(new Date(item?.approvedOn))}
             </Text>
           </View>
         }
-        <View style={styles.titleContianer}>
+        <View style={[styles.titleContianer, { backgroundColor: colors.overlayDark }]}>
 
           <Text style={styles.title}>{item?.title}</Text>
         </View>
@@ -57,8 +59,8 @@ const ExampleParallaxCarousel = (props) => {
         dotsLength={props?.newsItems?.length}
         activeDotIndex={activeIndex}
         containerStyle={styles.paginationContainer}
-        dotStyle={styles.dotStyle}
-        inactiveDotStyle={styles.inactiveDotStyle}
+        dotStyle={[styles.dotStyle, { backgroundColor: colors.textPrimary }]}
+        inactiveDotStyle={[styles.inactiveDotStyle, { backgroundColor: colors.textTertiary }]}
         inactiveDotOpacity={0.4}
         inactiveDotScale={0.6}
         tappableDots={true}
@@ -80,15 +82,12 @@ const styles = StyleSheet.create({
   imageContainer: {
     flex: 1,
     marginBottom: Platform.select({ ios: 0, android: 1 }),
-    backgroundColor: 'white',
     borderRadius: 8, borderRadius: 5
   },
   image: {
     resizeMode: 'cover',
   },
   titleContianer: {
-
-    backgroundColor: '#0000007d',
     position: 'absolute',
     bottom: 0,
     left: 0,
@@ -105,13 +104,11 @@ const styles = StyleSheet.create({
 
   },
   titleContianerV2: {
-
     position: 'absolute',
     top: 0,
     left: 0,
     padding: 15,
     width: '100%',
-    backgroundColor: '#0000007d',
     borderTopLeftRadius: 5,
     borderTopRightRadius: 5
   },
@@ -126,11 +123,8 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    // marginHorizontal: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.92)',
   },
   inactiveDotStyle: {
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
   },
 });
 

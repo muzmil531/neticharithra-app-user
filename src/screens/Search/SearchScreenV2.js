@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react'
 import { FlatList, Modal, StyleSheet, Text, TouchableOpacity, View, useColorScheme, SafeAreaView, StatusBar, RefreshControl } from 'react-native'
 import { ActivityIndicator, Searchbar } from 'react-native-paper'
 import debounce from 'lodash/debounce'
-import Colors from '../../colors/Colors'
+import { useTheme } from '../../context/ThemeContext'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { retrieveData } from '../../handelers/AsyncStorageHandeler'
 import { post } from '../../handelers/APIHandeler'
@@ -18,7 +18,7 @@ import {
 const SearchScreenV2 = () => {
   const navigation = useNavigation()
   const [searchQuery, setSearchQuery] = useState('')
-  const colors = Colors[useColorScheme()];
+  const { colors, isDark } = useTheme();
   let [selectedCategory, setSelectedCategory] = useState()
   let [selectedDate, setSelectedDate] = useState()
   const [refreshing, setRefreshing] = useState(false)
@@ -217,36 +217,36 @@ const SearchScreenV2 = () => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.screenBackground }]}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.headerThemeBg} />
 
       {/* Professional Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.headerThemeBg, borderBottomColor: colors.borderLight }]}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
           activeOpacity={0.7}
         >
-          <Ionicons name="arrow-back" size={24} color="#1a1a1a" />
+          <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
         </TouchableOpacity>
         <View style={styles.headerContent}>
-          <Ionicons name="search" size={24} color="#007bff" />
-          <Text style={styles.headerTitle}>Search News</Text>
+          <Ionicons name="search" size={24} color={colors.brandSecondary} />
+          <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>Search News</Text>
         </View>
         <View style={styles.headerSpacer} />
       </View>
 
       {/* Modern Search Section */}
-      <View style={styles.searchSection}>
+      <View style={[styles.searchSection, { backgroundColor: colors.headerThemeBg, borderBottomColor: colors.borderLight }]}>
         <View style={styles.searchContainer}>
           <Searchbar
             placeholder="Search by title, location, or keyword..."
             onChangeText={onChangeSearch}
             value={searchQuery}
-            style={styles.searchbar}
-            inputStyle={styles.searchInput}
-            iconColor="#007bff"
-            placeholderTextColor="#666"
+            style={[styles.searchbar, { backgroundColor: colors.backgroundColor }]}
+            inputStyle={[styles.searchInput, { color: colors.textPrimary }]}
+            iconColor={colors.brandSecondary}
+            placeholderTextColor={colors.textSecondary}
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity
@@ -254,30 +254,30 @@ const SearchScreenV2 = () => {
               onPress={clearSearch}
               activeOpacity={0.7}
             >
-              <Ionicons name="close-circle" size={20} color="#666" />
+              <Ionicons name="close-circle" size={20} color={colors.textSecondary} />
             </TouchableOpacity>
           )}
         </View>
 
         {/* Category Filter */}
         <TouchableOpacity
-          style={styles.categoryButton}
+          style={[styles.categoryButton, { backgroundColor: colors.backgroundColor, borderColor: colors.borderLight }]}
           onPress={() => setModalVisible(true)}
           activeOpacity={0.8}
         >
-          <Ionicons name="filter" size={18} color="#007bff" />
-          <Text style={styles.categoryButtonText}>
+          <Ionicons name="filter" size={18} color={colors.brandSecondary} />
+          <Text style={[styles.categoryButtonText, { color: colors.brandSecondary }]}>
             {selectedCategory ? selectedCategory?.[userLanguage || 'label'] : 'All Categories'}
           </Text>
-          <Ionicons name="chevron-down" size={16} color="#007bff" />
+          <Ionicons name="chevron-down" size={16} color={colors.brandSecondary} />
         </TouchableOpacity>
       </View>
 
       {/* Search Results */}
       <View style={styles.resultsContainer}>
         {searchQuery.length > 0 && (
-          <View style={styles.resultsHeader}>
-            <Text style={styles.resultsText}>
+          <View style={[styles.resultsHeader, { backgroundColor: colors.headerThemeBg, borderBottomColor: colors.borderLight }]}>
+            <Text style={[styles.resultsText, { color: colors.textSecondary }]}>
               {listOfNews.length > 0 ? `${listOfNews.length} results found` : 'No results found'}
             </Text>
             {selectedCategory && (
@@ -293,7 +293,7 @@ const SearchScreenV2 = () => {
                 }}
                 style={styles.clearFilterButton}
               >
-                <Text style={styles.clearFilterText}>Clear filter</Text>
+                <Text style={[styles.clearFilterText, { color: colors.brandSecondary }]}>Clear filter</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -319,17 +319,17 @@ const SearchScreenV2 = () => {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              colors={['#007bff']}
-              tintColor="#007bff"
+              colors={[colors.brandSecondary]}
+              tintColor={colors.brandSecondary}
             />
           }
           ListEmptyComponent={() => {
             if (searchQuery.length === 0) {
               return (
                 <View style={styles.emptyState}>
-                  <Ionicons name="search" size={64} color="#ccc" />
-                  <Text style={styles.emptyStateTitle}>Search for News</Text>
-                  <Text style={styles.emptyStateText}>
+                  <Ionicons name="search" size={64} color={colors.textTertiary} />
+                  <Text style={[styles.emptyStateTitle, { color: colors.textPrimary }]}>Search for News</Text>
+                  <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>
                     Enter keywords to find relevant news articles
                   </Text>
                 </View>
@@ -337,8 +337,8 @@ const SearchScreenV2 = () => {
             } else if (listOfNews.length === 0 && !loading) {
               return (
                 <View style={styles.emptyState}>
-                  <Ionicons name="document-text-outline" size={64} color="#ccc" />
-                  <Text style={styles.emptyStateText}>
+                  <Ionicons name="document-text-outline" size={64} color={colors.textTertiary} />
+                  <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>
                     Try different keywords or remove filters
                   </Text>
                 </View>
@@ -350,8 +350,8 @@ const SearchScreenV2 = () => {
             if (loading && listOfNews.length > 0) {
               return (
                 <View style={styles.loadingFooter}>
-                  <ActivityIndicator size="small" color="#007bff" />
-                  <Text style={styles.loadingText}>Loading more...</Text>
+                  <ActivityIndicator size="small" color={colors.brandSecondary} />
+                  <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Loading more...</Text>
                 </View>
               )
             }
@@ -371,14 +371,14 @@ const SearchScreenV2 = () => {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Select Category</Text>
+          <View style={[styles.modalContainer, { backgroundColor: colors.cardBackground }]}>
+            <View style={[styles.modalHeader, { borderBottomColor: colors.borderLight }]}>
+              <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>Select Category</Text>
               <TouchableOpacity
                 onPress={() => setModalVisible(false)}
                 style={styles.modalCloseButton}
               >
-                <Ionicons name="close" size={24} color="#666" />
+                <Ionicons name="close" size={24} color={colors.textSecondary} />
               </TouchableOpacity>
             </View>
 
@@ -389,22 +389,25 @@ const SearchScreenV2 = () => {
                 <TouchableOpacity
                   style={[
                     styles.categoryItem,
-                    selectedCategory?.label === item?.label && styles.categoryItemSelected
+                    { borderBottomColor: colors.borderLight },
+                    selectedCategory?.label === item?.label && { backgroundColor: colors.backgroundColor }
                   ]}
                   onPress={() => changeOfCategory(item)}
                   activeOpacity={0.8}
                 >
                   <View style={[
                     styles.radioButton,
-                    selectedCategory?.label === item?.label && styles.radioButtonSelected
+                    { borderColor: colors.borderColor },
+                    selectedCategory?.label === item?.label && { borderColor: colors.brandSecondary }
                   ]}>
                     {selectedCategory?.label === item?.label && (
-                      <View style={styles.radioButtonInner} />
+                      <View style={[styles.radioButtonInner, { backgroundColor: colors.brandSecondary }]} />
                     )}
                   </View>
                   <Text style={[
                     styles.categoryItemText,
-                    selectedCategory?.label === item?.label && styles.categoryItemTextSelected
+                    { color: colors.textPrimary },
+                    selectedCategory?.label === item?.label && { color: colors.brandSecondary, fontWeight: '500' }
                   ]}>
                     {item?.[userLanguage || 'label']}
                   </Text>
@@ -414,7 +417,7 @@ const SearchScreenV2 = () => {
             />
 
             <TouchableOpacity
-              style={styles.clearCategoryButton}
+              style={[styles.clearCategoryButton, { backgroundColor: colors.backgroundColor, borderColor: colors.brandSecondary }]}
               onPress={() => {
                 setSelectedCategory(null)
                 getSearchedData({
@@ -427,7 +430,7 @@ const SearchScreenV2 = () => {
               }}
               activeOpacity={0.8}
             >
-              <Text style={styles.clearCategoryButtonText}>Show All Categories</Text>
+              <Text style={[styles.clearCategoryButtonText, { color: colors.brandSecondary }]}>Show All Categories</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -441,16 +444,13 @@ export default SearchScreenV2
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: wp('4%'),
     paddingVertical: hp('1.2%'),
-    backgroundColor: '#ffffff',
     borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -470,34 +470,29 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: wp('4.5%'),
     fontWeight: '600',
-    color: '#1a1a1a',
     marginLeft: wp('2%'),
   },
   headerSpacer: {
     width: wp('10%'),
   },
   searchSection: {
-    backgroundColor: '#ffffff',
     paddingHorizontal: wp('4%'),
     paddingVertical: hp('1.2%'),
     borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
   },
   searchContainer: {
     position: 'relative',
     marginBottom: hp('1%'),
   },
   searchbar: {
-    backgroundColor: '#f8f9fa',
     borderRadius: wp('3%'),
     elevation: 0,
     shadowOpacity: 0,
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: 'transparent',
   },
   searchInput: {
     fontSize: wp('4%'),
-    color: '#1a1a1a',
   },
   clearButton: {
     position: 'absolute',
@@ -509,24 +504,20 @@ const styles = StyleSheet.create({
   categoryButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f8f9fa',
     paddingHorizontal: wp('4%'),
     paddingVertical: hp('1.2%'),
     borderRadius: wp('2%'),
     borderWidth: 1,
-    borderColor: '#e9ecef',
   },
   categoryButtonText: {
     flex: 1,
     fontSize: wp('3.8%'),
-    color: '#007bff',
     fontWeight: '500',
     marginLeft: wp('2%'),
     marginRight: wp('2%'),
   },
   resultsContainer: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
   },
   resultsHeader: {
     flexDirection: 'row',
@@ -534,13 +525,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: wp('4%'),
     paddingVertical: hp('1%'),
-    backgroundColor: '#ffffff',
     borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
   },
   resultsText: {
     fontSize: wp('3.5%'),
-    color: '#666',
     fontWeight: '500',
   },
   clearFilterButton: {
@@ -549,7 +537,6 @@ const styles = StyleSheet.create({
   },
   clearFilterText: {
     fontSize: wp('3.5%'),
-    color: '#007bff',
     fontWeight: '500',
   },
   listContent: {
@@ -573,14 +560,12 @@ const styles = StyleSheet.create({
   emptyStateTitle: {
     fontSize: wp('5%'),
     fontWeight: '600',
-    color: '#1a1a1a',
     marginTop: hp('2%'),
     marginBottom: hp('1%'),
     textAlign: 'center',
   },
   emptyStateText: {
     fontSize: wp('3.8%'),
-    color: '#666',
     textAlign: 'center',
     lineHeight: wp('5.5%'),
   },
@@ -592,7 +577,6 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: wp('3.5%'),
-    color: '#666',
     marginLeft: wp('2%'),
   },
   modalOverlay: {
@@ -601,7 +585,6 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContainer: {
-    backgroundColor: '#ffffff',
     borderTopLeftRadius: wp('5%'),
     borderTopRightRadius: wp('5%'),
     maxHeight: '80%',
@@ -614,12 +597,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: wp('5%'),
     paddingVertical: hp('2%'),
     borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
   },
   modalTitle: {
     fontSize: wp('4.5%'),
     fontWeight: '600',
-    color: '#1a1a1a',
   },
   modalCloseButton: {
     padding: wp('1%'),
@@ -630,52 +611,35 @@ const styles = StyleSheet.create({
     paddingHorizontal: wp('5%'),
     paddingVertical: hp('1.8%'),
     borderBottomWidth: 1,
-    borderBottomColor: '#f1f3f4',
-  },
-  categoryItemSelected: {
-    backgroundColor: '#f0f8ff',
   },
   radioButton: {
     width: wp('5%'),
     height: wp('5%'),
     borderRadius: wp('2.5%'),
     borderWidth: 2,
-    borderColor: '#ccc',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: wp('3%'),
-  },
-  radioButtonSelected: {
-    borderColor: '#007bff',
   },
   radioButtonInner: {
     width: wp('2.5%'),
     height: wp('2.5%'),
     borderRadius: wp('1.25%'),
-    backgroundColor: '#007bff',
   },
   categoryItemText: {
     fontSize: wp('4%'),
-    color: '#1a1a1a',
     flex: 1,
-  },
-  categoryItemTextSelected: {
-    color: '#007bff',
-    fontWeight: '500',
   },
   clearCategoryButton: {
     marginHorizontal: wp('5%'),
     marginTop: hp('2%'),
     paddingVertical: hp('1.5%'),
-    backgroundColor: '#f8f9fa',
     borderRadius: wp('2%'),
     borderWidth: 1,
-    borderColor: '#007bff',
     alignItems: 'center',
   },
   clearCategoryButtonText: {
     fontSize: wp('4%'),
-    color: '#007bff',
     fontWeight: '500',
   },
 });

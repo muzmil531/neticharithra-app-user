@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Image, Text, View, useColorScheme, Platform, TouchableOpacity, StyleSheet } from 'react-native';
+import { Image, Text, View, Platform, TouchableOpacity, StyleSheet } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { onAppEndLaunch } from '../route/launch-profiler';
-import Colors from '../colors/Colors';
+import { useTheme } from '../context/ThemeContext';
 import { getScreenBuilder } from '../route/ScreenRegistry';
 import { useTranslation } from 'react-i18next';
 import i18next from './../../services/i18next';
@@ -15,11 +15,25 @@ import GeneralHeader from '../components/GeneralHeader';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 
-const Tab = createMaterialBottomTabNavigator();
+const Tab = createBottomTabNavigator();
 
 export default function IndexScreen() {
     const [screens, setScreens] = useState([]);
-    const colors = Colors[useColorScheme()];
+    const themeData = useTheme();
+    console.log('IndexScreen theme data:', { 
+        hasColors: !!themeData?.colors,
+        colorsType: typeof themeData?.colors,
+        themeData: themeData
+    });
+    
+    // Ensure we always have valid colors object
+    const colors = themeData?.colors || {
+        tabBarActive: '#B61F24',
+        tabBarInactive: '#ccc',
+        tabBarBackground: 'white'
+    };
+    const isDark = themeData?.isDark || false;
+    
     const { t } = useTranslation();
 
     useFocusEffect(
@@ -51,26 +65,16 @@ export default function IndexScreen() {
         <>
             <GeneralHeader />
             <Tab.Navigator
-                activeColor="#B61F24"
-                shifting={false}
-                inactiveColor="#ccc"
-                barStyle={{ backgroundColor: 'white', height: 65 }}
-                tabBarOptions={{
-                    // style: {
-                    //     backgroundColor: 'white',
-                    //     borderTopLeftRadius: 20,
-                    //     borderTopRightRadius: 20,
-                    //     height: 65,
-                    // },
-                    // labelStyle: {
-                    //     marginBottom: 10, // Adjust as needed
-                    // },
-                    // Remove any background color applied to the tab icons
-                    tabStyle: {
-                        backgroundColor: 'transparent', // Make the background transparent
+                screenOptions={{
+                    tabBarActiveTintColor: colors?.tabBarActive || '#B61F24',
+                    tabBarInactiveTintColor: colors?.tabBarInactive || '#ccc',
+                    tabBarStyle: { 
+                        backgroundColor: colors?.tabBarBackground || 'white',
+                        height: 65,
+                        paddingBottom: 10
                     },
+                    headerShown: false
                 }}
-
             >
                 <Tab.Screen
                     name="Home"

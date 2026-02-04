@@ -6,7 +6,7 @@ import Icon from 'react-native-vector-icons/FontAwesome'
 import ImagePicker, { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 
 import { Dropdown } from 'react-native-element-dropdown';
-import Colors from '../colors/Colors';
+import { useTheme } from '../context/ThemeContext';
 import axios from 'axios';
 import { BASE_URL } from '../handelers/APIHandeler';
 import EndPointConfig from '../handelers/EndPointConfig';
@@ -21,7 +21,7 @@ const DFM = forwardRef(({ dfmValues, dfmForm, fieldOptions, onFormSubmit, editFi
     var [formValues, setFormValues] = useState({})
     var [filterData, setFilterData] = useState(editFilterData?.filterDataArray ? [...editFilterData?.filterDataArray] : [])
     const [errorValues, setErrorValues] = useState({});
-    const colors = Colors[useColorScheme()]
+    const { colors } = useTheme()
 
     const [dfmFieldsList, setDFMFieldsList] = useState([])
 

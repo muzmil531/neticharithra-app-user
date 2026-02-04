@@ -9,14 +9,18 @@ import { Modal } from 'react-native-paper';
 import SpecificDistrict from '../News/SpecificDistrict';
 const { height } = Dimensions.get('window');
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import DFM from '../../components/DFM';
 import { post } from '../../handelers/APIHandeler';
 import EndPointConfig from '../../handelers/EndPointConfig';
 import ToasterService from '../../components/ToasterService';
+import { useTheme } from '../../context/ThemeContext';
 
 const PublicUser = ({ }) => {
 
     const navigation = useNavigation()
+    const { colors, isDark, themeMode, setTheme } = useTheme();
     let [userLoggedInfo, setUserLoggedInfo] = useState();
     let [userLangPreference, setUserLangPreference] = useState();
     let [useLangCode, setUserLangCode] = useState();
@@ -165,14 +169,14 @@ const PublicUser = ({ }) => {
     }
     return (
         <>
-            <ScrollView >
-                <View style={publicUserStyles.indexParentContainer}>
+            <ScrollView style={{ backgroundColor: colors.backgroundColor }}>
+                <View style={[publicUserStyles.indexParentContainer, { backgroundColor: colors.backgroundColor }]}>
                     {
                         userLoggedInfo &&
 
 
-                        <View style={publicUserStyles.sectionContainer}>
-                            <Text style={publicUserStyles.sectionTitle}>
+                        <View style={[publicUserStyles.sectionContainer, { backgroundColor: colors.cardBackground }]}>
+                            <Text style={[publicUserStyles.sectionTitle, { color: colors.textPrimary }]}>
                                 {t('settingsScreen.yourDetails')}
                             </Text>
                             <TouchableOpacity style={closeButtonStyle} onPress={showUserModal}>
@@ -180,6 +184,7 @@ const PublicUser = ({ }) => {
                                     style={{
                                         fontSize: 15,
                                         fontWeight: 'bold',
+                                        color: colors.textPrimary
                                     }}
                                     name="edit"
                                 />
@@ -197,18 +202,18 @@ const PublicUser = ({ }) => {
                                     <Text style={[publicUserStyles.value, { textAlign: 'center', fontSize: 20, fontWeight: 'bold', marginBottom: 10 }]}>{userLoggedInfo.name || '-'}</Text>
                                 </View>
                                 <View style={publicUserStyles.infoRow}>
-                                    <Text style={publicUserStyles.label}>{t('settingsScreen.mobileNumber')}:</Text>
-                                    <Text style={publicUserStyles.value}>
+                                    <Text style={[publicUserStyles.label, { color: colors.textPrimary }]}>{t('settingsScreen.mobileNumber')}:</Text>
+                                    <Text style={[publicUserStyles.value, { color: colors.textSecondary }]}>
                                         {(userLoggedInfo?.mobileNumber ? ` (${userLoggedInfo?.countryCode}) ${userLoggedInfo?.mobileNumber}` : '-')}
                                     </Text>
                                 </View>
                                 <View style={publicUserStyles.infoRow}>
-                                    <Text style={publicUserStyles.label}>{t('settingsScreen.emailId')}:</Text>
-                                    <Text style={publicUserStyles.value}>{userLoggedInfo?.mail || '-'}</Text>
+                                    <Text style={[publicUserStyles.label, { color: colors.textPrimary }]}>{t('settingsScreen.emailId')}:</Text>
+                                    <Text style={[publicUserStyles.value, { color: colors.textSecondary }]}>{userLoggedInfo?.mail || '-'}</Text>
                                 </View>
                                 <View style={publicUserStyles.infoRow}>
-                                    <Text style={publicUserStyles.label}>{t('settingsScreen.address')}:</Text>
-                                    <Text style={publicUserStyles.value}>{userLoggedInfo?.address || '-'}</Text>
+                                    <Text style={[publicUserStyles.label, { color: colors.textPrimary }]}>{t('settingsScreen.address')}:</Text>
+                                    <Text style={[publicUserStyles.value, { color: colors.textSecondary }]}>{userLoggedInfo?.address || '-'}</Text>
                                 </View>
                             </View>
                         </View>
@@ -216,12 +221,12 @@ const PublicUser = ({ }) => {
                     {
                         !userLoggedInfo &&
 
-                        <View style={[publicUserStyles.sectionContainer, { paddingVertical: 20 }]}>
+                        <View style={[publicUserStyles.sectionContainer, { paddingVertical: 20, backgroundColor: colors.cardBackground }]}>
                             <OTPRequest manualFinalStep={moveToPublicSummaryHandler} />
                         </View>
                     }
-                    <View style={publicUserStyles.sectionContainer}>
-                        <Text style={publicUserStyles.sectionTitle}>
+                    <View style={[publicUserStyles.sectionContainer, { backgroundColor: colors.cardBackground }]}>
+                        <Text style={[publicUserStyles.sectionTitle, { color: colors.textPrimary }]}>
                             {t('settingsScreen.newsPreferance')}
                         </Text>
                         <TouchableOpacity style={closeButtonStyle} onPress={showModal}>
@@ -238,16 +243,16 @@ const PublicUser = ({ }) => {
                         </TouchableOpacity>
                         <View style={publicUserStyles.newsPreferences}>
                             <View style={publicUserStyles.infoRow}>
-                                <Text style={publicUserStyles.label}>{t('settingsScreen.mandal')}:</Text>
-                                <Text style={publicUserStyles.value}>{userLangPreference?.town?.[useLangCode] || '-'}</Text>
+                                <Text style={[publicUserStyles.label, { color: colors.textPrimary }]}>{t('settingsScreen.mandal')}:</Text>
+                                <Text style={[publicUserStyles.value, { color: colors.textSecondary }]}>{userLangPreference?.town?.[useLangCode] || '-'}</Text>
                             </View>
                             <View style={publicUserStyles.infoRow}>
-                                <Text style={publicUserStyles.label}>{t('settingsScreen.district')}:</Text>
-                                <Text style={publicUserStyles.value}>{userLangPreference?.district?.[useLangCode] || '-'}</Text>
+                                <Text style={[publicUserStyles.label, { color: colors.textPrimary }]}>{t('settingsScreen.district')}:</Text>
+                                <Text style={[publicUserStyles.value, { color: colors.textSecondary }]}>{userLangPreference?.district?.[useLangCode] || '-'}</Text>
                             </View>
                             <View style={publicUserStyles.infoRow}>
-                                <Text style={publicUserStyles.label}>{t('settingsScreen.state')}:</Text>
-                                <Text style={publicUserStyles.value}>{userLangPreference?.state?.[useLangCode] || '-'}</Text>
+                                <Text style={[publicUserStyles.label, { color: colors.textPrimary }]}>{t('settingsScreen.state')}:</Text>
+                                <Text style={[publicUserStyles.value, { color: colors.textSecondary }]}>{userLangPreference?.state?.[useLangCode] || '-'}</Text>
                             </View>
                         </View>
                     </View>
@@ -256,32 +261,99 @@ const PublicUser = ({ }) => {
                     {
                         userLoggedInfo &&
 
-                        <View style={publicUserStyles.sectionContainer}>
-                            <Text style={publicUserStyles.sectionTitle}>Counts</Text>
+                        <View style={[publicUserStyles.sectionContainer, { backgroundColor: colors.cardBackground }]}>
+                            <Text style={[publicUserStyles.sectionTitle, { color: colors.textPrimary }]}>Counts</Text>
                             <View style={publicUserStyles.newsCount}>
                                 <View style={publicUserStyles.newsRow}>
-                                    <Text style={publicUserStyles.newsType}>Pending:</Text>
-                                    <Text>{counts.pending}</Text>
+                                    <Text style={[publicUserStyles.newsType, { color: colors.textPrimary }]}>Pending:</Text>
+                                    <Text style={{ color: colors.textSecondary }}>{counts.pending}</Text>
                                 </View>
                                 <View style={publicUserStyles.newsRow}>
-                                    <Text style={publicUserStyles.newsType}>Approved:</Text>
-                                    <Text>{counts.approved}</Text>
+                                    <Text style={[publicUserStyles.newsType, { color: colors.textPrimary }]}>Approved:</Text>
+                                    <Text style={{ color: colors.textSecondary }}>{counts.approved}</Text>
                                 </View>
                                 <View style={publicUserStyles.newsRow}>
-                                    <Text style={publicUserStyles.newsType}>Rejected:</Text>
-                                    <Text>{counts.rejected}</Text>
+                                    <Text style={[publicUserStyles.newsType, { color: colors.textPrimary }]}>Rejected:</Text>
+                                    <Text style={{ color: colors.textSecondary }}>{counts.rejected}</Text>
                                 </View>
                             </View>
                         </View>
                     }
- <TouchableOpacity style={publicUserStyles.logoutButton} onPress={()=>{navigation.navigate('MainScreen')}}>
-                            <Text style={publicUserStyles.logoutButtonText}>Change Language</Text>
-                        </TouchableOpacity>
+                    <View style={[publicUserStyles.sectionContainer, { backgroundColor: colors.cardBackground }]}>
+                        <Text style={[publicUserStyles.sectionTitle, { color: colors.textPrimary }]}>
+                            {t('settingsScreen.themeSettings') || 'Theme Settings'}
+                        </Text>
+                        <View style={publicUserStyles.themeContainer}>
+                            <TouchableOpacity 
+                                style={[
+                                    publicUserStyles.themeOption,
+                                    { backgroundColor: colors.backgroundColor, borderColor: colors.borderLight },
+                                    themeMode === 'light' && { borderColor: colors.brandSecondary, borderWidth: 2 }
+                                ]}
+                                onPress={() => setTheme('light')}
+                            >
+                                <Ionicons name="sunny" size={24} color={themeMode === 'light' ? colors.brandSecondary : colors.textSecondary} />
+                                <Text style={[
+                                    publicUserStyles.themeOptionText,
+                                    { color: themeMode === 'light' ? colors.brandSecondary : colors.textSecondary }
+                                ]}>
+                                    {t('settingsScreen.lightTheme') || 'Light'}
+                                </Text>
+                                {themeMode === 'light' && (
+                                    <Ionicons name="checkmark-circle" size={20} color={colors.brandSecondary} style={publicUserStyles.checkIcon} />
+                                )}
+                            </TouchableOpacity>
+
+                            <TouchableOpacity 
+                                style={[
+                                    publicUserStyles.themeOption,
+                                    { backgroundColor: colors.backgroundColor, borderColor: colors.borderLight },
+                                    themeMode === 'dark' && { borderColor: colors.brandSecondary, borderWidth: 2 }
+                                ]}
+                                onPress={() => setTheme('dark')}
+                            >
+                                <Ionicons name="moon" size={24} color={themeMode === 'dark' ? colors.brandSecondary : colors.textSecondary} />
+                                <Text style={[
+                                    publicUserStyles.themeOptionText,
+                                    { color: themeMode === 'dark' ? colors.brandSecondary : colors.textSecondary }
+                                ]}>
+                                    {t('settingsScreen.darkTheme') || 'Dark'}
+                                </Text>
+                                {themeMode === 'dark' && (
+                                    <Ionicons name="checkmark-circle" size={20} color={colors.brandSecondary} style={publicUserStyles.checkIcon} />
+                                )}
+                            </TouchableOpacity>
+
+                            <TouchableOpacity 
+                                style={[
+                                    publicUserStyles.themeOption,
+                                    { backgroundColor: colors.backgroundColor, borderColor: colors.borderLight },
+                                    themeMode === 'system' && { borderColor: colors.brandSecondary, borderWidth: 2 }
+                                ]}
+                                onPress={() => setTheme('system')}
+                            >
+                                <MaterialCommunityIcons name="theme-light-dark" size={24} color={themeMode === 'system' ? colors.brandSecondary : colors.textSecondary} />
+                                <Text style={[
+                                    publicUserStyles.themeOptionText,
+                                    { color: themeMode === 'system' ? colors.brandSecondary : colors.textSecondary }
+                                ]}>
+                                    {t('settingsScreen.systemTheme') || 'System'}
+                                </Text>
+                                {themeMode === 'system' && (
+                                    <Ionicons name="checkmark-circle" size={20} color={colors.brandSecondary} style={publicUserStyles.checkIcon} />
+                                )}
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+
+                    <TouchableOpacity style={[publicUserStyles.logoutButton, { backgroundColor: colors.brandSecondary }]} onPress={()=>{navigation.navigate('MainScreen')}}>
+                        <Text style={publicUserStyles.logoutButtonText}>Change Language</Text>
+                    </TouchableOpacity>
 
                     {
                         userLoggedInfo &&
 
-                        <TouchableOpacity style={publicUserStyles.logoutButton} onPress={handleLogout}>
+                        <TouchableOpacity style={[publicUserStyles.logoutButton, { backgroundColor: colors.error }]} onPress={handleLogout}>
                             <Text style={publicUserStyles.logoutButtonText}>Logout</Text>
                         </TouchableOpacity>
                     }
@@ -290,8 +362,8 @@ const PublicUser = ({ }) => {
 
             </ScrollView>
             <Modal visible={userModalVisible} onDismiss={hideUserModal} dismissable={false} >
-                <View style={containerStyle}>
-                    <Text style={publicUserStyles.sectionTitle}>
+                <View style={[containerStyle, { backgroundColor: colors.modalBackground }]}>
+                    <Text style={[publicUserStyles.sectionTitle, { color: colors.textPrimary }]}>
 
                         {t('settingsScreen.yourDetails')}
                     </Text>
@@ -314,8 +386,8 @@ const PublicUser = ({ }) => {
                 </View>
             </Modal>
             <Modal visible={visible} onDismiss={hideModal} dismissable={false} >
-                <View style={containerStyle}>
-                    <Text style={publicUserStyles.sectionTitle}>    {t('settingsScreen.newsPreferance')} </Text>
+                <View style={[containerStyle, { backgroundColor: colors.modalBackground }]}>
+                    <Text style={[publicUserStyles.sectionTitle, { color: colors.textPrimary }]}>    {t('settingsScreen.newsPreferance')} </Text>
                     <SpecificDistrict directDFM={true} redirectBack={redirectBackHandeler} />
                     <TouchableOpacity style={closeButtonStyle} onPress={hideModal} >
                         {/* <Text>Close</Text> */}
@@ -323,6 +395,7 @@ const PublicUser = ({ }) => {
                             style={{
                                 fontSize: 15,
                                 fontWeight: 'bold',
+                                color: colors.textPrimary
                             }}
                             name="close"
                         />
@@ -345,11 +418,9 @@ const closeButtonStyle = {
 export default PublicUser
 // const containerStyle = { marginHorizontal: 10, backgroundColor: 'white', textAlign: 'center' };
 const containerStyle = {
-    // flex: 1, 
-    justifyContent: 'center', // Center vertically
-    alignItems: 'center', // Center horizontally
+    justifyContent: 'center',
+    alignItems: 'center',
     marginHorizontal: 10,
-    backgroundColor: 'white',
     paddingTop: 10
 };
 const publicUserStyles = StyleSheet.create({
@@ -439,5 +510,32 @@ const publicUserStyles = StyleSheet.create({
         color: '#fff',
         fontWeight: 'bold',
         fontSize: 16,
+    },
+    themeContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingHorizontal: 20,
+        paddingBottom: 20,
+        gap: 10,
+    },
+    themeOption: {
+        flex: 1,
+        alignItems: 'center',
+        paddingVertical: 15,
+        paddingHorizontal: 10,
+        borderRadius: 10,
+        borderWidth: 1,
+        position: 'relative',
+    },
+    themeOptionText: {
+        marginTop: 8,
+        fontSize: 12,
+        fontWeight: '600',
+        textAlign: 'center',
+    },
+    checkIcon: {
+        position: 'absolute',
+        top: 5,
+        right: 5,
     }
 })

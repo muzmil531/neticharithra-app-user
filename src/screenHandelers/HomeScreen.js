@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { useColorScheme } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import Colors from '../colors/Colors';
+import { useTheme } from '../context/ThemeContext';
 import { retrieveData } from '../handelers/AsyncStorageHandeler';
 import { getScreenBuilder } from '../route/ScreenRegistry';
 import { onAppEndLaunch } from '../route/launch-profiler';
@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 const Tab = createMaterialTopTabNavigator();
 
 const HomeScreen = () => {
-    const colors = Colors[useColorScheme()];
+    const { colors, isDark } = useTheme();
     const [screens, setScreens] = useState([
        
     ]);

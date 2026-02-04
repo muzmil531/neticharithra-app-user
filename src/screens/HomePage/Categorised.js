@@ -23,6 +23,7 @@ import TabScreenWrapper from '../../components/TabScreenWrapper'
 import { useTranslation } from 'react-i18next'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useTheme } from '../../context/ThemeContext';
 
 const { height, width } = Dimensions.get('screen');
 
@@ -31,6 +32,7 @@ const Categorised = () => {
   let [latestNews, setlatestNews] = useState([]);
   let [initalLoading, setInitialLoading] = useState(true)
   const { t } = useTranslation();
+  const { colors, isDark } = useTheme();
 
   let route = useRoute()
   let [paginationMetaData, setPaginationMetaData] = useState({
@@ -154,8 +156,8 @@ const Categorised = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#f8f9fa" />
+    <View style={[styles.container, { backgroundColor: colors.screenBackground }]}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.headerThemeBg} />
       
       {initalLoading ? (
         <LoadingScreen message={"Fetching Latest News"} />
@@ -167,25 +169,25 @@ const Categorised = () => {
           </View>
           
           {/* Latest News Header */}
-          <View style={styles.sectionHeader}>
+          <View style={[styles.sectionHeader, { backgroundColor: colors.cardBackground }]}>
             <View style={styles.headerContent}>
               <View style={styles.titleSection}>
-                <View style={styles.iconContainer}>
+                <View style={[styles.iconContainer, { backgroundColor: colors.brandSecondary }]}>
                   <Ionicons name="newspaper" size={16} color="#fff" />
                 </View>
-                <Text style={styles.sectionTitle}>
+                <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
                   { t('latestNews')}
                 </Text>
               </View>
             </View>
             
             {/* Decorative bottom accent */}
-            <View style={styles.headerAccent} />
+            <View style={[styles.headerAccent, { backgroundColor: colors.brandSecondary }]} />
           </View>
           
           {/* News List */}
           <FlatList
-            style={styles.newsList}
+            style={[styles.newsList, { backgroundColor: colors.screenBackground }]}
             data={latestNews}
             keyExtractor={(item, index) => item.newsId?.toString() || item._id?.toString() || item.id?.toString() || index.toString()}
             showsVerticalScrollIndicator={false}
@@ -193,8 +195,8 @@ const Categorised = () => {
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={onRefresh}
-                colors={['#007bff']}
-                tintColor="#007bff"
+                colors={[colors.brandSecondary]}
+                tintColor={colors.brandSecondary}
               />
             }
             renderItem={({ item, index }) => (
@@ -213,17 +215,17 @@ const Categorised = () => {
             ListFooterComponent={() => {
               if (!loading) return <View style={styles.bottomSpacing} />;
               return (
-                <View style={styles.loadingFooter}>
-                  <ActivityIndicator size="small" color="#007bff" />
-                  <Text style={styles.loadingText}>Loading more articles...</Text>
+                <View style={[styles.loadingFooter, { backgroundColor: colors.cardBackground }]}>
+                  <ActivityIndicator size="small" color={colors.brandSecondary} />
+                  <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Loading more articles...</Text>
                 </View>
               );
             }}
             ListEmptyComponent={() => (
               <View style={styles.emptyContainer}>
-                <Ionicons name="newspaper-outline" size={64} color="#ccc" />
-                <Text style={styles.emptyTitle}>No articles available</Text>
-                <Text style={styles.emptySubtitle}>Pull down to refresh</Text>
+                <Ionicons name="newspaper-outline" size={64} color={colors.textTertiary} />
+                <Text style={[styles.emptyTitle, { color: colors.textSecondary }]}>No articles available</Text>
+                <Text style={[styles.emptySubtitle, { color: colors.textTertiary }]}>Pull down to refresh</Text>
               </View>
             )}
             contentContainerStyle={latestNews.length === 0 ? styles.emptyContentContainer : { paddingBottom: 20 }}
@@ -239,20 +241,16 @@ export default Categorised
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
   },
   mainContainer: {
     flex: 1,
   },
   carouselSection: {
-    backgroundColor: '#f8f9fa',
   },
   newsList: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
   },
   sectionHeader: {
-    backgroundColor: '#fff',
     marginTop: 8,
     marginBottom: 0,
     ...Platform.select({
@@ -282,13 +280,12 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 7,
-    backgroundColor: '#007bff',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 10,
     ...Platform.select({
       ios: {
-        shadowColor: '#007bff',
+        shadowColor: '#000',
         shadowOffset: {
           width: 0,
           height: 1,
@@ -304,12 +301,10 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1a1a1a',
     letterSpacing: -0.2,
   },
   headerAccent: {
     height: 1,
-    backgroundColor: '#007bff',
     marginHorizontal: 16,
   },
   loadingFooter: {
@@ -317,13 +312,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 20,
-    backgroundColor: '#fff',
     marginTop: 8,
   },
   loadingText: {
     marginLeft: 8,
     fontSize: 14,
-    color: '#666',
     fontWeight: '500',
   },
   bottomSpacing: {
@@ -341,13 +334,11 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#666',
     marginTop: 16,
     marginBottom: 8,
   },
   emptySubtitle: {
     fontSize: 14,
-    color: '#999',
     textAlign: 'center',
   },
 })

@@ -13,17 +13,20 @@ import {
 import { calculateNumberOfLines, epochToDate, scaleFont } from '../handelers/ReusableHandeler';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
 import logo from './../assets/branding/logo.png';
+import { useTheme } from '../context/ThemeContext';
 
 const { height, width } = Dimensions.get('window');
 const maxImageHeight = height * 0.4;
 const maxNewsHeight = height * 0.6;
 
 const NewsContainer = (props) => {
+    const navigation = useNavigation();
+    const { colors } = useTheme();
+
     const styles = StyleSheet.create({
         container: {
-            backgroundColor: '#ffffff',
+            backgroundColor: colors.cardBackground,
             borderRadius: 16,
             overflow: 'hidden',
             marginHorizontal: 16,
@@ -65,7 +68,7 @@ const NewsContainer = (props) => {
             position: 'absolute',
             top: 12,
             left: 12,
-            backgroundColor: '#007bff',
+            backgroundColor: colors.brandSecondary,
             paddingHorizontal: 12,
             paddingVertical: 6,
             borderRadius: 12,
@@ -113,21 +116,21 @@ const NewsContainer = (props) => {
         title: {
             fontSize: 20,
             fontWeight: 'bold',
-            color: '#1a1a1a',
+            color: colors.textPrimary,
             lineHeight: 28,
             marginBottom: 8,
         },
         subTitle: {
             fontSize: 16,
             fontWeight: '600',
-            color: '#4a4a4a',
+            color: colors.textSecondary,
             lineHeight: 22,
             marginBottom: 12,
         },
         content: {
             fontSize: 15,
             lineHeight: 24,
-            color: '#666',
+            color: colors.textSecondary,
             textAlign: 'justify',
         },
         readMoreContainer: {
@@ -137,7 +140,7 @@ const NewsContainer = (props) => {
         readMoreButton: {
             flexDirection: 'row',
             alignItems: 'center',
-            backgroundColor: '#007bff',
+            backgroundColor: colors.brandSecondary,
             paddingHorizontal: 16,
             paddingVertical: 10,
             borderRadius: 20,
@@ -181,8 +184,6 @@ const NewsContainer = (props) => {
 
         );
     };
-
-    const navigation = useNavigation();
 
     return (
         <View style={[styles.container, { height: props?.showFullContent ? undefined : (height - 100) }]}>

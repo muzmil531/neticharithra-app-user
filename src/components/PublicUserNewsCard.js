@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import PropTypes from 'prop-types';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useTheme } from '../context/ThemeContext';
 
 import logo from '../assets/branding/logo.png';
 
@@ -17,6 +18,7 @@ const { width } = Dimensions.get('window');
 
 const PublicUserNewsCard = ({ data, badgeColor, onPress }) => {
     const { photo, title, subtitle, description, date, badge, viewCount, category } = data || {};
+    const { colors } = useTheme();
 
     return (
         <TouchableOpacity 
@@ -24,7 +26,7 @@ const PublicUserNewsCard = ({ data, badgeColor, onPress }) => {
             onPress={onPress}
             activeOpacity={0.8}
         >
-            <View style={styles.card}>
+            <View style={[styles.card, { backgroundColor: colors.cardBackground }]}>
                 {/* Image Section */}
                 <View style={styles.imageContainer}>
                     <Image
@@ -36,7 +38,7 @@ const PublicUserNewsCard = ({ data, badgeColor, onPress }) => {
                     
                     {/* Category Badge */}
                     {category && (
-                        <View style={styles.categoryBadge}>
+                        <View style={[styles.categoryBadge, { backgroundColor: colors.brandSecondary }]}>
                             <Text style={styles.categoryText}>{String(category)}</Text>
                         </View>
                     )}
@@ -45,17 +47,17 @@ const PublicUserNewsCard = ({ data, badgeColor, onPress }) => {
                 {/* Content Section */}
                 <View style={styles.contentSection}>
                     <View style={styles.textContainer}>
-                        <Text numberOfLines={2} style={styles.title}>
+                        <Text numberOfLines={2} style={[styles.title, { color: colors.textPrimary }]}>
                             {String(title || "No Title")}
                         </Text>
                         
                         {subtitle && (
-                            <Text numberOfLines={1} style={styles.subtitle}>
+                            <Text numberOfLines={1} style={[styles.subtitle, { color: colors.textSecondary }]}>
                                 {String(subtitle)}
                             </Text>
                         )}
                         
-                        <Text numberOfLines={3} style={styles.description}>
+                        <Text numberOfLines={3} style={[styles.description, { color: colors.textSecondary }]}>
                             {String(description || "No Description")}
                         </Text>
                     </View>
@@ -64,20 +66,20 @@ const PublicUserNewsCard = ({ data, badgeColor, onPress }) => {
                     <View style={styles.metaContainer}>
                         <View style={styles.leftMeta}>
                             <View style={styles.dateContainer}>
-                                <Ionicons name="time-outline" size={12} color="#666" />
-                                <Text style={styles.date}>{String(date || "No Date")}</Text>
+                                <Ionicons name="time-outline" size={12} color={colors.textSecondary} />
+                                <Text style={[styles.date, { color: colors.textSecondary }]}>{String(date || "No Date")}</Text>
                             </View>
                             
                             {viewCount && (
                                 <View style={styles.viewContainer}>
-                                    <Ionicons name="eye-outline" size={12} color="#666" />
-                                    <Text style={styles.viewText}>{String(viewCount)}</Text>
+                                    <Ionicons name="eye-outline" size={12} color={colors.textSecondary} />
+                                    <Text style={[styles.viewText, { color: colors.textSecondary }]}>{String(viewCount)}</Text>
                                 </View>
                             )}
                         </View>
                         
                         {badge && (
-                            <View style={[styles.badge, { backgroundColor: badgeColor || '#007bff' }]}>
+                            <View style={[styles.badge, { backgroundColor: badgeColor || colors.brandSecondary }]}>
                                 <Text style={styles.badgeText}>{String(badge)}</Text>
                             </View>
                         )}
@@ -109,7 +111,6 @@ const styles = StyleSheet.create({
         marginVertical: 8,
     },
     card: {
-        backgroundColor: '#ffffff',
         borderRadius: 16,
         overflow: 'hidden',
         ...Platform.select({
@@ -140,7 +141,6 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 12,
         left: 12,
-        backgroundColor: '#007bff',
         paddingHorizontal: 10,
         paddingVertical: 6,
         borderRadius: 12,
@@ -159,20 +159,17 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#1a1a1a',
         lineHeight: 24,
         marginBottom: 6,
     },
     subtitle: {
         fontSize: 14,
-        color: '#666',
         fontWeight: '500',
         marginBottom: 8,
         lineHeight: 20,
     },
     description: {
         fontSize: 14,
-        color: '#666',
         lineHeight: 22,
         textAlign: 'justify',
     },
@@ -193,7 +190,6 @@ const styles = StyleSheet.create({
     },
     date: {
         fontSize: 12,
-        color: '#666',
         marginLeft: 4,
         fontWeight: '500',
     },
@@ -203,7 +199,6 @@ const styles = StyleSheet.create({
     },
     viewText: {
         fontSize: 12,
-        color: '#666',
         marginLeft: 4,
         fontWeight: '500',
     },
@@ -213,7 +208,7 @@ const styles = StyleSheet.create({
         borderRadius: 16,
     },
     badgeText: {
-        color: '#ffffff',
+        color: '#fff',
         fontWeight: '600',
         fontSize: 12,
     },

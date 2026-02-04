@@ -15,6 +15,7 @@ import {
     SafeAreaView
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useTheme } from '../context/ThemeContext';
 
 import te from './../assets/branding/te.png'
 import en from './../assets/branding/en.png'
@@ -23,29 +24,9 @@ import { post } from '../handelers/APIHandeler';
 import EndPointConfig from '../handelers/EndPointConfig';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 // Define team members with their details
-const teamMembers = [
-    {
-        name: 'John Doe',
-        role: 'CEO',
-        email: 'john.doe@example.com',
-        image: 'https://example.com/ceo.jpg',
-    },
-    {
-        name: 'Jane Smith',
-        role: 'Technical Director',
-        email: 'jane.smith@example.com',
-        image: 'https://example.com/technical_director.jpg',
-    },
-    {
-        name: 'Michael Johnson',
-        role: 'Incharge Director',
-        email: 'michael.johnson@example.com',
-        image: 'https://example.com/incharge_director.jpg',
-    },
-];
 
 const HelpScreen = () => {
-
+    const { colors, isDark } = useTheme();
     const { t } = useTranslation()
     const handleWhatsAppMessage = () => {
         Linking.openURL('https://wa.me/+916362923654'); // Replace with your WhatsApp number
@@ -117,18 +98,18 @@ const HelpScreen = () => {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="dark-content" backgroundColor="#f8f9fa" />
+        <SafeAreaView style={[styles.container, { backgroundColor: colors.screenBackground }]}>
+            <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.headerThemeBg} />
             
             {/* Header */}
-            <View style={styles.header}>
+            <View style={[styles.header, { backgroundColor: colors.headerThemeBg, borderBottomColor: colors.borderLight }]}>
                 <TouchableOpacity 
                     style={styles.backButton}
                     onPress={() => navigation.goBack()}
                 >
-                    <Ionicons name="chevron-back" size={24} color="#1a1a1a" />
+                    <Ionicons name="chevron-back" size={24} color={colors.textPrimary} />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Help & Support</Text>
+                <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>Help & Support</Text>
                 <View style={styles.headerSpacer} />
             </View>
             
@@ -138,19 +119,19 @@ const HelpScreen = () => {
                 contentContainerStyle={styles.scrollContent}
             >
                 {/* App Logo Section */}
-                <View style={styles.logoSection}>
-                    <View style={styles.logoContainer}>
+                <View style={[styles.logoSection, { backgroundColor: colors.cardBackground }]}>
+                    <View style={[styles.logoContainer, { backgroundColor: colors.backgroundColor }]}>
                         <Image source={t('languageCode') === 'te' ? te : en} style={styles.logo} />
                     </View>
-                    <Text style={styles.appTitle}>Neti Charithra</Text>
-                    <Text style={styles.appSubtitle}>Your trusted news source</Text>
+                    <Text style={[styles.appTitle, { color: colors.textPrimary }]}>Neti Charithra</Text>
+                    <Text style={[styles.appSubtitle, { color: colors.textSecondary }]}>Your trusted news source</Text>
                 </View>
 
                 {/* Contact Information */}
-                <View style={styles.section}>
-                    <View style={styles.sectionHeader}>
-                        <Ionicons name="call-outline" size={20} color="#007bff" />
-                        <Text style={styles.sectionTitle}>Contact Information</Text>
+                <View style={[styles.section, { backgroundColor: colors.cardBackground }]}>
+                    <View style={[styles.sectionHeader, { borderBottomColor: colors.borderLight }]}>
+                        <Ionicons name="call-outline" size={20} color={colors.brandSecondary} />
+                        <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Contact Information</Text>
                     </View>
                     
                     <View style={styles.contactCard}>
@@ -158,52 +139,52 @@ const HelpScreen = () => {
                             style={styles.contactItem}
                             onPress={() => Linking.openURL('tel:+916362923654')}
                         >
-                            <View style={styles.contactIcon}>
-                                <Ionicons name="call" size={18} color="#007bff" />
+                            <View style={[styles.contactIcon, { backgroundColor: colors.backgroundColor }]}>
+                                <Ionicons name="call" size={18} color={colors.brandSecondary} />
                             </View>
                             <View style={styles.contactDetails}>
-                                <Text style={styles.contactLabel}>Phone</Text>
-                                <Text style={styles.contactValue}>+91 6362923654</Text>
+                                <Text style={[styles.contactLabel, { color: colors.textSecondary }]}>Phone</Text>
+                                <Text style={[styles.contactValue, { color: colors.textPrimary }]}>+91 6362923654</Text>
                             </View>
-                            <Ionicons name="chevron-forward" size={16} color="#ccc" />
+                            <Ionicons name="chevron-forward" size={16} color={colors.borderColor} />
                         </TouchableOpacity>
                         
                         <TouchableOpacity 
                             style={styles.contactItem}
                             onPress={handleEmail}
                         >
-                            <View style={styles.contactIcon}>
-                                <Ionicons name="mail" size={18} color="#007bff" />
+                            <View style={[styles.contactIcon, { backgroundColor: colors.backgroundColor }]}>
+                                <Ionicons name="mail" size={18} color={colors.brandSecondary} />
                             </View>
                             <View style={styles.contactDetails}>
-                                <Text style={styles.contactLabel}>Email</Text>
-                                <Text style={styles.contactValue}>netichatithra@gmail.com</Text>
+                                <Text style={[styles.contactLabel, { color: colors.textSecondary }]}>Email</Text>
+                                <Text style={[styles.contactValue, { color: colors.textPrimary }]}>netichatithra@gmail.com</Text>
                             </View>
-                            <Ionicons name="chevron-forward" size={16} color="#ccc" />
+                            <Ionicons name="chevron-forward" size={16} color={colors.borderColor} />
                         </TouchableOpacity>
                         
                         <TouchableOpacity 
                             style={styles.contactItem}
                             onPress={handleWebsite}
                         >
-                            <View style={styles.contactIcon}>
-                                <Ionicons name="globe" size={18} color="#007bff" />
+                            <View style={[styles.contactIcon, { backgroundColor: colors.backgroundColor }]}>
+                                <Ionicons name="globe" size={18} color={colors.brandSecondary} />
                             </View>
                             <View style={styles.contactDetails}>
-                                <Text style={styles.contactLabel}>Website</Text>
-                                <Text style={styles.contactValue}>neticharithra.com</Text>
+                                <Text style={[styles.contactLabel, { color: colors.textSecondary }]}>Website</Text>
+                                <Text style={[styles.contactValue, { color: colors.textPrimary }]}>neticharithra.com</Text>
                             </View>
-                            <Ionicons name="chevron-forward" size={16} color="#ccc" />
+                            <Ionicons name="chevron-forward" size={16} color={colors.borderColor} />
                         </TouchableOpacity>
                     </View>
                 </View>
 
                 {/* Team Section */}
                 {teamInfo.length > 0 && (
-                    <View style={styles.section}>
-                        <View style={styles.sectionHeader}>
-                            <Ionicons name="people-outline" size={20} color="#007bff" />
-                            <Text style={styles.sectionTitle}>Our Team</Text>
+                    <View style={[styles.section, { backgroundColor: colors.cardBackground }]}>
+                        <View style={[styles.sectionHeader, { borderBottomColor: colors.borderLight }]}>
+                            <Ionicons name="people-outline" size={20} color={colors.brandSecondary} />
+                            <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Our Team</Text>
                         </View>
                         
                         <View style={styles.teamGrid}>
@@ -213,14 +194,14 @@ const HelpScreen = () => {
                                         source={{ uri: item?.tempURLProfile || 'https://via.placeholder.com/80' }} 
                                         style={styles.teamImage} 
                                     />
-                                    <Text style={styles.teamName}>{item.name}</Text>
-                                    <Text style={styles.teamRole}>{item.role}</Text>
+                                    <Text style={[styles.teamName, { color: colors.textPrimary }]}>{item.name}</Text>
+                                    <Text style={[styles.teamRole, { color: colors.textSecondary }]}>{item.role}</Text>
                                     <TouchableOpacity 
                                         onPress={() => Linking.openURL(`mailto:${item.email}`)}
                                         style={styles.emailButton}
                                     >
-                                        <Ionicons name="mail-outline" size={14} color="#007bff" />
-                                        <Text style={styles.emailText}>Contact</Text>
+                                        <Ionicons name="mail-outline" size={14} color={colors.brandSecondary} />
+                                        <Text style={[styles.emailText, { color: colors.brandSecondary }]}>Contact</Text>
                                     </TouchableOpacity>
                                 </View>
                             ))}
@@ -229,46 +210,46 @@ const HelpScreen = () => {
                 )}
 
                 {/* Quick Actions */}
-                <View style={styles.section}>
-                    <View style={styles.sectionHeader}>
-                        <Ionicons name="flash-outline" size={20} color="#007bff" />
-                        <Text style={styles.sectionTitle}>Quick Actions</Text>
+                <View style={[styles.section, { backgroundColor: colors.cardBackground }]}>
+                    <View style={[styles.sectionHeader, { borderBottomColor: colors.borderLight }]}>
+                        <Ionicons name="flash-outline" size={20} color={colors.brandSecondary} />
+                        <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Quick Actions</Text>
                     </View>
                     
                     <View style={styles.actionsGrid}>
-                        <TouchableOpacity style={styles.actionCard} onPress={handleWhatsAppMessage}>
-                            <View style={styles.actionIcon}>
+                        <TouchableOpacity style={[styles.actionCard, { backgroundColor: colors.backgroundColor }]} onPress={handleWhatsAppMessage}>
+                            <View style={[styles.actionIcon, { backgroundColor: colors.cardBackground }]}>
                                 <Ionicons name="logo-whatsapp" size={24} color="#25D366" />
                             </View>
-                            <Text style={styles.actionTitle}>WhatsApp</Text>
-                            <Text style={styles.actionSubtitle}>Message us directly</Text>
+                            <Text style={[styles.actionTitle, { color: colors.textPrimary }]}>WhatsApp</Text>
+                            <Text style={[styles.actionSubtitle, { color: colors.textSecondary }]}>Message us directly</Text>
                         </TouchableOpacity>
                         
-                        <TouchableOpacity style={styles.actionCard} onPress={handleEmail}>
-                            <View style={styles.actionIcon}>
-                                <Ionicons name="mail-outline" size={24} color="#007bff" />
+                        <TouchableOpacity style={[styles.actionCard, { backgroundColor: colors.backgroundColor }]} onPress={handleEmail}>
+                            <View style={[styles.actionIcon, { backgroundColor: colors.cardBackground }]}>
+                                <Ionicons name="mail-outline" size={24} color={colors.brandSecondary} />
                             </View>
-                            <Text style={styles.actionTitle}>Email</Text>
-                            <Text style={styles.actionSubtitle}>Send us an email</Text>
+                            <Text style={[styles.actionTitle, { color: colors.textPrimary }]}>Email</Text>
+                            <Text style={[styles.actionSubtitle, { color: colors.textSecondary }]}>Send us an email</Text>
                         </TouchableOpacity>
                         
-                        <TouchableOpacity style={styles.actionCard} onPress={handleWebsite}>
-                            <View style={styles.actionIcon}>
-                                <Ionicons name="globe-outline" size={24} color="#007bff" />
+                        <TouchableOpacity style={[styles.actionCard, { backgroundColor: colors.backgroundColor }]} onPress={handleWebsite}>
+                            <View style={[styles.actionIcon, { backgroundColor: colors.cardBackground }]}>
+                                <Ionicons name="globe-outline" size={24} color={colors.brandSecondary} />
                             </View>
-                            <Text style={styles.actionTitle}>Website</Text>
-                            <Text style={styles.actionSubtitle}>Visit our site</Text>
+                            <Text style={[styles.actionTitle, { color: colors.textPrimary }]}>Website</Text>
+                            <Text style={[styles.actionSubtitle, { color: colors.textSecondary }]}>Visit our site</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
 
                 {/* Disclaimer */}
-                <View style={styles.disclaimerCard}>
+                <View style={[styles.disclaimerCard, { backgroundColor: colors.cardBackground, borderLeftColor: colors.success }]}>
                     <View style={styles.disclaimerHeader}>
-                        <Ionicons name="information-circle-outline" size={20} color="#28a745" />
-                        <Text style={styles.disclaimerTitle}>Free News Publishing</Text>
+                        <Ionicons name="information-circle-outline" size={20} color={colors.success} />
+                        <Text style={[styles.disclaimerTitle, { color: colors.success }]}>Free News Publishing</Text>
                     </View>
-                    <Text style={styles.disclaimerText}>
+                    <Text style={[styles.disclaimerText, { color: colors.textSecondary }]}>
                         We do not charge for publishing news articles. Contact us via email, WhatsApp, or visit our website to publish your news for free.
                     </Text>
                 </View>
