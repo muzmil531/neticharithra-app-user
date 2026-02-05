@@ -102,12 +102,10 @@ const AllNews = () => {
         additionalPayload = paginationMetaData
       }
 
-      console.log("A2")
       post(EndPointConfig.getLatestNewsV2, { ...{ language: lang }, ...additionalPayload || {} })
         .then(function (response) {
           setLoading(false);
           setInitialLoading(false)
-          console.log("RRR2", response)
           if (response?.status === 'success') {
             if (payload) {
               setlatestNews((prev) => {

@@ -17,10 +17,7 @@ const HomePageScreens = () => {
   let [listOfNEWSTYPE, setListOfNewsType] = useState([]);
   let [userLanguage, setUserLanguage] = useState('label');
   const themeData = useTheme();
-  console.log('HomePageScreens theme data:', { 
-    hasColors: !!themeData?.colors,
-    themeData: themeData
-  });
+
   
   // Ensure we always have valid colors with all required properties
   const colors = themeData?.colors || {
