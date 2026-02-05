@@ -20,11 +20,7 @@ const Tab = createBottomTabNavigator();
 export default function IndexScreen() {
     const [screens, setScreens] = useState([]);
     const themeData = useTheme();
-    console.log('IndexScreen theme data:', { 
-        hasColors: !!themeData?.colors,
-        colorsType: typeof themeData?.colors,
-        themeData: themeData
-    });
+   
     
     // Ensure we always have valid colors object
     const colors = themeData?.colors || {

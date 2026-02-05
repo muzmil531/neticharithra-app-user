@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, Platform, Dimensions, TouchableOpacity } from 'react-native';
-import Carousel, { ParallaxImage, Pagination } from 'react-native-snap-carousel';
+import { View, Text, StyleSheet, Platform, Dimensions, TouchableOpacity, Image } from 'react-native';
+import Carousel from 'react-native-reanimated-carousel';
 import { timeAgo } from '../handelers/ReusableHandeler';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeContext';
@@ -13,17 +13,13 @@ const ExampleParallaxCarousel = (props) => {
   const { colors } = useTheme();
 
   const navigation = useNavigation()
-  const renderItem = ({ item, index }, parallaxProps) => {
+  const renderItem = ({ item, index }) => {
     return (
 
-      // <TouchableOpacity style={styles.item} onPress={() => { console.log(item) }}>
       <TouchableOpacity style={styles.item} onPress={() => { navigation.navigate('NewsContainerV2', { data: item }) }}>
-        <ParallaxImage
+        <Image
           source={{ uri: item.images?.[0]?.externalURL || item.images?.[0]?.tempURL || 'https://upload.wikimedia.org/wikipedia/commons/3/32/Googleplex_HQ_%28cropped%29.jpg' }}
-          containerStyle={[styles.imageContainer, { backgroundColor: colors.cardBackground }]}
-          style={styles.image}
-          parallaxFactor={0.4}
-          {...parallaxProps}
+          style={[styles.imageContainer, { backgroundColor: colors.cardBackground }]}
         />
         {
           item?.approvedOn &&
@@ -47,25 +43,31 @@ const ExampleParallaxCarousel = (props) => {
         ref={carouselRef}
         data={props?.newsItems || []}
         renderItem={renderItem}
-        sliderWidth={screenWidth}
-        itemWidth={screenWidth - 60}
-        hasParallaxImages={true}
-        autoplay={true}
-        autoplayInterval={3000}
+        width={screenWidth - 60}
+        height={200}
+        autoPlay={true}
+        autoPlayInterval={3000}
         loop={true}
         onSnapToItem={(index) => setActiveIndex(index)}
+        mode="parallax"
+        modeConfig={{
+          parallaxScrollingScale: 0.9,
+          parallaxScrollingOffset: 50,
+        }}
       />
-      <Pagination
-        dotsLength={props?.newsItems?.length}
-        activeDotIndex={activeIndex}
-        containerStyle={styles.paginationContainer}
-        dotStyle={[styles.dotStyle, { backgroundColor: colors.textPrimary }]}
-        inactiveDotStyle={[styles.inactiveDotStyle, { backgroundColor: colors.textTertiary }]}
-        inactiveDotOpacity={0.4}
-        inactiveDotScale={0.6}
-        tappableDots={true}
-        carouselRef={carouselRef}
-      />
+      <View style={styles.paginationContainer}>
+        {props?.newsItems?.map((_, index) => (
+          <View
+            key={index}
+            style={[
+              styles.dotStyle,
+              index === activeIndex
+                ? { backgroundColor: colors.textPrimary }
+                : [styles.inactiveDotStyle, { backgroundColor: colors.textTertiary, opacity: 0.4 }]
+            ]}
+          />
+        ))}
+      </View>
     </View>
   );
 };
@@ -82,9 +84,7 @@ const styles = StyleSheet.create({
   imageContainer: {
     flex: 1,
     marginBottom: Platform.select({ ios: 0, android: 1 }),
-    borderRadius: 8, borderRadius: 5
-  },
-  image: {
+    borderRadius: 5,
     resizeMode: 'cover',
   },
   titleContianer: {
@@ -118,13 +118,20 @@ const styles = StyleSheet.create({
   },
   paginationContainer: {
     paddingVertical: 10,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   dotStyle: {
     width: 10,
     height: 10,
     borderRadius: 5,
+    marginHorizontal: 4,
   },
   inactiveDotStyle: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
   },
 });
 

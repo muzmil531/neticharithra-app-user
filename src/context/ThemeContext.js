@@ -18,7 +18,6 @@ export const ThemeProvider = ({ children }) => {
     const [currentTheme, setCurrentTheme] = useState(systemColorScheme || 'light');
     const [isLoading, setIsLoading] = useState(true);
 
-    console.log('ThemeProvider rendering with:', { systemColorScheme, themeMode, currentTheme });
 
     useEffect(() => {
         loadThemePreference();
@@ -79,7 +78,6 @@ export const ThemeProvider = ({ children }) => {
         isDark: currentTheme === 'dark',
     };
 
-    console.log('ThemeProvider value:', { hasColors: !!value.colors, themeMode: value.themeMode });
 
     return (
         <ThemeContext.Provider value={value}>
