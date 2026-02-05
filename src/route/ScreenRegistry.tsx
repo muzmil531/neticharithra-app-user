@@ -45,22 +45,22 @@ export function getScreenBuilder(screen: ScreenName, parent: any): ScreenBuilder
 }
 
 function getScreen(screenName: any, parent: any): ScreenType {
-
-    switch (screenName) {
-        case 'MainScreen':
-            return require('./../screenHandelers/MainScreen').default;
-        case 'IndexScreen':
-            return require('./../screenHandelers/IndexScreen').default;
-        case 'HomeScreen':
-            return require('./../screenHandelers/HomeScreen').default;
-        case 'HomePageScreens':
-            return require('./../screenHandelers/HomePageScreens').default;
-        case 'SearchScreen':
-            return require('./../screenHandelers/SearchScreen').default;
-        case 'SearchScreenV2':
-            return require('./../screens/Search/SearchScreenV2').default;
-        case 'HelpScreen':
-            return require('./../screens/HelpScreen').default;
+    try {
+        switch (screenName) {
+            case 'MainScreen':
+                return require('./../screenHandelers/MainScreen').default;
+            case 'IndexScreen':
+                return require('./../screenHandelers/IndexScreen').default;
+            case 'HomeScreen':
+                return require('./../screenHandelers/HomeScreen').default;
+            case 'HomePageScreens':
+                return require('./../screenHandelers/HomePageScreens').default;
+            case 'SearchScreen':
+                return require('./../screenHandelers/SearchScreen').default;
+            case 'SearchScreenV2':
+                return require('./../screens/Search/SearchScreenV2').default;
+            case 'HelpScreen':
+                return require('./../screens/HelpScreen').default;
         case 'AllNews':
             return require('./../screens/HomePage/AllNews').default;
         case 'Categorised':
@@ -93,8 +93,14 @@ function getScreen(screenName: any, parent: any): ScreenType {
         // case 'PostIndex/PublicUserInfoRequest':
         //     return require('./../screens/Post/PublicUserLogin/PublicUserInfoRequest').default;
 
+        }
+        return assertUnreachableScreen(screenName);
+    } catch (error: any) {
+        console.error(`Error loading screen "${screenName}":`, error);
+        throw new Error(
+            `getScreen(...): Failed to load screen "${screenName}" - ${error?.message || 'Unknown error'}`,
+        );
     }
-    return assertUnreachableScreen(screenName);
 }
 function assertUnreachableScreen(screenName: never): never {
     throw new Error(

@@ -14,6 +14,8 @@ import Main from './src/route/Main';
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 
 import i18next from './services/i18next';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import DeviceInfo from 'react-native-device-info';
 
 import {
   requestUserPermission,
@@ -22,6 +24,7 @@ import {
   displayNotification,
   handleNotificationNavigation
 } from "./src/services/pushService";
+import { getLocationWithPermission } from "./src/services/locationService";
 
 
 type SectionProps = PropsWithChildren<{
@@ -49,10 +52,29 @@ function AppContent(): React.JSX.Element {
       await requestUserPermission();
 
       const token = await getFCMToken();
-
+      console.log("FCM TOKEN:", token);
+      
       if (token) {
-        // Replace with logged in user id
-        await sendTokenToBackend("USER_123", token);
+        // Get unique device ID
+        const deviceId = await DeviceInfo.getUniqueId();
+        
+        // Get user's saved language
+        let userLanguage: string | null = null;
+        try {
+          const savedLang = await AsyncStorage.getItem('userLanguageSaved');
+          userLanguage = savedLang || null;
+        } catch (error) {
+          console.log('Error retrieving language:', error);
+        }
+
+        // Request location permission and get coordinates
+        const { latitude, longitude } = await getLocationWithPermission();
+        
+        console.log('Device ID:', deviceId);
+        console.log('Location:', { latitude, longitude, language: userLanguage });
+        
+        // Send device ID instead of user ID
+        await sendTokenToBackend(deviceId, token, latitude, longitude, userLanguage);
       }
     }
 

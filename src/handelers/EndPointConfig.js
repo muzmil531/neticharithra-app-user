@@ -15,6 +15,7 @@ const EndPointConfig = {
     listPublicUserNews: 'public/listPublicUserNews',
     updateUserInfo: 'public/updateUserInfo',
     getUserNewsCount: 'public/getUserNewsCount',
+    registerMobileUser: 'registerMobileUser',
     
     
     

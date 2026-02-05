@@ -1,6 +1,9 @@
 import messaging from "@react-native-firebase/messaging";
 import notifee from "@notifee/react-native";
+import { Platform } from "react-native";
 import { navigate } from "./NotificationServices";
+import { post } from "../handelers/APIHandeler";
+import EndPointConfig from "../handelers/EndPointConfig";
 
 // Request Permission
 export async function requestUserPermission() {
@@ -21,20 +24,31 @@ export async function getFCMToken() {
 }
 
 // Save token to backend
-export async function sendTokenToBackend(userId, token) {
+export async function sendTokenToBackend(userId, token, latitude, longitude, language) {
   try {
-    const response = await fetch("http://YOUR_BACKEND_URL:5000/api/save-token", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ userId, token }),
-    });
+    const payload = {
+      userId,
+      token,
+      latitude,
+      longitude,
+      language,
+      platform: Platform.OS
+    };
 
-    const data = await response.json();
-    console.log("Token saved:", data);
+    console.log("Sending token to backend:", payload);
+
+    const response = await post(EndPointConfig.registerMobileUser, payload);
+    
+    if (response?.status === 'success') {
+      console.log("Token saved successfully:", response);
+    } else {
+      console.log("Registration response:", response);
+    }
+    
+    return response;
   } catch (error) {
-    console.log("Error saving token:", error);
+    console.error("Error saving token:", error);
+    return null;
   }
 }
 
