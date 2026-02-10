@@ -1,4 +1,5 @@
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
+import { navigationRef } from './src/services/NotificationServices';
 import React, { useEffect } from 'react';
 import type { PropsWithChildren } from 'react';
 import {
@@ -7,6 +8,7 @@ import {
 } from 'react-native';
 
 import messaging from "@react-native-firebase/messaging";
+import notifee, { EventType } from '@notifee/react-native';
 
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -102,9 +104,20 @@ function AppContent(): React.JSX.Element {
         }
       });
 
+    // ✅ Handle foreground notification clicks (when user taps notification while app is open)
+    const unsubscribeNotifee = notifee.onForegroundEvent(({ type, detail }) => {
+      if (type === EventType.PRESS) {
+        console.log('User pressed foreground notification:', detail.notification?.data);
+        if (detail.notification?.data) {
+          handleNotificationNavigation({ data: detail.notification.data });
+        }
+      }
+    });
+
     return () => {
       unsubscribeOnMessage();
       unsubscribeBackground();
+      unsubscribeNotifee();
     };
   }, []);
 
@@ -120,8 +133,8 @@ function AppContent(): React.JSX.Element {
             backgroundColor={colors.headerThemeBg}
           />
 
-          {/* ✅ Navigation container stays same */}
-          <NavigationContainer theme={navTheme}>
+          {/* ✅ Navigation container with ref for push notifications */}
+          <NavigationContainer ref={navigationRef} theme={navTheme}>
             <Main />
           </NavigationContainer>
 

@@ -245,7 +245,7 @@ const NewsContainerV2 = () => {
                                         <Pressable onPress={openSourceLink} style={[styles.sourceContainer, { backgroundColor: colors.backgroundColor, borderLeftColor: colors.brandSecondary }]}>
                                             <Text style={[styles.sourceLabel, { color: colors.textSecondary }]}>Source:</Text>
                                             <Text style={[styles.sourceName, { color: colors.brandSecondary }]}>
-                                                {newsInfo?.source}
+                                                {newsInfo?.source} 
                                             </Text>
                                             {newsInfo?.source !== 'Neti Charithra' && newsInfo?.sourceLink && (
                                                 <Ionicons name="open-outline" size={14} color={colors.brandSecondary} style={styles.externalIcon} />

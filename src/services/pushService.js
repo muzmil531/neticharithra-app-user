@@ -76,10 +76,32 @@ export async function displayNotification(remoteMessage) {
 
 // Handle click navigation
 export function handleNotificationNavigation(remoteMessage) {
-  const screen = remoteMessage?.data?.screen;
-  const id = remoteMessage?.data?.id;
+  console.log("=== NOTIFICATION NAVIGATION START ===");
+  console.log("Full remoteMessage:", JSON.stringify(remoteMessage, null, 2));
+  console.log("Notification data:", remoteMessage?.data);
+  
+  const newsId = remoteMessage?.data?.newsId;
+  const type = remoteMessage?.data?.type;
 
-  if (screen) {
+  console.log("Extracted newsId:", newsId);
+  console.log("Extracted type:", type);
+
+  if (newsId && type === 'news_approved') {
+    console.log("Navigating to NewsContainerV2 with newsId:", newsId);
+    // Navigate to NewsContainerV2 with newsId payload
+    navigate('NewsContainerV2', { 
+      data: { 
+        newsId: newsId 
+      } 
+    });
+  } else if (remoteMessage?.data?.screen) {
+    console.log("Using fallback navigation to screen:", remoteMessage?.data?.screen);
+    // Fallback for other notification types
+    const screen = remoteMessage?.data?.screen;
+    const id = remoteMessage?.data?.id;
     navigate(screen, { id });
+  } else {
+    console.log("No valid navigation data found in notification");
   }
+  console.log("=== NOTIFICATION NAVIGATION END ===");
 }
