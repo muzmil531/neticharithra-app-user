@@ -23,7 +23,7 @@ import { ActivityIndicator } from 'react-native-paper'
 import { useTranslation } from 'react-i18next'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../../context/ThemeContext';
-import LoadingScreen from '../../components/LoadingScreen'
+import NewsSkeletonLoader from '../../components/NewsSkeletonLoader'
 import LinearGradient from 'react-native-linear-gradient';
 import Carousel from 'react-native-reanimated-carousel';
 
@@ -198,7 +198,7 @@ const AllNews = () => {
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.screenBackground} />
 
       {initalLoading ? (
-        <LoadingScreen message={"Fetching Latest News"} />
+        <NewsSkeletonLoader />
       ) : (
         <View style={styles.mainContainer}>
           {/* Search Bar */}
@@ -209,7 +209,7 @@ const AllNews = () => {
                 style={[styles.searchInput, { color: colors.textPrimary }]}
                 placeholder="Search Latest News"
                 placeholderTextColor={colors.textTertiary}
-                onFocus={() => navigation.navigate('SearchScreenV2')}
+                onFocus={() => navigation.navigate('Search')}
               />
             </View>
           </View>
@@ -379,17 +379,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     overflow: 'hidden',
     height: 220,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 3,
-      },
-    }),
+    backgroundColor: '#e1e4e8', // Light background while loading
   },
   featuredImage: {
     width: '100%',
