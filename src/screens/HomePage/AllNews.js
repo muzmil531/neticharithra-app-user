@@ -55,6 +55,7 @@ const AllNews = () => {
   let [loading, setLoading] = useState(false)
   let [refreshing, setRefreshing] = useState(false)
   let [carouselActiveIndex, setCarouselActiveIndex] = useState(0);
+  const isLoadingRef = React.useRef(false);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -64,13 +65,10 @@ const AllNews = () => {
           setlatestNews([]) // Clear previous data
           let lang = await retrieveData('userLanguageSaved', 'string');
           if (lang) {
+            const initialPagination = { count: 5, page: 0, endOfRecords: false };
+            setPaginationMetaData(initialPagination);
             getPriorityNews(lang);
-            setPaginationMetaData({
-              "count": 5,
-              "page": 0,
-              endOfRecords: false
-            })
-            getLatestNews();
+            getLatestNews(initialPagination);
           }
         } catch (error) {
           console.error('Error fetching data:', error);
@@ -100,6 +98,8 @@ const AllNews = () => {
   };
 
   const getLatestNews = async (customPagination) => {
+    if (isLoadingRef.current) return;
+    isLoadingRef.current = true;
     try {
       setLoading(true);
       let lang = await retrieveData('userLanguageSaved', 'string');
@@ -107,7 +107,7 @@ const AllNews = () => {
       if (lang) {
         let pagination = customPagination || paginationMetaData;
         console.log('[AllNews] Fetching news with pagination:', pagination);
-        post(EndPointConfig.getNewsInfoV2, { ...pagination, ...{ language: lang } })
+        post(EndPointConfig.getLatestNewsV2, { ...pagination, ...{ language: lang } })
           .then(function (response) {
             console.log('[AllNews] Response status:', response?.status);
             console.log('[AllNews] Response data length:', response?.data?.length);
@@ -118,47 +118,51 @@ const AllNews = () => {
                   console.log('[AllNews] Total news items:', newData.length);
                   return newData;
                 });
-                setPaginationMetaData((prev) => ({
-                  ...prev,
+                setPaginationMetaData({
+                  ...pagination,
                   endOfRecords: response?.data?.length < pagination.count
-                }));
+                });
               } else {
                 console.log('[AllNews] No more data, end of records');
-                setPaginationMetaData((prev) => ({
-                  ...prev,
+                setPaginationMetaData({
+                  ...pagination,
                   endOfRecords: true
-                }));
+                });
               }
             }
             setInitialLoading(false);
             setLoading(false);
+            isLoadingRef.current = false;
           })
           .catch(function (error) {
             console.error('[AllNews] Error fetching news:', error);
             setLoading(false);
             setInitialLoading(false);
+            isLoadingRef.current = false;
           });
+      } else {
+        setLoading(false);
+        isLoadingRef.current = false;
       }
     } catch (error) {
       console.error('[AllNews] Error in getLatestNews:', error);
       setLoading(false);
       setInitialLoading(false);
+      isLoadingRef.current = false;
     }
   };
 
   const onRefresh = async () => {
     setRefreshing(true);
+    isLoadingRef.current = false;
     try {
       setlatestNews([]) // Clear previous data
       let lang = await retrieveData('userLanguageSaved', 'string');
       if (lang) {
+        const initialPagination = { count: 5, page: 0, endOfRecords: false };
+        setPaginationMetaData(initialPagination);
         getPriorityNews(lang);
-        setPaginationMetaData({
-          "count": 5,
-          "page": 0,
-          endOfRecords: false
-        });
-        await getLatestNews();
+        await getLatestNews(initialPagination);
       }
     } catch (error) {
       console.error('Error refreshing:', error);
@@ -228,7 +232,7 @@ const AllNews = () => {
           <FlatList
             style={styles.newsList}
             data={latestNews}
-            keyExtractor={(item, index) => (item.newsId?.toString() || item._id?.toString() || item.id?.toString() || index.toString())+'_scrollList'+Math.floor(10000 + Math.random() * 90000)}
+            keyExtractor={(item, index) => `${item.newsId || item._id || item.id || index}_scrollList_${index}`}
             showsVerticalScrollIndicator={false}
             refreshControl={
               <RefreshControl
@@ -280,12 +284,10 @@ const AllNews = () => {
               <NewsTitleCard item={item} />
             )}
             onEndReached={() => {
-              if (!paginationMetaData?.endOfRecords && !loading) {
-                getLatestNews({ ...paginationMetaData, page: paginationMetaData.page + 1 })
-                setPaginationMetaData((prev) => ({
-                  ...prev,
-                  page: prev.page + 1
-                }))
+              if (!paginationMetaData?.endOfRecords && !loading && !isLoadingRef.current) {
+                const nextPagination = { ...paginationMetaData, page: paginationMetaData.page + 1 };
+                setPaginationMetaData(nextPagination);
+                getLatestNews(nextPagination);
               }
             }}
             onEndReachedThreshold={0.3}
