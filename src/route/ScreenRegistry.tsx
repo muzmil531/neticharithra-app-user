@@ -71,11 +71,7 @@ function getScreen(screenName: any, parent: any): ScreenType {
        
         case 'DetailedNewsInfo':
             return require('./../screens/News/detailedNewsInfo').default;
-        case 'SearchIndex':
-            return require('./../screens/Search/SearchIndex').default;
         
-        case 'Settings':
-            return require('./../screens/Settings/Settings').default;
 
         }
         return assertUnreachableScreen(screenName);
