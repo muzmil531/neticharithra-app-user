@@ -17,12 +17,11 @@ import { retrieveData } from '../../handelers/AsyncStorageHandeler'
 import { post } from '../../handelers/APIHandeler'
 import EndPointConfig from '../../handelers/EndPointConfig'
 import { ActivityIndicator } from 'react-native-paper'
-import LoaderScreen from '../../components/LoaderScreen'
-import TabScreenWrapper from '../../components/TabScreenWrapper'
 import { useTranslation } from 'react-i18next'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../../context/ThemeContext';
+import LoadingScreen from '../../components/LoadingScreen'
 
 const { height, width } = Dimensions.get('screen');
 const AllNews = () => {
@@ -159,7 +158,7 @@ const AllNews = () => {
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.headerThemeBg} />
       
       {initalLoading ? (
-       <Text>Removed Loader Component</Text>
+       <LoadingScreen message={"Fetching Latest News"} />
       ) : (
         <View style={styles.mainContainer}>
           {/* Hero Carousel */}
