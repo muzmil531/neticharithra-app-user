@@ -66,8 +66,7 @@ function getScreen(screenName: any, parent: any): ScreenType {
             return require('./../screens/HomePage/Categorised').default;
         case 'NewsContainerV2':
             return require('./../components/NewsContainerV2').default;
-        case 'News':
-            return require('./../screens/News/News').default;
+
        
         case 'DetailedNewsInfo':
             return require('./../screens/News/detailedNewsInfo').default;
