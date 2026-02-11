@@ -13,7 +13,7 @@ import {
   TextInput,
   Image
 } from 'react-native'
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import NewsTitleCard from '../../components/NewsTitleCard'
 import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native'
 import { retrieveData } from '../../handelers/AsyncStorageHandeler'
@@ -238,7 +238,7 @@ const Categorised = () => {
                 tintColor={colors.brandSecondary}
               />
             }
-            ListHeaderComponent={() => (
+            ListHeaderComponent={
               topPriorityNews.length > 0 ? (
                 <View style={styles.carouselContainer}>
                   <Carousel
@@ -275,7 +275,7 @@ const Categorised = () => {
                   </View>
                 </View>
               ) : null
-            )}
+            }
             renderItem={({ item, index }) => (
               <NewsTitleCard item={item} />
             )}

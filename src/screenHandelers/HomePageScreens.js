@@ -149,32 +149,38 @@ const HomePageScreens = () => {
   };
 
   return (
-    <View style={{ height: height * 0.79 }}>
+    <View style={{ flex: 1 }}>
+
+      <Text>hi</Text>
       <Tab.Navigator
         initialRouteName="All News"
+        sceneContainerStyle={{ flex: 1 }}
         screenOptions={{
           tabBarActiveTintColor: colors?.tabBarActive || '#e91e63',
           tabBarInactiveTintColor: colors?.textSecondary || '#666',
           tabBarStyle: {
-            // backgroundColor: 'transparent',
             backgroundColor: colors?.headerThemeBg || '#fff',
             elevation: 2,
             shadowColor: '#000',
             shadowOffset: { width: 0, height: 1 },
             shadowOpacity: 0.05,
             shadowRadius: 2,
-            height: 90,
+            height: 75,
+            paddingTop: 4,
+            paddingBottom: 4,
           },
           tabBarIndicatorStyle: {
-            height: 0, // Remove underline indicator
+            height: 0,
           },
           tabBarScrollEnabled: true,
           tabBarItemStyle: {
             width: 'auto',
             minWidth: 85,
-            paddingHorizontal: 12,
+            paddingHorizontal: 8,
           },
           tabBarPressColor: colors?.backgroundColor || '#f8f9fa',
+          swipeEnabled: false,
+          lazy: false,
         }}
       >
         <Tab.Screen
@@ -188,7 +194,7 @@ const HomePageScreens = () => {
 
         {listOfCategories?.map((element, index) => (
           <Tab.Screen
-            key={index}
+            key={`category-${index}-${element?.[userLanguage || 'label']}`}
             name={element?.[userLanguage || 'label']}
             getComponent={getScreenBuilder('Categorised')}
             options={{
@@ -205,7 +211,7 @@ const HomePageScreens = () => {
         ))}
         {listOfNEWSTYPE?.map((element, index) => (
           <Tab.Screen
-            key={index}
+            key={`newstype-${index}-${element?.[userLanguage || 'label']}`}
             name={element?.[userLanguage || 'label']}
             getComponent={getScreenBuilder('Categorised')}
             options={{
@@ -231,16 +237,16 @@ const styles = StyleSheet.create({
   tabLabelContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 6,
+    paddingVertical: 2,
     backgroundColor: "transparent",
   },
   tabCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 6,
+    marginBottom: 4,
   },
   tabFirstLetter: {
     fontSize: 18,

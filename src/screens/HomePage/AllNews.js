@@ -13,7 +13,7 @@ import {
   TextInput,
   Image
 } from 'react-native'
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import NewsTitleCard from '../../components/NewsTitleCard'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { retrieveData } from '../../handelers/AsyncStorageHandeler'
@@ -61,13 +61,14 @@ const AllNews = () => {
       const fetchData = async () => {
         try {
           setInitialLoading(true)
+          setlatestNews([]) // Clear previous data
           let lang = await retrieveData('userLanguageSaved', 'string');
           if (lang) {
             getPriorityNews(lang);
             setPaginationMetaData({
               "count": 5,
               "page": 0,
-              endOfRecords: true
+              endOfRecords: false
             })
             getLatestNews();
           }
@@ -98,55 +99,64 @@ const AllNews = () => {
     }
   };
 
-  const getLatestNews = async (payload) => {
+  const getLatestNews = async (customPagination) => {
     try {
-      setLoading(true)
+      setLoading(true);
       let lang = await retrieveData('userLanguageSaved', 'string');
-      let additionalPayload = payload;
-      if (!additionalPayload) {
-        additionalPayload = paginationMetaData
-      }
-
-      post(EndPointConfig.getLatestNewsV2, { ...{ language: lang }, ...additionalPayload || {} })
-        .then(function (response) {
-          setLoading(false);
-          setInitialLoading(false)
-          if (response?.status === 'success') {
-            if (payload) {
-              setlatestNews((prev) => {
-                return [...prev, ...response?.data || []]
-              })
-            } else {
-              setlatestNews(response?.data || []);
-            }
-            setPaginationMetaData((prev) => {
-              return {
-                ...prev,
-                endOfRecords: response?.endOfRecords
+      console.log('[AllNews] Language:', lang);
+      if (lang) {
+        let pagination = customPagination || paginationMetaData;
+        console.log('[AllNews] Fetching news with pagination:', pagination);
+        post(EndPointConfig.getNewsInfoV2, { ...pagination, ...{ language: lang } })
+          .then(function (response) {
+            console.log('[AllNews] Response status:', response?.status);
+            console.log('[AllNews] Response data length:', response?.data?.length);
+            if (response?.status === 'success') {
+              if (response?.data?.length > 0) {
+                setlatestNews((prev) => {
+                  const newData = [...prev, ...response.data];
+                  console.log('[AllNews] Total news items:', newData.length);
+                  return newData;
+                });
+                setPaginationMetaData((prev) => ({
+                  ...prev,
+                  endOfRecords: response?.data?.length < pagination.count
+                }));
+              } else {
+                console.log('[AllNews] No more data, end of records');
+                setPaginationMetaData((prev) => ({
+                  ...prev,
+                  endOfRecords: true
+                }));
               }
-            })
-          }
-        })
-        .catch(function (error) {
-          console.error(error);
-          setLoading(false)
-        });
+            }
+            setInitialLoading(false);
+            setLoading(false);
+          })
+          .catch(function (error) {
+            console.error('[AllNews] Error fetching news:', error);
+            setLoading(false);
+            setInitialLoading(false);
+          });
+      }
     } catch (error) {
-      console.error(error);
-      setLoading(false)
+      console.error('[AllNews] Error in getLatestNews:', error);
+      setLoading(false);
+      setInitialLoading(false);
     }
   };
 
   const onRefresh = async () => {
     setRefreshing(true);
     try {
+      setlatestNews([]) // Clear previous data
       let lang = await retrieveData('userLanguageSaved', 'string');
       if (lang) {
         getPriorityNews(lang);
         setPaginationMetaData({
           "count": 5,
           "page": 0,
-          endOfRecords: true
+          endOfRecords: false
         });
         await getLatestNews();
       }
@@ -218,7 +228,7 @@ const AllNews = () => {
           <FlatList
             style={styles.newsList}
             data={latestNews}
-            keyExtractor={(item, index) => item.newsId?.toString() || item._id?.toString() || item.id?.toString() || index.toString()}
+            keyExtractor={(item, index) => (item.newsId?.toString() || item._id?.toString() || item.id?.toString() || index.toString())+'_scrollList'+Math.floor(10000 + Math.random() * 90000)}
             showsVerticalScrollIndicator={false}
             refreshControl={
               <RefreshControl
@@ -228,7 +238,7 @@ const AllNews = () => {
                 tintColor={colors.brandSecondary}
               />
             }
-            ListHeaderComponent={() => (
+            ListHeaderComponent={
               topPriorityNews.length > 0 ? (
                 <View style={styles.carouselContainer}>
                   <Carousel
@@ -248,9 +258,9 @@ const AllNews = () => {
                   />
                   {/* Pagination Dots */}
                   <View style={styles.paginationContainer}>
-                    {topPriorityNews.map((_, index) => (
+                    {topPriorityNews.map((item, index) => (
                       <View
-                        key={index}
+                        key={`dot-${item?.newsId || item?._id || index}`}
                         style={[
                           styles.paginationDot,
                           {
@@ -265,7 +275,7 @@ const AllNews = () => {
                   </View>
                 </View>
               ) : null
-            )}
+            }
             renderItem={({ item, index }) => (
               <NewsTitleCard item={item} />
             )}
@@ -307,9 +317,12 @@ export default AllNews
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: '100%',
+    height: '100%',
   },
   mainContainer: {
     flex: 1,
+    width: '100%',
   },
   searchContainer: {
     paddingHorizontal: 16,
@@ -428,6 +441,7 @@ const styles = StyleSheet.create({
   },
   newsList: {
     flex: 1,
+    width: '100%',
   },
   loadingFooter: {
     paddingVertical: 20,
