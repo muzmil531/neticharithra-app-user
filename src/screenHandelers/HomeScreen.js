@@ -56,34 +56,7 @@ const HomeScreen = () => {
 
     return (
         <>
-            {screens?.length > 0 &&
-                <Tab.Navigator
-                    initialRouteName="SpecificDistrict"
-                    screenOptions={{
-                        tabBarActiveTintColor: colors.heading,
-                        tabBarInactiveTintColor: colors.textColor,
-                        tabBarStyle: {
-                            backgroundColor: colors.backgroundColor,
-                        },
-                        style: {
-                            backgroundColor: colors.backgroundColor
-                        },
-                        scrollEnabled: true,
-                        tabBarLabelStyle: {
-                            fontWeight: 'bold',
-                            fontSize: scaleFont(14)
-                        },
-                    }}>
-                    {screens.map(screen => (
-                        <Tab.Screen
-                            key={screen.heading}
-                            name={screen.heading}
-                            getComponent={getScreenBuilder(screen.route)}
-                            options={{ tabBarLabel: screen.heading }}
-                        />
-                    ))}
-                </Tab.Navigator>
-            }
+           
         </>
     );
 }

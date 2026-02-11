@@ -15,18 +15,7 @@ const SearchCategory = () => {
 
   const { t } = useTranslation();
   const [userLanguage, setUserLanguage] = useState('label');
-  const subHeaderElements2 = {
-    heading: {
-      label: t('searchScreen.tabsName.searchIndex'),
-      
-      configuration:{
-        parent:{
-          fontSize:scaleFont(20)
-        }
-      }
 
-    },
-  };
   let [subHeaderElements, setSubheaderElements]=useState()
   useFocusEffect(
     React.useCallback(() => {

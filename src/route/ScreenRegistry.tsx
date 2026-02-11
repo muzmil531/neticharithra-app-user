@@ -55,8 +55,7 @@ function getScreen(screenName: any, parent: any): ScreenType {
                 return require('./../screenHandelers/HomeScreen').default;
             case 'HomePageScreens':
                 return require('./../screenHandelers/HomePageScreens').default;
-            case 'SearchScreen':
-                return require('./../screenHandelers/SearchScreen').default;
+           
             case 'SearchScreenV2':
                 return require('./../screens/Search/SearchScreenV2').default;
             case 'HelpScreen':
@@ -69,8 +68,7 @@ function getScreen(screenName: any, parent: any): ScreenType {
             return require('./../components/NewsContainerV2').default;
         case 'News':
             return require('./../screens/News/News').default;
-        case 'SpecificDistrict':
-            return require('./../screens/News/SpecificDistrict').default;
+       
         case 'DetailedNewsInfo':
             return require('./../screens/News/detailedNewsInfo').default;
         case 'SearchIndex':
