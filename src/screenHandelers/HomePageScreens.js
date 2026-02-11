@@ -1,6 +1,6 @@
-import { Dimensions, StyleSheet, Text, View, useColorScheme, ScrollView, TouchableOpacity } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { TabView, TabBar } from 'react-native-tab-view';
+import { Dimensions, StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { getScreenBuilder } from '../route/ScreenRegistry';
 import { post } from '../handelers/APIHandeler';
 import EndPointConfig from '../handelers/EndPointConfig';
@@ -10,8 +10,8 @@ import { useTheme } from '../context/ThemeContext';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
+const Tab = createMaterialTopTabNavigator();
 let height = Dimensions.get('screen').height;
-const { width } = Dimensions.get('window');
 
 const HomePageScreens = () => {
 
@@ -27,7 +27,7 @@ const HomePageScreens = () => {
     tabBarActive: '#e91e63',
     heading: '#000',
     headerThemeBg: '#fff',
-    headerThemeText: '#000',
+    headerThemeText: '#cdc9c9ff',
     tabIndicator: '#B61F24'
   };
   const isDark = themeData?.isDark || false;
@@ -72,146 +72,133 @@ const HomePageScreens = () => {
     }
   };
 
-  // Category icon colors
-  const getCategoryColor = (iconName) => {
+  // Each menu item gets a unique color
+  const getItemColor = (icon) => {
     const colorMap = {
-      'newspaper': '#FF6B35',      // Orange for news
-      'users': '#4A90E2',          // Blue for political
-      'film': '#9B59B6',           // Purple for entertainment
-      'basketball-ball': '#27AE60', // Green for sports
-      'globe': '#00BCD4',          // Cyan for technology
-      'industry': '#F39C12',       // Amber for business
-      'apps': '#E91E63',           // Pink for All News
+      'newspaper': '#FF6B35',
+      'users': '#4A90E2',
+      'film': '#9B59B6',
+      'basketball-ball': '#27AE60',
+      'globe': '#00BCD4',
+      'industry': '#F39C12',
+      'apps': '#E91E63',
+      'regional': '#FF5722',
+      'national': '#3F51B5',
+      'international': '#009688',
     };
-    return colorMap[iconName] || '#666';
+    return colorMap[icon] || colors?.tabBarActive || '#e91e63';
   };
 
-  // Custom Tab Label Component
-  const TabLabel = ({ label, focused, icon, useIonicons = false }) => {
-    const firstLetter = label?.charAt(0) || '';
-    const hasIcon = icon && icon.trim() !== '';
-    const categoryColor = hasIcon ? getCategoryColor(icon) : (colors?.tabBarActive || '#e91e63');
+  // Custom top menu bar
+  const scrollRef = useRef(null);
+  const ITEM_WIDTH = 74; // menuItem width (62) + marginHorizontal (6*2)
 
-    // Icon color: always use category color (colored icons)
-    const iconColor = categoryColor;
+  const CustomTabBar = ({ state, navigation }) => (
+    <View style={[styles.menuContainer, { backgroundColor: colors?.headerThemeBg || '#fff' }]}>
+      <ScrollView
+        ref={scrollRef}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.menuScrollContent}
+      >
+        {state.routes.map((route, idx) => {
+          const focused = state.index === idx;
+          const params = route.params || {};
+          const icon = params._icon || '';
+          const iconType = params._iconType || 'fa5';
+          const itemColor = getItemColor(params._colorKey || icon);
+          const firstLetter = route.name?.charAt(0) || '';
 
-    // Circle background: transparent with category color when focused, gray when not
-    const circleBackgroundColor = focused
-      ? `${categoryColor}15`  // 15% opacity of category color (transparent)
-      : (isDark ? colors?.backgroundColor || '#2a2a2a' : '#f5f5f5');
+          const circleBg = focused
+            ? `${itemColor}15`
+            : (isDark ? '#2a2a2a' : '#f5f5f5');
 
-    return (
-      <View style={styles.tabLabelContainer}>
-        <View style={[
-          styles.tabCircle,
-          {
-            backgroundColor: circleBackgroundColor,
-            borderWidth: focused ? 2 : 0,
-            borderColor: focused ? categoryColor : 'transparent'
-          }
-        ]}>
-          {hasIcon ? (
-            useIonicons ? (
-              <Ionicons
-                name={icon}
-                size={22}
-                color={iconColor}
-              />
-            ) : (
-              <FontAwesome5
-                name={icon}
-                size={20}
-                color={iconColor}
-                solid={focused}
-              />
-            )
-          ) : (
-            <Text style={[
-              styles.tabFirstLetter,
-              {
-                color: focused ? categoryColor : colors?.textSecondary || '#666',
-              }
-            ]}>
-              {firstLetter}
-            </Text>
-          )}
-        </View>
-        <Text style={[
-          styles.tabFullName,
-          {
-            color: focused ? categoryColor : colors?.textSecondary || '#666',
-            fontWeight: focused ? '600' : '500'
-          }
-        ]}>
-          {label}
-        </Text>
-      </View>
-    );
-  };
-
-  // Build routes array
-  const routes = [
-    { key: 'allnews', title: 'All News' },
-    ...listOfCategories.map((cat, idx) => ({ 
-      key: `cat-${idx}`, 
-      title: cat?.[userLanguage || 'label'],
-      data: cat
-    })),
-    ...listOfNEWSTYPE.map((type, idx) => ({ 
-      key: `type-${idx}`, 
-      title: type?.[userLanguage || 'label'],
-      data: type,
-      newsType: true
-    }))
-  ];
-
-  const renderScene = ({ route }) => {
-    if (route.key === 'allnews') {
-      const AllNewsComponent = getScreenBuilder('AllNews')();
-      return (
-        <View style={{ flex: 1 }}>
-          <AllNewsComponent />
-        </View>
-      );
-    }
-    const CategorisedComponent = getScreenBuilder('Categorised')();
-    return (
-      <View style={{ flex: 1 }}>
-        <CategorisedComponent 
-          route={{ 
-            params: { 
-              mainProp: route.data, 
-              newsType: route.newsType 
-            } 
-          }} 
-        />
-      </View>
-    );
-  };
-
-  const renderTabBar = props => (
-    <TabBar
-      {...props}
-      scrollEnabled
-      indicatorStyle={{ backgroundColor: colors?.tabBarActive || '#e91e63', height: 3 }}
-      style={{ backgroundColor: colors?.headerThemeBg || '#fff' }}
-      tabStyle={{ width: 'auto', minWidth: 90 }}
-      labelStyle={{ fontSize: 14, fontWeight: '600', textTransform: 'none' }}
-      activeColor={colors?.tabBarActive || '#e91e63'}
-      inactiveColor="#666"
-    />
+          return (
+            <TouchableOpacity
+              key={route.key}
+              onPress={() => {
+                navigation.navigate(route.name);
+              }}
+              activeOpacity={0.7}
+              style={styles.menuItem}
+            >
+              <View style={styles.tabLabelContainer}>
+                <View style={[
+                  styles.tabCircle,
+                  {
+                    backgroundColor: circleBg,
+                    borderWidth: focused ? 2 : 1,
+                    borderColor: focused ? itemColor : (isDark ? '#444' : '#e0e0e0'),
+                  }
+                ]}>
+                  {icon ? (
+                    iconType === 'ionicons' ? (
+                      <Ionicons name={icon} size={20} color={itemColor} />
+                    ) : (
+                      <FontAwesome5 name={icon} size={18} color={itemColor} solid={focused} />
+                    )
+                  ) : (
+                    <Text style={[
+                      styles.tabFirstLetter,
+                      { color: itemColor }
+                    ]}>
+                      {firstLetter}
+                    </Text>
+                  )}
+                </View>
+                <Text
+                  numberOfLines={1}
+                  style={[
+                    styles.tabFullName,
+                    {
+                      color: focused ? itemColor : (colors?.textSecondary || '#888'),
+                      fontWeight: focused ? '700' : '400',
+                    }
+                  ]}
+                >
+                  {route.name}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
+    </View>
   );
 
   return (
     <View style={{ flex: 1 }}>
-      <TabView
-        navigationState={{ index, routes }}
-        renderScene={renderScene}
-        renderTabBar={renderTabBar}
-        onIndexChange={setIndex}
-        initialLayout={{ width }}
-        swipeEnabled={false}
-      />
+      <Tab.Navigator
+        initialRouteName="All News"
+        tabBar={CustomTabBar}
+        sceneContainerStyle={{ flex: 1 }}
+        screenOptions={{
+          swipeEnabled: false,
+          lazy: false,
+        }}
+      >
+        <Tab.Screen
+          name="All News"
+          getComponent={getScreenBuilder('AllNews')}
+          initialParams={{ _icon: 'apps', _iconType: 'ionicons', _colorKey: 'apps' }}
+        />
+        {listOfCategories?.map((element, idx) => (
+          <Tab.Screen
+            key={`category-${idx}-${element?.[userLanguage || 'label']}`}
+            name={element?.[userLanguage || 'label']}
+            getComponent={getScreenBuilder('Categorised')}
+            initialParams={{ mainProp: element, _icon: element?.icon, _iconType: 'fa5', _colorKey: element?.icon }}
+          />
+        ))}
+        {listOfNEWSTYPE?.map((element, idx) => (
+          <Tab.Screen
+            key={`newstype-${idx}-${element?.[userLanguage || 'label']}`}
+            name={element?.[userLanguage || 'label']}
+            getComponent={getScreenBuilder('Categorised')}
+            initialParams={{ mainProp: element, newsType: true, _icon: '', _colorKey: element?.webRoute }}
+          />
+        ))}
+      </Tab.Navigator>
     </View>
   );
 }
@@ -219,28 +206,43 @@ const HomePageScreens = () => {
 export default HomePageScreens;
 
 const styles = StyleSheet.create({
+  menuContainer: {
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#e0e0e0',
+  },
+  menuScrollContent: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    gap: 6,
+  },
+  menuItem: {
+    marginHorizontal: 6,
+  },
   tabLabelContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 2,
-    backgroundColor: "transparent",
+    width: 62,
   },
   tabCircle: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   tabFirstLetter: {
     fontSize: 18,
     fontWeight: '700',
-    letterSpacing: -0.3,
   },
   tabFullName: {
-    fontSize: 11,
-    letterSpacing: -0.1,
+    fontSize: 10,
     textAlign: 'center',
+    maxWidth: 62,
   },
 });
