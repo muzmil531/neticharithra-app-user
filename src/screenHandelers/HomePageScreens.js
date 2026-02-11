@@ -1,6 +1,6 @@
-import { Dimensions, StyleSheet, Text, View, useColorScheme } from 'react-native';
+import { Dimensions, StyleSheet, Text, View, useColorScheme, ScrollView, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { TabView, TabBar } from 'react-native-tab-view';
 import { getScreenBuilder } from '../route/ScreenRegistry';
 import { post } from '../handelers/APIHandeler';
 import EndPointConfig from '../handelers/EndPointConfig';
@@ -10,14 +10,15 @@ import { useTheme } from '../context/ThemeContext';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-const Tab = createMaterialTopTabNavigator();
 let height = Dimensions.get('screen').height;
+const { width } = Dimensions.get('window');
 
 const HomePageScreens = () => {
 
   let [listOfCategories, setListOfCategories] = useState([]);
   let [listOfNEWSTYPE, setListOfNewsType] = useState([]);
   let [userLanguage, setUserLanguage] = useState('label');
+  const [index, setIndex] = useState(0);
   const themeData = useTheme();
 
 
@@ -148,85 +149,69 @@ const HomePageScreens = () => {
     );
   };
 
+  // Build routes array
+  const routes = [
+    { key: 'allnews', title: 'All News' },
+    ...listOfCategories.map((cat, idx) => ({ 
+      key: `cat-${idx}`, 
+      title: cat?.[userLanguage || 'label'],
+      data: cat
+    })),
+    ...listOfNEWSTYPE.map((type, idx) => ({ 
+      key: `type-${idx}`, 
+      title: type?.[userLanguage || 'label'],
+      data: type,
+      newsType: true
+    }))
+  ];
+
+  const renderScene = ({ route }) => {
+    if (route.key === 'allnews') {
+      const AllNewsComponent = getScreenBuilder('AllNews')();
+      return (
+        <View style={{ flex: 1 }}>
+          <AllNewsComponent />
+        </View>
+      );
+    }
+    const CategorisedComponent = getScreenBuilder('Categorised')();
+    return (
+      <View style={{ flex: 1 }}>
+        <CategorisedComponent 
+          route={{ 
+            params: { 
+              mainProp: route.data, 
+              newsType: route.newsType 
+            } 
+          }} 
+        />
+      </View>
+    );
+  };
+
+  const renderTabBar = props => (
+    <TabBar
+      {...props}
+      scrollEnabled
+      indicatorStyle={{ backgroundColor: colors?.tabBarActive || '#e91e63', height: 3 }}
+      style={{ backgroundColor: colors?.headerThemeBg || '#fff' }}
+      tabStyle={{ width: 'auto', minWidth: 90 }}
+      labelStyle={{ fontSize: 14, fontWeight: '600', textTransform: 'none' }}
+      activeColor={colors?.tabBarActive || '#e91e63'}
+      inactiveColor="#666"
+    />
+  );
+
   return (
     <View style={{ flex: 1 }}>
-
-      <Text>hi</Text>
-      <Tab.Navigator
-        initialRouteName="All News"
-        sceneContainerStyle={{ flex: 1 }}
-        screenOptions={{
-          tabBarActiveTintColor: colors?.tabBarActive || '#e91e63',
-          tabBarInactiveTintColor: colors?.textSecondary || '#666',
-          tabBarStyle: {
-            backgroundColor: colors?.headerThemeBg || '#fff',
-            elevation: 2,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 1 },
-            shadowOpacity: 0.05,
-            shadowRadius: 2,
-            height: 75,
-            paddingTop: 4,
-            paddingBottom: 4,
-          },
-          tabBarIndicatorStyle: {
-            height: 0,
-          },
-          tabBarScrollEnabled: true,
-          tabBarItemStyle: {
-            width: 'auto',
-            minWidth: 85,
-            paddingHorizontal: 8,
-          },
-          tabBarPressColor: colors?.backgroundColor || '#f8f9fa',
-          swipeEnabled: false,
-          lazy: false,
-        }}
-      >
-        <Tab.Screen
-          name="All News"
-          getComponent={getScreenBuilder('AllNews')}
-          options={{
-            tabBarLabel: ({ focused }) => <TabLabel label="All News" focused={focused} icon="apps" useIonicons={true} />
-          }}
-          initialParams={{ exampleProp: 'exampleValue1' }}
-        />
-
-        {listOfCategories?.map((element, index) => (
-          <Tab.Screen
-            key={`category-${index}-${element?.[userLanguage || 'label']}`}
-            name={element?.[userLanguage || 'label']}
-            getComponent={getScreenBuilder('Categorised')}
-            options={{
-              tabBarLabel: ({ focused }) => (
-                <TabLabel
-                  label={element?.[userLanguage || 'label']}
-                  focused={focused}
-                  icon={element?.icon}
-                />
-              )
-            }}
-            initialParams={{ mainProp: element }}
-          />
-        ))}
-        {listOfNEWSTYPE?.map((element, index) => (
-          <Tab.Screen
-            key={`newstype-${index}-${element?.[userLanguage || 'label']}`}
-            name={element?.[userLanguage || 'label']}
-            getComponent={getScreenBuilder('Categorised')}
-            options={{
-              tabBarLabel: ({ focused }) => (
-                <TabLabel
-                  label={element?.[userLanguage || 'label']}
-                  focused={focused}
-                  icon={null}
-                />
-              )
-            }}
-            initialParams={{ mainProp: element, newsType: true }}
-          />
-        ))}
-      </Tab.Navigator>
+      <TabView
+        navigationState={{ index, routes }}
+        renderScene={renderScene}
+        renderTabBar={renderTabBar}
+        onIndexChange={setIndex}
+        initialLayout={{ width }}
+        swipeEnabled={false}
+      />
     </View>
   );
 }
