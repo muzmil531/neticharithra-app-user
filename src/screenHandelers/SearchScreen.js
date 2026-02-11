@@ -1,8 +1,6 @@
 import { View, Text } from 'react-native'
 import React, { useState } from 'react'
 import { createStackNavigator } from '@react-navigation/stack';
-import SearchIndex from '../screens/Search/SearchIndex';
-import SearchCategory from '../screens/Search/SearchCategory';
 import { getScreenBuilder } from '../route/ScreenRegistry';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';

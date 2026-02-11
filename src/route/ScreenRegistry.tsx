@@ -75,23 +75,9 @@ function getScreen(screenName: any, parent: any): ScreenType {
             return require('./../screens/News/detailedNewsInfo').default;
         case 'SearchIndex':
             return require('./../screens/Search/SearchIndex').default;
-        case 'SearchCategory':
-            return require('./../screens/Search/SearchCategory').default;
-        case 'PostIndex':
-            return require('./../screens/Post/PostIndex').default;
-        case 'PostIndex/OTPRequest':
-            return require('./../screens/Post/PublicUserLogin/OTPRequest').default;
-
-        case 'PostIndex/PublicUserSummary':
-            return require('./../screens/Post/PublicUserPost/PublicUserSummary').default;
-        case 'PostIndex/PublicNewsPost':
-            return require('./../screens/Post/PublicUserPost/PublicNewsPost').default;
+        
         case 'Settings':
             return require('./../screens/Settings/Settings').default;
-        // case 'PostIndex/OTPValidate':
-        //     return require('./../screens/Post/PublicUserLogin/OTPValidate').default;
-        // case 'PostIndex/PublicUserInfoRequest':
-        //     return require('./../screens/Post/PublicUserLogin/PublicUserInfoRequest').default;
 
         }
         return assertUnreachableScreen(screenName);
