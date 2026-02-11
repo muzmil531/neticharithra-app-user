@@ -18,7 +18,6 @@ import { post } from '../../handelers/APIHandeler'
 import EndPointConfig from '../../handelers/EndPointConfig'
 import { ActivityIndicator } from 'react-native-paper'
 import EmptyListComponent from '../../components/EmptyListComponent'
-import LoadingScreen from '../../components/LoadingScreen'
 import TabScreenWrapper from '../../components/TabScreenWrapper'
 import { useTranslation } from 'react-i18next'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
@@ -160,7 +159,7 @@ const Categorised = () => {
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.headerThemeBg} />
       
       {initalLoading ? (
-        <LoadingScreen message={"Fetching Latest News"} />
+<Text>Removed Loader Component</Text>
       ) : (
         <View style={styles.mainContainer}>
           {/* Hero Carousel */}

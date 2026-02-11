@@ -10,7 +10,6 @@ import { useTheme } from '../context/ThemeContext';
 import axios from 'axios';
 import { BASE_URL } from '../handelers/APIHandeler';
 import EndPointConfig from '../handelers/EndPointConfig';
-import ToasterService from './ToasterService';
 import { useTranslation } from 'react-i18next';
 
 const DFM = forwardRef(({ dfmValues, dfmForm, fieldOptions, onFormSubmit, editFilterData, applyFilters, resetableFields, maxHeight, updateValues, parentField, htmlContent = {}, extraOptions = {} }, ref) => {
@@ -329,7 +328,7 @@ const DFM = forwardRef(({ dfmValues, dfmForm, fieldOptions, onFormSubmit, editFi
     const selectImageFromLibrary = (field) => {
         console.log(formValues?.[field?.key])
         if (formValues?.[field?.key]?.length >= 3) {
-            ToasterService.showError(t('maxOf3Images'))
+            console.error(t('maxOf3Images'))
             return
         }
         const options = {
@@ -339,7 +338,7 @@ const DFM = forwardRef(({ dfmValues, dfmForm, fieldOptions, onFormSubmit, editFi
         launchImageLibrary(options, (response) => {
             if (response.assets && response.assets.length > 0) {
                 if (((formValues?.[field?.key]?.length || 0) + (response?.assets?.length || 0)) > 3) {
-                    ToasterService.showError(t('maxOf3Images'))
+                    console.error(t('maxOf3Images'))
                     return
                 } else {
                     uploadImage(response.assets, field);

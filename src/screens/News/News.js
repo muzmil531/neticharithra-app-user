@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, FlatList, Text, Animated, StyleSheet, RefreshControl, TouchableOpacity } from 'react-native';
-import NewsContainer from '../../components/NewsContainer';
 import { post } from '../../handelers/APIHandeler';
 import EndPointConfig from '../../handelers/EndPointConfig';
 import { useFocusEffect } from '@react-navigation/native';
@@ -144,24 +143,10 @@ const News = () => {
                 transform: [{ translateY: translateYAnim }],
               }}
             >
-              <NewsContainer
-                params={item}
-                newsId={item?.newsId}
-                imageUrl={item?.images?.[0]?.tempURL}
-                title={item?.title || ''}
-                subTitle={item?.sub_title || ''}
-                content={item?.description || ''}
-              />
+           <Text>Removed News Container Component</Text>      
             </Animated.View>
           ) : (
-            <NewsContainer
-              params={item}
-              newsId={item?.newsId}
-              imageUrl={item?.images?.[0]?.tempURL}
-              title={item?.title || ''}
-              subTitle={item?.sub_title || ''}
-              content={item?.description || ''}
-            />
+           <Text>Removed News Container Component</Text>      
           )
         }
         keyExtractor={(item, index) => 'activeEmp' + index}

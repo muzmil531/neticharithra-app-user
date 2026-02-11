@@ -2,7 +2,6 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useState } from 'react'
 import { post } from '../../handelers/APIHandeler';
 import EndPointConfig from '../../handelers/EndPointConfig';
-import NewsContainer from '../../components/NewsContainer';
 import { useFocusEffect, useRoute } from '@react-navigation/native';
 import SubHeaderOfScreen from '../../components/SubHeaderOfScreen';
 
@@ -56,14 +55,7 @@ var[newsInfo, setNewsInfo]=useState()
         <SubHeaderOfScreen elements={subHeaderElements} />
         
         <ScrollView>
-            <NewsContainer
-                params={newsInfo}
-                imageUrl={newsInfo?.images?.[0]?.tempURL}
-                title={newsInfo?.title || ''}
-                subTitle={newsInfo?.sub_title || ''}
-                content={newsInfo?.description || ''}
-                showFullContent={true}
-            />        
+            <Text>Removed News Container Component</Text>      
             </ScrollView>
         </>
     )
