@@ -1,28 +1,36 @@
 import React, { useState, useCallback } from 'react'
-import { FlatList, Modal, StyleSheet, Text, TouchableOpacity, View, useColorScheme, SafeAreaView, StatusBar, RefreshControl } from 'react-native'
-import { ActivityIndicator, Searchbar } from 'react-native-paper'
+import {
+  FlatList,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  SafeAreaView,
+  StatusBar,
+  RefreshControl,
+  TextInput,
+  Platform,
+  Dimensions
+} from 'react-native'
+import { ActivityIndicator } from 'react-native-paper'
 import debounce from 'lodash/debounce'
 import { useTheme } from '../../context/ThemeContext'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { retrieveData } from '../../handelers/AsyncStorageHandeler'
 import { post } from '../../handelers/APIHandeler'
 import EndPointConfig from '../../handelers/EndPointConfig'
-import EmptyListComponent from '../../components/EmptyListComponent'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import NewsTitleCard from '../../components/NewsTitleCard'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
+
+const { width } = Dimensions.get('window');
 
 const SearchScreenV2 = () => {
   const navigation = useNavigation()
   const [searchQuery, setSearchQuery] = useState('')
   const { colors, isDark } = useTheme();
   let [selectedCategory, setSelectedCategory] = useState()
-  let [selectedDate, setSelectedDate] = useState()
   const [refreshing, setRefreshing] = useState(false)
-
   const [modalVisible, setModalVisible] = useState(false);
   let [userLanguage, setUserLanguage] = useState('label');
   let [listOfCategories, setListOfCategories] = useState([]);
@@ -33,11 +41,12 @@ const SearchScreenV2 = () => {
     "page": 0,
     endOfRecords: true
   })
+
   // Debounced function to handle search query
   const logSearchQuery = useCallback(
     debounce((query) => {
       console.log('Search value:', query)
-      
+
       // Only search if query has content
       if (query.trim().length > 0) {
         setPaginationMetaData({
@@ -63,7 +72,6 @@ const SearchScreenV2 = () => {
     []
   )
 
-
   useFocusEffect(
     React.useCallback(() => {
       const fetchData = async () => {
@@ -78,7 +86,7 @@ const SearchScreenV2 = () => {
         }
       };
 
-      fetchData(); // Call the async function when the screen gains focus
+      fetchData();
     }, [])
   );
 
@@ -104,6 +112,7 @@ const SearchScreenV2 = () => {
       console.error(error);
     }
   };
+
   const getSearchedData = (payloadP1, newSearch) => {
     try {
       // Don't make API calls if there's no search query and no category selected
@@ -115,11 +124,11 @@ const SearchScreenV2 = () => {
       setLoading(true)
       let payload = { ...payloadP1 }
       console.log('Search payload:', payload)
-      
+
       if (selectedCategory && !newSearch) {
         payload['category'] = selectedCategory?.label
       }
-      
+
       post(EndPointConfig.searchNewsV2, payload)
         .then(function (response) {
           if (response?.status === 'success') {
@@ -178,7 +187,7 @@ const SearchScreenV2 = () => {
         page: 0
       }, true)
     }
-    
+
     setTimeout(() => {
       setModalVisible(false)
     }, 300);
@@ -186,7 +195,7 @@ const SearchScreenV2 = () => {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true)
-    
+
     // Only refresh if we have a search query or category
     if (searchQuery.trim() || selectedCategory) {
       setPaginationMetaData({
@@ -201,7 +210,7 @@ const SearchScreenV2 = () => {
         page: 0
       }, true)
     }
-    
+
     setTimeout(() => setRefreshing(false), 1000)
   }, [searchQuery, selectedCategory])
 
@@ -217,42 +226,26 @@ const SearchScreenV2 = () => {
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.screenBackground }]}>
-      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.headerThemeBg} />
+    <View style={[styles.container, { backgroundColor: colors.screenBackground }]}>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.screenBackground} />
 
-      {/* Professional Header */}
-      <View style={[styles.header, { backgroundColor: colors.headerThemeBg, borderBottomColor: colors.borderLight }]}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-          activeOpacity={0.7}
-        >
-          <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
-        </TouchableOpacity>
-        <View style={styles.headerContent}>
-          <Ionicons name="search" size={24} color={colors.brandSecondary} />
-          <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>Search News</Text>
-        </View>
-        <View style={styles.headerSpacer} />
-      </View>
-
-      {/* Modern Search Section */}
-      <View style={[styles.searchSection, { backgroundColor: colors.headerThemeBg, borderBottomColor: colors.borderLight }]}>
-        <View style={styles.searchContainer}>
-          <Searchbar
+      {/* Compact Search Bar */}
+      <View style={[styles.searchContainer, { backgroundColor: colors.headerThemeBg }]}>
+        <View style={[styles.searchBar, { backgroundColor: isDark ? colors.backgroundColor : '#f5f5f5' }]}>
+          <Ionicons name="search" size={18} color={colors.textTertiary} />
+          <TextInput
+            style={[styles.searchInput, { color: colors.textPrimary }]}
             placeholder="Search by title, location, or keyword..."
-            onChangeText={onChangeSearch}
+            placeholderTextColor={colors.textTertiary}
             value={searchQuery}
-            style={[styles.searchbar, { backgroundColor: colors.backgroundColor }]}
-            inputStyle={[styles.searchInput, { color: colors.textPrimary }]}
-            iconColor={colors.brandSecondary}
-            placeholderTextColor={colors.textSecondary}
+            onChangeText={onChangeSearch}
+            autoFocus={true}
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity
-              style={styles.clearButton}
               onPress={clearSearch}
               activeOpacity={0.7}
+              style={styles.clearButton}
             >
               <Ionicons name="close-circle" size={20} color={colors.textSecondary} />
             </TouchableOpacity>
@@ -261,22 +254,22 @@ const SearchScreenV2 = () => {
 
         {/* Category Filter */}
         <TouchableOpacity
-          style={[styles.categoryButton, { backgroundColor: colors.backgroundColor, borderColor: colors.borderLight }]}
+          style={[styles.categoryButton, { backgroundColor: isDark ? colors.backgroundColor : '#f5f5f5', borderColor: colors.borderLight }]}
           onPress={() => setModalVisible(true)}
           activeOpacity={0.8}
         >
-          <Ionicons name="filter" size={18} color={colors.brandSecondary} />
-          <Text style={[styles.categoryButtonText, { color: colors.brandSecondary }]}>
+          <Ionicons name="filter" size={16} color={colors.brandSecondary} />
+          <Text style={[styles.categoryButtonText, { color: colors.textPrimary }]}>
             {selectedCategory ? selectedCategory?.[userLanguage || 'label'] : 'All Categories'}
           </Text>
-          <Ionicons name="chevron-down" size={16} color={colors.brandSecondary} />
+          <Ionicons name="chevron-down" size={14} color={colors.textSecondary} />
         </TouchableOpacity>
       </View>
 
       {/* Search Results */}
       <View style={styles.resultsContainer}>
         {searchQuery.length > 0 && (
-          <View style={[styles.resultsHeader, { backgroundColor: colors.headerThemeBg, borderBottomColor: colors.borderLight }]}>
+          <View style={[styles.resultsHeader, { backgroundColor: colors.cardBackground, borderBottomColor: colors.borderLight }]}>
             <Text style={[styles.resultsText, { color: colors.textSecondary }]}>
               {listOfNews.length > 0 ? `${listOfNews.length} results found` : 'No results found'}
             </Text>
@@ -338,6 +331,7 @@ const SearchScreenV2 = () => {
               return (
                 <View style={styles.emptyState}>
                   <Ionicons name="document-text-outline" size={64} color={colors.textTertiary} />
+                  <Text style={[styles.emptyStateTitle, { color: colors.textPrimary }]}>No Results Found</Text>
                   <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>
                     Try different keywords or remove filters
                   </Text>
@@ -351,19 +345,18 @@ const SearchScreenV2 = () => {
               return (
                 <View style={styles.loadingFooter}>
                   <ActivityIndicator size="small" color={colors.brandSecondary} />
-                  <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Loading more...</Text>
                 </View>
               )
             }
-            return null
+            return <View style={styles.bottomSpacing} />
           }}
-          showsVerticalScrollIndicator={true}
-          contentContainerStyle={listOfNews.length === 0 ? styles.emptyListContent : styles.listContent}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={listOfNews.length === 0 ? styles.emptyListContent : {}}
           style={styles.flatListStyle}
         />
       </View>
 
-      {/* Modern Category Selection Modal */}
+      {/* Category Selection Modal */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -407,7 +400,7 @@ const SearchScreenV2 = () => {
                   <Text style={[
                     styles.categoryItemText,
                     { color: colors.textPrimary },
-                    selectedCategory?.label === item?.label && { color: colors.brandSecondary, fontWeight: '500' }
+                    selectedCategory?.label === item?.label && { color: colors.brandSecondary, fontWeight: '600' }
                   ]}>
                     {item?.[userLanguage || 'label']}
                   </Text>
@@ -435,7 +428,7 @@ const SearchScreenV2 = () => {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   )
 }
 
@@ -445,76 +438,53 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: wp('4%'),
-    paddingVertical: hp('1.2%'),
-    borderBottomWidth: 1,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-  },
-  backButton: {
-    padding: wp('2%'),
-    marginRight: wp('3%'),
-  },
-  headerContent: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    fontSize: wp('4.5%'),
-    fontWeight: '600',
-    marginLeft: wp('2%'),
-  },
-  headerSpacer: {
-    width: wp('10%'),
-  },
-  searchSection: {
-    paddingHorizontal: wp('4%'),
-    paddingVertical: hp('1.2%'),
-    borderBottomWidth: 1,
-  },
   searchContainer: {
-    position: 'relative',
-    marginBottom: hp('1%'),
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
   },
-  searchbar: {
-    borderRadius: wp('3%'),
-    elevation: 0,
-    shadowOpacity: 0,
-    borderWidth: 1,
-    borderColor: 'transparent',
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 24,
+    marginBottom: 12,
   },
   searchInput: {
-    fontSize: wp('4%'),
+    flex: 1,
+    marginLeft: 8,
+    fontSize: 14,
+    fontWeight: '400',
+    height: 40,
   },
   clearButton: {
-    position: 'absolute',
-    right: wp('4%'),
-    top: '50%',
-    transform: [{ translateY: -10 }],
-    padding: wp('1%'),
+    padding: 4,
   },
   categoryButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: wp('4%'),
-    paddingVertical: hp('1.2%'),
-    borderRadius: wp('2%'),
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 20,
     borderWidth: 1,
   },
   categoryButtonText: {
     flex: 1,
-    fontSize: wp('3.8%'),
+    fontSize: 13,
     fontWeight: '500',
-    marginLeft: wp('2%'),
-    marginRight: wp('2%'),
+    marginLeft: 8,
+    marginRight: 4,
   },
   resultsContainer: {
     flex: 1,
@@ -523,25 +493,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: wp('4%'),
-    paddingVertical: hp('1%'),
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     borderBottomWidth: 1,
   },
   resultsText: {
-    fontSize: wp('3.5%'),
+    fontSize: 13,
     fontWeight: '500',
   },
   clearFilterButton: {
-    paddingHorizontal: wp('3%'),
-    paddingVertical: hp('0.5%'),
+    paddingHorizontal: 8,
+    paddingVertical: 4,
   },
   clearFilterText: {
-    fontSize: wp('3.5%'),
+    fontSize: 13,
     fontWeight: '500',
-  },
-  listContent: {
-    paddingBottom: hp('2%'),
-    flexGrow: 1,
   },
   emptyListContent: {
     flexGrow: 1,
@@ -553,31 +519,28 @@ const styles = StyleSheet.create({
   emptyState: {
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: wp('8%'),
-    paddingVertical: hp('10%'),
-    minHeight: hp('50%'),
+    paddingHorizontal: 32,
+    paddingVertical: 60,
+    minHeight: 400,
   },
   emptyStateTitle: {
-    fontSize: wp('5%'),
+    fontSize: 16,
     fontWeight: '600',
-    marginTop: hp('2%'),
-    marginBottom: hp('1%'),
+    marginTop: 16,
+    marginBottom: 8,
     textAlign: 'center',
   },
   emptyStateText: {
-    fontSize: wp('3.8%'),
+    fontSize: 13,
     textAlign: 'center',
-    lineHeight: wp('5.5%'),
+    lineHeight: 20,
   },
   loadingFooter: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    paddingVertical: 20,
     alignItems: 'center',
-    paddingVertical: hp('1.5%'),
   },
-  loadingText: {
-    fontSize: wp('3.5%'),
-    marginLeft: wp('2%'),
+  bottomSpacing: {
+    height: 20,
   },
   modalOverlay: {
     flex: 1,
@@ -585,61 +548,61 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContainer: {
-    borderTopLeftRadius: wp('5%'),
-    borderTopRightRadius: wp('5%'),
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     maxHeight: '80%',
-    paddingBottom: hp('2%'),
+    paddingBottom: 16,
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: wp('5%'),
-    paddingVertical: hp('2%'),
+    paddingHorizontal: 20,
+    paddingVertical: 16,
     borderBottomWidth: 1,
   },
   modalTitle: {
-    fontSize: wp('4.5%'),
+    fontSize: 18,
     fontWeight: '600',
   },
   modalCloseButton: {
-    padding: wp('1%'),
+    padding: 4,
   },
   categoryItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: wp('5%'),
-    paddingVertical: hp('1.8%'),
+    paddingHorizontal: 20,
+    paddingVertical: 14,
     borderBottomWidth: 1,
   },
   radioButton: {
-    width: wp('5%'),
-    height: wp('5%'),
-    borderRadius: wp('2.5%'),
+    width: 20,
+    height: 20,
+    borderRadius: 10,
     borderWidth: 2,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: wp('3%'),
+    marginRight: 12,
   },
   radioButtonInner: {
-    width: wp('2.5%'),
-    height: wp('2.5%'),
-    borderRadius: wp('1.25%'),
+    width: 10,
+    height: 10,
+    borderRadius: 5,
   },
   categoryItemText: {
-    fontSize: wp('4%'),
+    fontSize: 15,
     flex: 1,
   },
   clearCategoryButton: {
-    marginHorizontal: wp('5%'),
-    marginTop: hp('2%'),
-    paddingVertical: hp('1.5%'),
-    borderRadius: wp('2%'),
+    marginHorizontal: 20,
+    marginTop: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
     borderWidth: 1,
     alignItems: 'center',
   },
   clearCategoryButtonText: {
-    fontSize: wp('4%'),
+    fontSize: 15,
     fontWeight: '500',
   },
 });

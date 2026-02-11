@@ -1,35 +1,35 @@
-// HelpScreen.js
-
 import React, { useEffect, useState } from 'react';
-import { 
-    View, 
-    Text, 
-    StyleSheet, 
-    TouchableOpacity, 
-    Linking, 
-    Image, 
-    FlatList,
+import {
+    View,
+    Text,
+    StyleSheet,
+    TouchableOpacity,
+    Linking,
+    Image,
     ScrollView,
     StatusBar,
     Platform,
-    SafeAreaView
+    Dimensions
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../context/ThemeContext';
-
 import te from './../assets/branding/te.png'
 import en from './../assets/branding/en.png'
 import { useTranslation } from 'react-i18next';
 import { post } from '../handelers/APIHandeler';
 import EndPointConfig from '../handelers/EndPointConfig';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-// Define team members with their details
+
+const { width } = Dimensions.get('window');
 
 const HelpScreen = () => {
     const { colors, isDark } = useTheme();
     const { t } = useTranslation()
+    const navigation = useNavigation()
+    const [teamInfo, setTeamInfo] = useState([])
+
     const handleWhatsAppMessage = () => {
-        Linking.openURL('https://wa.me/+916362923654'); // Replace with your WhatsApp number
+        Linking.openURL('https://wa.me/+916362923654');
     };
 
     const handleEmail = () => {
@@ -40,80 +40,49 @@ const HelpScreen = () => {
         Linking.openURL('https://neticharithra.com/');
     };
 
-    const [teamInfo, setTeamInfo] = useState([])
-
-    const navigation = useNavigation()
-
     useFocusEffect(
         React.useCallback(() => {
-            // Do something when the screen comes into focus
-
             getTeamInfo()
-            // console.log("called")
-            // Cleanup function, executed when the component unmounts or the effect is re-run
             return () => {
-                // Do cleanup here if necessary
                 console.log('Screen unfocused');
             };
         }, [])
     );
 
-
-
-
-
-
-    const renderTeamMember = ({ item }) => (
-        <View style={styles.card}>
-            {/* <Text>{item?.tempURL || 'aa'}</Text> */}
-            <Image source={{ uri: item?.tempURLProfile }} style={styles.personnelImage} />
-            {/* <Image source={t('languageCode') === 'te' ? te : en} style={styles.personnelImage} /> */}
-            <Text style={styles.personnelName}>{item.name}</Text>
-            <Text style={styles.personnelRole}>{item.role}</Text>
-            <TouchableOpacity onPress={() => Linking.openURL(`mailto:${item.email}`)}>
-                <Text style={styles.personnelEmail}>{item.email}</Text>
-            </TouchableOpacity>
-        </View>
-    );
-
     const getTeamInfo = () => {
         try {
-            console.log("Called2")
-            // const metaList = ['NEWS_CATEGORIES_REGIONAL'];
             post(EndPointConfig.getHelpTeam, {})
                 .then(function (response) {
-                    console.log("response", response)
                     if (response?.status === 'success') {
-                        console.log(response.data)
                         setTeamInfo(response?.data || []);
                     }
                 })
                 .catch(function (error) {
                     console.error(error);
                 });
-
         } catch (error) {
             console.error(error);
         }
     };
 
     return (
-        <SafeAreaView style={[styles.container, { backgroundColor: colors.screenBackground }]}>
-            <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.headerThemeBg} />
-            
+        <View style={[styles.container, { backgroundColor: colors.screenBackground }]}>
+            <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.screenBackground} />
+
             {/* Header */}
             <View style={[styles.header, { backgroundColor: colors.headerThemeBg, borderBottomColor: colors.borderLight }]}>
-                <TouchableOpacity 
+                <TouchableOpacity
                     style={styles.backButton}
                     onPress={() => navigation.goBack()}
+                    activeOpacity={0.7}
                 >
                     <Ionicons name="chevron-back" size={24} color={colors.textPrimary} />
                 </TouchableOpacity>
                 <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>Help & Support</Text>
                 <View style={styles.headerSpacer} />
             </View>
-            
-            <ScrollView 
+
+            <ScrollView
                 style={styles.scrollContainer}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.scrollContent}
@@ -130,17 +99,17 @@ const HelpScreen = () => {
                 {/* Contact Information */}
                 <View style={[styles.section, { backgroundColor: colors.cardBackground }]}>
                     <View style={[styles.sectionHeader, { borderBottomColor: colors.borderLight }]}>
-                        <Ionicons name="call-outline" size={20} color={colors.brandSecondary} />
+                        <Ionicons name="call-outline" size={18} color={colors.brandSecondary} />
                         <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Contact Information</Text>
                     </View>
-                    
+
                     <View style={styles.contactCard}>
-                        <TouchableOpacity 
+                        <TouchableOpacity
                             style={styles.contactItem}
                             onPress={() => Linking.openURL('tel:+916362923654')}
                         >
                             <View style={[styles.contactIcon, { backgroundColor: colors.backgroundColor }]}>
-                                <Ionicons name="call" size={18} color={colors.brandSecondary} />
+                                <Ionicons name="call" size={16} color={colors.brandSecondary} />
                             </View>
                             <View style={styles.contactDetails}>
                                 <Text style={[styles.contactLabel, { color: colors.textSecondary }]}>Phone</Text>
@@ -148,13 +117,13 @@ const HelpScreen = () => {
                             </View>
                             <Ionicons name="chevron-forward" size={16} color={colors.borderColor} />
                         </TouchableOpacity>
-                        
-                        <TouchableOpacity 
+
+                        <TouchableOpacity
                             style={styles.contactItem}
                             onPress={handleEmail}
                         >
                             <View style={[styles.contactIcon, { backgroundColor: colors.backgroundColor }]}>
-                                <Ionicons name="mail" size={18} color={colors.brandSecondary} />
+                                <Ionicons name="mail" size={16} color={colors.brandSecondary} />
                             </View>
                             <View style={styles.contactDetails}>
                                 <Text style={[styles.contactLabel, { color: colors.textSecondary }]}>Email</Text>
@@ -162,13 +131,13 @@ const HelpScreen = () => {
                             </View>
                             <Ionicons name="chevron-forward" size={16} color={colors.borderColor} />
                         </TouchableOpacity>
-                        
-                        <TouchableOpacity 
+
+                        <TouchableOpacity
                             style={styles.contactItem}
                             onPress={handleWebsite}
                         >
                             <View style={[styles.contactIcon, { backgroundColor: colors.backgroundColor }]}>
-                                <Ionicons name="globe" size={18} color={colors.brandSecondary} />
+                                <Ionicons name="globe" size={16} color={colors.brandSecondary} />
                             </View>
                             <View style={styles.contactDetails}>
                                 <Text style={[styles.contactLabel, { color: colors.textSecondary }]}>Website</Text>
@@ -183,24 +152,24 @@ const HelpScreen = () => {
                 {teamInfo.length > 0 && (
                     <View style={[styles.section, { backgroundColor: colors.cardBackground }]}>
                         <View style={[styles.sectionHeader, { borderBottomColor: colors.borderLight }]}>
-                            <Ionicons name="people-outline" size={20} color={colors.brandSecondary} />
+                            <Ionicons name="people-outline" size={18} color={colors.brandSecondary} />
                             <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Our Team</Text>
                         </View>
-                        
+
                         <View style={styles.teamGrid}>
                             {teamInfo.map((item, index) => (
                                 <View key={index} style={styles.teamCard}>
-                                    <Image 
-                                        source={{ uri: item?.tempURLProfile || 'https://via.placeholder.com/80' }} 
-                                        style={styles.teamImage} 
+                                    <Image
+                                        source={{ uri: item?.tempURLProfile || 'https://via.placeholder.com/80' }}
+                                        style={styles.teamImage}
                                     />
                                     <Text style={[styles.teamName, { color: colors.textPrimary }]}>{item.name}</Text>
                                     <Text style={[styles.teamRole, { color: colors.textSecondary }]}>{item.role}</Text>
-                                    <TouchableOpacity 
+                                    <TouchableOpacity
                                         onPress={() => Linking.openURL(`mailto:${item.email}`)}
                                         style={styles.emailButton}
                                     >
-                                        <Ionicons name="mail-outline" size={14} color={colors.brandSecondary} />
+                                        <Ionicons name="mail-outline" size={12} color={colors.brandSecondary} />
                                         <Text style={[styles.emailText, { color: colors.brandSecondary }]}>Contact</Text>
                                     </TouchableOpacity>
                                 </View>
@@ -212,33 +181,33 @@ const HelpScreen = () => {
                 {/* Quick Actions */}
                 <View style={[styles.section, { backgroundColor: colors.cardBackground }]}>
                     <View style={[styles.sectionHeader, { borderBottomColor: colors.borderLight }]}>
-                        <Ionicons name="flash-outline" size={20} color={colors.brandSecondary} />
+                        <Ionicons name="flash-outline" size={18} color={colors.brandSecondary} />
                         <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Quick Actions</Text>
                     </View>
-                    
+
                     <View style={styles.actionsGrid}>
                         <TouchableOpacity style={[styles.actionCard, { backgroundColor: colors.backgroundColor }]} onPress={handleWhatsAppMessage}>
                             <View style={[styles.actionIcon, { backgroundColor: colors.cardBackground }]}>
-                                <Ionicons name="logo-whatsapp" size={24} color="#25D366" />
+                                <Ionicons name="logo-whatsapp" size={20} color="#25D366" />
                             </View>
                             <Text style={[styles.actionTitle, { color: colors.textPrimary }]}>WhatsApp</Text>
-                            <Text style={[styles.actionSubtitle, { color: colors.textSecondary }]}>Message us directly</Text>
+                            <Text style={[styles.actionSubtitle, { color: colors.textSecondary }]}>Message us</Text>
                         </TouchableOpacity>
-                        
+
                         <TouchableOpacity style={[styles.actionCard, { backgroundColor: colors.backgroundColor }]} onPress={handleEmail}>
                             <View style={[styles.actionIcon, { backgroundColor: colors.cardBackground }]}>
-                                <Ionicons name="mail-outline" size={24} color={colors.brandSecondary} />
+                                <Ionicons name="mail-outline" size={20} color={colors.brandSecondary} />
                             </View>
                             <Text style={[styles.actionTitle, { color: colors.textPrimary }]}>Email</Text>
-                            <Text style={[styles.actionSubtitle, { color: colors.textSecondary }]}>Send us an email</Text>
+                            <Text style={[styles.actionSubtitle, { color: colors.textSecondary }]}>Send email</Text>
                         </TouchableOpacity>
-                        
+
                         <TouchableOpacity style={[styles.actionCard, { backgroundColor: colors.backgroundColor }]} onPress={handleWebsite}>
                             <View style={[styles.actionIcon, { backgroundColor: colors.cardBackground }]}>
-                                <Ionicons name="globe-outline" size={24} color={colors.brandSecondary} />
+                                <Ionicons name="globe-outline" size={20} color={colors.brandSecondary} />
                             </View>
                             <Text style={[styles.actionTitle, { color: colors.textPrimary }]}>Website</Text>
-                            <Text style={[styles.actionSubtitle, { color: colors.textSecondary }]}>Visit our site</Text>
+                            <Text style={[styles.actionSubtitle, { color: colors.textSecondary }]}>Visit site</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -246,23 +215,22 @@ const HelpScreen = () => {
                 {/* Disclaimer */}
                 <View style={[styles.disclaimerCard, { backgroundColor: colors.cardBackground, borderLeftColor: colors.success }]}>
                     <View style={styles.disclaimerHeader}>
-                        <Ionicons name="information-circle-outline" size={20} color={colors.success} />
+                        <Ionicons name="information-circle-outline" size={18} color={colors.success} />
                         <Text style={[styles.disclaimerTitle, { color: colors.success }]}>Free News Publishing</Text>
                     </View>
                     <Text style={[styles.disclaimerText, { color: colors.textSecondary }]}>
                         We do not charge for publishing news articles. Contact us via email, WhatsApp, or visit our website to publish your news for free.
                     </Text>
                 </View>
-                
+
             </ScrollView>
-        </SafeAreaView>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f8f9fa',
     },
     header: {
         flexDirection: 'row',
@@ -270,16 +238,11 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingHorizontal: 16,
         paddingVertical: 12,
-        backgroundColor: '#fff',
         borderBottomWidth: 1,
-        borderBottomColor: '#f0f0f0',
         ...Platform.select({
             ios: {
                 shadowColor: '#000',
-                shadowOffset: {
-                    width: 0,
-                    height: 1,
-                },
+                shadowOffset: { width: 0, height: 1 },
                 shadowOpacity: 0.05,
                 shadowRadius: 2,
             },
@@ -295,7 +258,6 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#1a1a1a',
         letterSpacing: -0.2,
     },
     headerSpacer: {
@@ -309,64 +271,21 @@ const styles = StyleSheet.create({
     },
     logoSection: {
         alignItems: 'center',
-        paddingVertical: 32,
-        backgroundColor: '#fff',
-        marginBottom: 16,
+        paddingVertical: 24,
+        marginBottom: 12,
     },
     logoContainer: {
-        width: 80,
-        height: 80,
-        borderRadius: 20,
-        backgroundColor: '#f8f9fa',
+        width: 70,
+        height: 70,
+        borderRadius: 16,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 16,
+        marginBottom: 12,
         ...Platform.select({
             ios: {
                 shadowColor: '#000',
-                shadowOffset: {
-                    width: 0,
-                    height: 2,
-                },
-                shadowOpacity: 0.1,
-                shadowRadius: 4,
-            },
-            android: {
-                elevation: 3,
-            },
-        }),
-    },
-    logo: {
-        width: 60,
-        height: 40,
-        resizeMode: 'contain',
-    },
-    appTitle: {
-        fontSize: 24,
-        fontWeight: '800',
-        color: '#1a1a1a',
-        marginBottom: 4,
-        letterSpacing: -0.3,
-    },
-    appSubtitle: {
-        fontSize: 14,
-        color: '#666',
-        fontWeight: '500',
-    },
-    section: {
-        backgroundColor: '#fff',
-        marginHorizontal: 16,
-        marginBottom: 16,
-        borderRadius: 12,
-        overflow: 'hidden',
-        ...Platform.select({
-            ios: {
-                shadowColor: '#000',
-                shadowOffset: {
-                    width: 0,
-                    height: 1,
-                },
-                shadowOpacity: 0.05,
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.08,
                 shadowRadius: 3,
             },
             android: {
@@ -374,35 +293,64 @@ const styles = StyleSheet.create({
             },
         }),
     },
+    logo: {
+        width: 55,
+        height: 35,
+        resizeMode: 'contain',
+    },
+    appTitle: {
+        fontSize: 20,
+        fontWeight: '700',
+        marginBottom: 4,
+        letterSpacing: -0.3,
+    },
+    appSubtitle: {
+        fontSize: 13,
+        fontWeight: '500',
+    },
+    section: {
+        marginHorizontal: 16,
+        marginBottom: 12,
+        borderRadius: 12,
+        overflow: 'hidden',
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.05,
+                shadowRadius: 2,
+            },
+            android: {
+                elevation: 1,
+            },
+        }),
+    },
     sectionHeader: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 16,
-        paddingVertical: 16,
+        paddingVertical: 12,
         borderBottomWidth: 1,
-        borderBottomColor: '#f0f0f0',
     },
     sectionTitle: {
-        fontSize: 16,
-        fontWeight: '700',
-        color: '#1a1a1a',
+        fontSize: 15,
+        fontWeight: '600',
         marginLeft: 8,
         letterSpacing: -0.1,
     },
     contactCard: {
-        paddingVertical: 8,
+        paddingVertical: 4,
     },
     contactItem: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 16,
-        paddingVertical: 12,
+        paddingVertical: 10,
     },
     contactIcon: {
-        width: 36,
-        height: 36,
+        width: 32,
+        height: 32,
         borderRadius: 8,
-        backgroundColor: '#f8f9fa',
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 12,
@@ -411,88 +359,78 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     contactLabel: {
-        fontSize: 12,
-        color: '#666',
+        fontSize: 11,
         fontWeight: '500',
         marginBottom: 2,
     },
     contactValue: {
-        fontSize: 14,
-        color: '#1a1a1a',
+        fontSize: 13,
         fontWeight: '600',
     },
     teamGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        padding: 16,
+        padding: 12,
         justifyContent: 'space-between',
     },
     teamCard: {
         width: '48%',
         alignItems: 'center',
-        paddingVertical: 16,
-        marginBottom: 16,
+        paddingVertical: 12,
+        marginBottom: 12,
     },
     teamImage: {
-        width: 60,
-        height: 60,
-        borderRadius: 30,
+        width: 55,
+        height: 55,
+        borderRadius: 28,
         marginBottom: 8,
         backgroundColor: '#f0f0f0',
     },
     teamName: {
-        fontSize: 14,
-        fontWeight: '700',
-        color: '#1a1a1a',
+        fontSize: 13,
+        fontWeight: '600',
         textAlign: 'center',
         marginBottom: 2,
     },
     teamRole: {
-        fontSize: 12,
-        color: '#666',
+        fontSize: 11,
         textAlign: 'center',
-        marginBottom: 8,
+        marginBottom: 6,
     },
     emailButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 8,
-        paddingVertical: 4,
+        paddingHorizontal: 6,
+        paddingVertical: 3,
     },
     emailText: {
-        fontSize: 12,
-        color: '#007bff',
+        fontSize: 11,
         fontWeight: '600',
-        marginLeft: 4,
+        marginLeft: 3,
     },
     actionsGrid: {
         flexDirection: 'row',
-        padding: 16,
+        padding: 12,
         justifyContent: 'space-between',
     },
     actionCard: {
         flex: 1,
         alignItems: 'center',
-        paddingVertical: 16,
-        marginHorizontal: 4,
-        backgroundColor: '#f8f9fa',
+        paddingVertical: 12,
+        marginHorizontal: 3,
         borderRadius: 8,
     },
     actionIcon: {
-        width: 48,
-        height: 48,
-        borderRadius: 12,
-        backgroundColor: '#fff',
+        width: 40,
+        height: 40,
+        borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 8,
+        marginBottom: 6,
         ...Platform.select({
             ios: {
                 shadowColor: '#000',
-                shadowOffset: {
-                    width: 0,
-                    height: 1,
-                },
+                shadowOffset: { width: 0, height: 1 },
                 shadowOpacity: 0.05,
                 shadowRadius: 2,
             },
@@ -502,54 +440,45 @@ const styles = StyleSheet.create({
         }),
     },
     actionTitle: {
-        fontSize: 12,
-        fontWeight: '700',
-        color: '#1a1a1a',
+        fontSize: 11,
+        fontWeight: '600',
         marginBottom: 2,
     },
     actionSubtitle: {
-        fontSize: 10,
-        color: '#666',
+        fontSize: 9,
         textAlign: 'center',
     },
     disclaimerCard: {
-        backgroundColor: '#fff',
         marginHorizontal: 16,
         marginBottom: 16,
-        padding: 16,
+        padding: 12,
         borderRadius: 12,
-        borderLeftWidth: 4,
-        borderLeftColor: '#28a745',
+        borderLeftWidth: 3,
         ...Platform.select({
             ios: {
                 shadowColor: '#000',
-                shadowOffset: {
-                    width: 0,
-                    height: 1,
-                },
+                shadowOffset: { width: 0, height: 1 },
                 shadowOpacity: 0.05,
-                shadowRadius: 3,
+                shadowRadius: 2,
             },
             android: {
-                elevation: 2,
+                elevation: 1,
             },
         }),
     },
     disclaimerHeader: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 8,
+        marginBottom: 6,
     },
     disclaimerTitle: {
-        fontSize: 14,
-        fontWeight: '700',
-        color: '#28a745',
-        marginLeft: 8,
+        fontSize: 13,
+        fontWeight: '600',
+        marginLeft: 6,
     },
     disclaimerText: {
-        fontSize: 13,
-        color: '#666',
-        lineHeight: 18,
+        fontSize: 12,
+        lineHeight: 17,
     },
 });
 

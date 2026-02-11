@@ -55,22 +55,22 @@ function getScreen(screenName: any, parent: any): ScreenType {
                 return require('./../screenHandelers/HomeScreen').default;
             case 'HomePageScreens':
                 return require('./../screenHandelers/HomePageScreens').default;
-           
+
             case 'SearchScreenV2':
                 return require('./../screens/Search/SearchScreenV2').default;
             case 'HelpScreen':
                 return require('./../screens/HelpScreen').default;
-        case 'AllNews':
-            return require('./../screens/HomePage/AllNews').default;
-        case 'Categorised':
-            return require('./../screens/HomePage/Categorised').default;
-        case 'NewsContainerV2':
-            return require('./../components/NewsContainerV2').default;
+            case 'AllNews':
+                return require('./../screens/HomePage/AllNews').default;
+            case 'Categorised':
+                return require('./../screens/HomePage/Categorised').default;
+            case 'NewsContainerV2':
+                return require('./../components/NewsContainerV2').default;
 
-       
-        case 'DetailedNewsInfo':
-            return require('./../screens/News/detailedNewsInfo').default;
-        
+
+            case 'DetailedNewsInfo':
+                return require('./../screens/News/detailedNewsInfo').default;
+
 
         }
         return assertUnreachableScreen(screenName);
