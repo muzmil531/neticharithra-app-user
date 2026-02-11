@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Image, Text, View, Platform, TouchableOpacity, StyleSheet } from 'react-native';
+import { Image, Text, View, Platform, TouchableOpacity, StyleSheet, SafeAreaView, StatusBar } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
@@ -20,8 +20,8 @@ const Tab = createBottomTabNavigator();
 export default function IndexScreen() {
     const [screens, setScreens] = useState([]);
     const themeData = useTheme();
-   
-    
+
+
     // Ensure we always have valid colors object
     const colors = themeData?.colors || {
         tabBarActive: '#B61F24',
@@ -29,7 +29,7 @@ export default function IndexScreen() {
         tabBarBackground: 'white'
     };
     const isDark = themeData?.isDark || false;
-    
+
     const { t } = useTranslation();
 
     useFocusEffect(
@@ -58,45 +58,72 @@ export default function IndexScreen() {
     );
 
     return (
-        <>
-            <GeneralHeader />
-            <Tab.Navigator
-                screenOptions={{
-                    tabBarActiveTintColor: colors?.tabBarActive || '#B61F24',
-                    tabBarInactiveTintColor: colors?.tabBarInactive || '#ccc',
-                    tabBarStyle: { 
-                        backgroundColor: colors?.tabBarBackground || 'white',
-                        height: 65,
-                        paddingBottom: 10
-                    },
-                    headerShown: false
-                }}
-            >
-                <Tab.Screen
-                    name="Home"
-                    options={{
-                        tabBarLabel: 'Home',
-                        tabBarIcon: ({ color }) => (
-                            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                                <MaterialCommunityIcons name="home" size={24} color={color} />
-                            </View>
-                            // <MaterialCommunityIcons name="home" color={color} size={26} />
-                        ),
-                    }}
-                    getComponent={getScreenBuilder('HomePageScreens')}
-                />
-                <Tab.Screen
-                    name="Search"
-                    options={{
-                        tabBarLabel: 'Search',
-                        tabBarIcon: ({ color }) => (
-                            <FontAwesome5 name="search" color={color} size={26} />
-                        ),
-                    }}
-                    getComponent={getScreenBuilder('SearchScreenV2')}
-                />
-            </Tab.Navigator >
-        </>
+        <View style={{ flex: 1, backgroundColor: colors?.headerThemeBg || '#fff' }}>
+            <StatusBar
+                backgroundColor={colors?.headerThemeBg || '#fff'}
+                barStyle={isDark ? 'light-content' : 'dark-content'}
+            />
+            <SafeAreaView style={{ flex: 1 }}>
+                <GeneralHeader />
+                <View style={{ flex: 1, backgroundColor: colors?.backgroundColor || '#fff' }}>
+                    <Tab.Navigator
+                        screenOptions={{
+                            tabBarActiveTintColor: colors?.tabBarActive || '#B61F24',
+                            tabBarInactiveTintColor: colors?.tabBarInactive || '#ccc',
+                            tabBarStyle: {
+                                backgroundColor: colors?.tabBarBackground || 'white',
+                                height: Platform.OS === 'ios' ? 85 : 70,
+                                paddingBottom: Platform.OS === 'ios' ? 25 : 12,
+                                paddingTop: 8,
+                                borderTopWidth: 1,
+                                borderTopColor: colors?.borderLight || '#f0f0f0',
+                                ...Platform.select({
+                                    ios: {
+                                        shadowColor: '#000',
+                                        shadowOffset: {
+                                            width: 0,
+                                            height: -2,
+                                        },
+                                        shadowOpacity: 0.1,
+                                        shadowRadius: 3,
+                                    },
+                                    android: {
+                                        elevation: 8,
+                                    },
+                                }),
+                            },
+                            tabBarLabelStyle: {
+                                fontSize: 12,
+                                fontWeight: '600',
+                                marginTop: 4,
+                            },
+                            headerShown: false
+                        }}
+                    >
+                        <Tab.Screen
+                            name="Home"
+                            options={{
+                                tabBarLabel: 'Home',
+                                tabBarIcon: ({ color }) => (
+                                    <MaterialCommunityIcons name="home" size={26} color={color} />
+                                ),
+                            }}
+                            getComponent={getScreenBuilder('HomePageScreens')}
+                        />
+                        <Tab.Screen
+                            name="Search"
+                            options={{
+                                tabBarLabel: 'Search',
+                                tabBarIcon: ({ color }) => (
+                                    <FontAwesome5 name="search" color={color} size={22} />
+                                ),
+                            }}
+                            getComponent={getScreenBuilder('SearchScreenV2')}
+                        />
+                    </Tab.Navigator >
+                </View>
+            </SafeAreaView>
+        </View>
     );
 }
 

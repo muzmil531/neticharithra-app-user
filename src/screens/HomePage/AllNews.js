@@ -1,31 +1,37 @@
-import { 
-    Dimensions, 
-    FlatList, 
-    Platform, 
-    StyleSheet, 
-    Text, 
-    View,
-    SafeAreaView,
-    StatusBar,
-    RefreshControl
+import {
+  Dimensions,
+  FlatList,
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  StatusBar,
+  RefreshControl,
+  TouchableOpacity,
+  ScrollView,
+  TextInput,
+  Image
 } from 'react-native'
 import React, { useState } from 'react'
-import ExampleParallaxCarousel from '../../components/ExampleParallaxCarousel'
 import NewsTitleCard from '../../components/NewsTitleCard'
-import { useFocusEffect } from '@react-navigation/native'
+import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { retrieveData } from '../../handelers/AsyncStorageHandeler'
 import { post } from '../../handelers/APIHandeler'
 import EndPointConfig from '../../handelers/EndPointConfig'
 import { ActivityIndicator } from 'react-native-paper'
 import { useTranslation } from 'react-i18next'
-import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../../context/ThemeContext';
 import LoadingScreen from '../../components/LoadingScreen'
+import LinearGradient from 'react-native-linear-gradient';
+import Carousel from 'react-native-reanimated-carousel';
 
 const { height, width } = Dimensions.get('screen');
+
 const AllNews = () => {
   const { t } = useTranslation();
+  const navigation = useNavigation();
   const themeData = useTheme();
   const colors = themeData?.colors || {
     screenBackground: '#f8f9fa',
@@ -41,7 +47,6 @@ const AllNews = () => {
   let [topPriorityNews, setTopPriorityNews] = useState([])
   let [latestNews, setlatestNews] = useState([]);
   let [initalLoading, setInitialLoading] = useState(true)
-  // let [endOfRecords, setEndOfRecords] = useState(true)
   let [paginationMetaData, setPaginationMetaData] = useState({
     "count": 5,
     "page": 0,
@@ -49,6 +54,8 @@ const AllNews = () => {
   })
   let [loading, setLoading] = useState(false)
   let [refreshing, setRefreshing] = useState(false)
+  let [carouselActiveIndex, setCarouselActiveIndex] = useState(0);
+
   useFocusEffect(
     React.useCallback(() => {
       const fetchData = async () => {
@@ -56,7 +63,6 @@ const AllNews = () => {
           setInitialLoading(true)
           let lang = await retrieveData('userLanguageSaved', 'string');
           if (lang) {
-            // setUserLanguage(lang);
             getPriorityNews(lang);
             setPaginationMetaData({
               "count": 5,
@@ -70,13 +76,14 @@ const AllNews = () => {
         }
       };
 
-      fetchData(); // Call the async function when the screen gains focus
+      fetchData();
     }, [])
   );
+
+
+
   const getPriorityNews = (lang) => {
     try {
-      // const metaList = ['NEWS_CATEGORIES_REGIONAL'];
-    
       post(EndPointConfig.getNewsInfoV2, { ...paginationMetaData, ...{ language: lang } })
         .then(function (response) {
           if (response?.status === 'success') {
@@ -86,11 +93,11 @@ const AllNews = () => {
         .catch(function (error) {
           console.error(error);
         });
-
     } catch (error) {
       console.error(error);
     }
   };
+
   const getLatestNews = async (payload) => {
     try {
       setLoading(true)
@@ -123,13 +130,10 @@ const AllNews = () => {
         .catch(function (error) {
           console.error(error);
           setLoading(false)
-
         });
-
     } catch (error) {
       console.error(error);
       setLoading(false)
-
     }
   };
 
@@ -153,39 +157,66 @@ const AllNews = () => {
     }
   };
 
+  const renderCarouselItem = ({ item }) => {
+    return (
+      <TouchableOpacity
+        style={styles.featuredCard}
+        onPress={() => navigation.navigate('NewsContainerV2', { data: item })}
+        activeOpacity={0.9}
+      >
+        <Image
+          source={{
+            uri: item?.images?.[0]?.externalURL ||
+              item?.images?.[0]?.tempURL ||
+              'https://via.placeholder.com/400x250?text=News'
+          }}
+          style={styles.featuredImage}
+          resizeMode="cover"
+        />
+        <LinearGradient
+          colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.7)']}
+          style={styles.featuredGradient}
+        />
+        <View style={styles.featuredContent}>
+          <Text style={styles.featuredTitle} numberOfLines={2}>
+            {item?.title}
+          </Text>
+          {item?.subTitle && (
+            <Text style={styles.featuredSubtitle} numberOfLines={2}>
+              {item?.subTitle}
+            </Text>
+          )}
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+
+
   return (
     <View style={[styles.container, { backgroundColor: colors.screenBackground }]}>
-      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.headerThemeBg} />
-      
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.screenBackground} />
+
       {initalLoading ? (
-       <LoadingScreen message={"Fetching Latest News"} />
+        <LoadingScreen message={"Fetching Latest News"} />
       ) : (
         <View style={styles.mainContainer}>
-          {/* Hero Carousel */}
-          <View style={styles.carouselSection}>
-            <ExampleParallaxCarousel newsItems={topPriorityNews} />
-          </View>
-          
-          {/* Latest News Header */}
-          <View style={[styles.sectionHeader, { backgroundColor: colors.cardBackground }]}>
-            <View style={styles.headerContent}>
-              <View style={styles.titleSection}>
-                <View style={[styles.iconContainer, { backgroundColor: colors.brandSecondary }]}>
-                  <Ionicons name="newspaper" size={16} color="#fff" />
-                </View>
-                <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
-                  {t('latestNews')}
-                </Text>
-              </View>
+          {/* Search Bar */}
+          <View style={[styles.searchContainer, { backgroundColor: "transparent" }]}>
+            <View style={[styles.searchBar, { backgroundColor: isDark ? colors.backgroundColor : '#f5f5f5' }]}>
+              <Ionicons name="search" size={18} color={colors.textTertiary} />
+              <TextInput
+                style={[styles.searchInput, { color: colors.textPrimary }]}
+                placeholder="Search Latest News"
+                placeholderTextColor={colors.textTertiary}
+                onFocus={() => navigation.navigate('SearchScreenV2')}
+              />
             </View>
-            
-            {/* Decorative bottom accent */}
-            <View style={[styles.headerAccent, { backgroundColor: colors.brandSecondary }]} />
           </View>
-          
+
           {/* News List */}
           <FlatList
-            style={[styles.newsList, { backgroundColor: colors.screenBackground }]}
+            style={styles.newsList}
             data={latestNews}
             keyExtractor={(item, index) => item.newsId?.toString() || item._id?.toString() || item.id?.toString() || index.toString()}
             showsVerticalScrollIndicator={false}
@@ -197,6 +228,44 @@ const AllNews = () => {
                 tintColor={colors.brandSecondary}
               />
             }
+            ListHeaderComponent={() => (
+              topPriorityNews.length > 0 ? (
+                <View style={styles.carouselContainer}>
+                  <Carousel
+                    data={topPriorityNews}
+                    renderItem={renderCarouselItem}
+                    width={width - 32}
+                    height={220}
+                    autoPlay={true}
+                    autoPlayInterval={4000}
+                    loop={true}
+                    onSnapToItem={(index) => setCarouselActiveIndex(index)}
+                    mode="parallax"
+                    modeConfig={{
+                      parallaxScrollingScale: 0.94,
+                      parallaxScrollingOffset: 35,
+                    }}
+                  />
+                  {/* Pagination Dots */}
+                  <View style={styles.paginationContainer}>
+                    {topPriorityNews.map((_, index) => (
+                      <View
+                        key={index}
+                        style={[
+                          styles.paginationDot,
+                          {
+                            backgroundColor: index === carouselActiveIndex
+                              ? colors.brandSecondary
+                              : isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.15)',
+                            width: index === carouselActiveIndex ? 20 : 6,
+                          },
+                        ]}
+                      />
+                    ))}
+                  </View>
+                </View>
+              ) : null
+            )}
             renderItem={({ item, index }) => (
               <NewsTitleCard item={item} />
             )}
@@ -213,9 +282,8 @@ const AllNews = () => {
             ListFooterComponent={() => {
               if (!loading) return <View style={styles.bottomSpacing} />;
               return (
-                <View style={[styles.loadingFooter, { backgroundColor: colors.cardBackground }]}>
+                <View style={styles.loadingFooter}>
                   <ActivityIndicator size="small" color={colors.brandSecondary} />
-                  <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Loading more articles...</Text>
                 </View>
               );
             }}
@@ -226,7 +294,7 @@ const AllNews = () => {
                 <Text style={[styles.emptySubtitle, { color: colors.textTertiary }]}>Pull down to refresh</Text>
               </View>
             )}
-            contentContainerStyle={latestNews.length === 0 ? styles.emptyContentContainer : { paddingBottom: 20 }}
+            contentContainerStyle={latestNews.length === 0 ? styles.emptyContentContainer : {}}
           />
         </View>
       )}
@@ -243,22 +311,79 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
   },
-  carouselSection: {
-  },
-  newsList: {
-    flex: 1,
-  },
-  sectionHeader: {
-    marginTop: 8,
-    marginBottom: 0,
+  searchContainer: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     ...Platform.select({
       ios: {
         shadowColor: '#000',
-        shadowOffset: {
-          width: 0,
-          height: 2,
-        },
-        shadowOpacity: 0.08,
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
+  },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 5,
+    paddingVertical: 5,
+    borderRadius: 24,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+  },
+  searchInput: {
+    flex: 1,
+    marginLeft: 8,
+    fontSize: 14,
+    fontWeight: '400',
+    height: 40
+  },
+  categoriesContainer: {
+    paddingVertical: 16,
+  },
+  categoriesScroll: {
+    paddingHorizontal: 12,
+  },
+  categoryItem: {
+    alignItems: 'center',
+    marginHorizontal: 8,
+    width: 64,
+  },
+  categoryCircle: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 6,
+    borderWidth: 2,
+  },
+  categoryName: {
+    fontSize: 11,
+    fontWeight: '500',
+    textAlign: 'center',
+  },
+  carouselContainer: {
+    marginBottom: 16,
+    alignItems: 'center',
+  },
+  featuredCard: {
+    marginHorizontal: 16,
+    borderRadius: 16,
+    overflow: 'hidden',
+    height: 220,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
         shadowRadius: 4,
       },
       android: {
@@ -266,56 +391,57 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  headerContent: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+  featuredImage: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
   },
-  titleSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  featuredGradient: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: '60%',
   },
-  iconContainer: {
-    width: 28,
-    height: 28,
-    borderRadius: 7,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 10,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: {
-          width: 0,
-          height: 1,
-        },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-      },
-      android: {
-        elevation: 1,
-      },
-    }),
+  featuredContent: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 16,
   },
-  sectionTitle: {
-    fontSize: 18,
+  featuredTitle: {
+    fontSize: 16,
     fontWeight: '700',
+    color: '#fff',
+    lineHeight: 22,
+    marginBottom: 4,
     letterSpacing: -0.2,
   },
-  headerAccent: {
-    height: 1,
-    marginHorizontal: 16,
+  featuredSubtitle: {
+    fontSize: 13,
+    fontWeight: '400',
+    color: '#fff',
+    lineHeight: 18,
+    opacity: 0.9,
   },
-  loadingFooter: {
+  paginationContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 20,
     marginTop: 8,
   },
-  loadingText: {
-    marginLeft: 8,
-    fontSize: 14,
-    fontWeight: '500',
+  paginationDot: {
+    height: 6,
+    borderRadius: 3,
+    marginHorizontal: 3,
+  },
+  newsList: {
+    flex: 1,
+  },
+  loadingFooter: {
+    paddingVertical: 20,
+    alignItems: 'center',
   },
   bottomSpacing: {
     height: 20,
@@ -330,13 +456,13 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   emptyTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 16,
+    fontWeight: '600',
     marginTop: 16,
     marginBottom: 8,
   },
   emptySubtitle: {
-    fontSize: 14,
+    fontSize: 13,
     textAlign: 'center',
   },
 })

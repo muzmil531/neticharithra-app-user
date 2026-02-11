@@ -1,12 +1,12 @@
 import React from 'react';
-import { 
-    View, 
-    Text, 
-    StyleSheet, 
-    Image, 
-    TouchableOpacity, 
+import {
+    View,
+    Text,
+    StyleSheet,
+    Image,
+    TouchableOpacity,
     Dimensions,
-    Platform 
+    Platform
 } from 'react-native';
 import { timeAgo } from '../handelers/ReusableHandeler';
 import { useNavigation } from '@react-navigation/native';
@@ -18,32 +18,33 @@ const { width } = Dimensions.get('window');
 const NewsTitleCard = (props) => {
     const navigation = useNavigation();
     const { colors, isDark } = useTheme();
-    
+
     return (
-        <TouchableOpacity 
+        <TouchableOpacity
             style={styles.container}
             onPress={() => {
                 navigation.navigate('NewsContainerV2', { data: props.item })
             }}
-            activeOpacity={0.95}
+            activeOpacity={0.7}
         >
-            <View style={[styles.card, { backgroundColor: colors.cardBackground, borderColor: colors.divider }]}>
-                {/* Main Content */}
-                <View style={styles.mainContent}>
-                    {/* Text Content */}
-                    <View style={styles.textContent}>
-                        {/* Category & Meta Row */}
-                        <View style={styles.topRow}>
+            <View style={[styles.card, { backgroundColor: colors.cardBackground, borderBottomColor: colors.borderLight }]}>
+                {/* Horizontal Layout */}
+                <View style={styles.contentRow}>
+                    {/* Left: Text Content */}
+                    <View style={styles.textSection}>
+                        {/* Category & Time Row */}
+                        <View style={styles.metaRow}>
                             {props?.item?.category && (
-                                <View style={[styles.categoryChip, { backgroundColor: isDark ? colors.backgroundColor : '#f8f9fa', borderLeftColor: colors.brandSecondary }]}>
+                                <View style={[styles.categoryBadge, { backgroundColor: isDark ? colors.backgroundColor : '#f5f5f5' }]}>
+                                    <View style={[styles.categoryDot, { backgroundColor: colors.brandSecondary }]} />
                                     <Text style={[styles.categoryText, { color: colors.brandSecondary }]}>
                                         {String(props?.item?.category || 'News').toUpperCase()}
                                     </Text>
                                 </View>
                             )}
-                            
-                            <View style={styles.metaInfo}>
-                                <Ionicons name="time-outline" size={12} color={colors.textTertiary} />
+
+                            <View style={styles.timeContainer}>
+                                <Ionicons name="time-outline" size={11} color={colors.textTertiary} />
                                 <Text style={[styles.timeText, { color: colors.textTertiary }]}>
                                     {(() => {
                                         try {
@@ -59,36 +60,33 @@ const NewsTitleCard = (props) => {
                                 </Text>
                             </View>
                         </View>
-                        
+
                         {/* Title */}
-                        <Text style={[styles.title, { color: colors.textPrimary }]} numberOfLines={2}>
+                        <Text style={[styles.title, { color: colors.textPrimary }]} numberOfLines={3}>
                             {String(props?.item?.title || 'No Title Available')}
                         </Text>
-                        
-                        {/* Subtitle */}
+
+                        {/* Subtitle (optional) */}
                         {props?.item?.subTitle && (
                             <Text style={[styles.subtitle, { color: colors.textSecondary }]} numberOfLines={1}>
                                 {String(props?.item?.subTitle)}
                             </Text>
                         )}
                     </View>
-                    
-                    {/* Image */}
+
+                    {/* Right: Thumbnail Image */}
                     <View style={[styles.imageContainer, { backgroundColor: colors.backgroundColor }]}>
-                        <Image 
+                        <Image
                             source={{
-                                uri: props?.item?.images?.[0]?.externalURL || 
-                                     props?.item?.images?.[0]?.tempURL || 
-                                     'https://via.placeholder.com/100x80?text=News'
-                            }} 
-                            style={styles.image}
+                                uri: props?.item?.images?.[0]?.externalURL ||
+                                    props?.item?.images?.[0]?.tempURL ||
+                                    'https://via.placeholder.com/90x90?text=News'
+                            }}
+                            style={styles.thumbnail}
                             resizeMode="cover"
                         />
                     </View>
                 </View>
-                
-                {/* Bottom Border */}
-                <View style={styles.bottomBorder} />
             </View>
         </TouchableOpacity>
     );
@@ -96,84 +94,75 @@ const NewsTitleCard = (props) => {
 
 const styles = StyleSheet.create({
     container: {
-        marginHorizontal: 0,
-        marginVertical: 0,
+        marginBottom: 0,
     },
     card: {
-        marginHorizontal: 16,
-        marginVertical: 3,
-        paddingHorizontal: 14,
-        paddingVertical: 12,
-        borderRadius: 8,
-        borderWidth: 1,
-        ...Platform.select({
-            ios: {
-                shadowColor: '#000',
-                shadowOffset: {
-                    width: 0,
-                    height: 1,
-                },
-                shadowOpacity: 0.05,
-                shadowRadius: 2,
-            },
-            android: {
-                elevation: 1,
-            },
-        }),
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        borderBottomWidth: 0.5,
     },
-    mainContent: {
+    contentRow: {
         flexDirection: 'row',
         alignItems: 'flex-start',
     },
-    textContent: {
+    textSection: {
         flex: 1,
         marginRight: 12,
     },
-    topRow: {
+    metaRow: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 6,
+        marginBottom: 4,
+        flexWrap: 'wrap',
     },
-    categoryChip: {
+    categoryBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
         paddingHorizontal: 6,
         paddingVertical: 2,
-        borderRadius: 3,
-        borderLeftWidth: 2,
+        borderRadius: 10,
+        marginRight: 8,
+    },
+    categoryDot: {
+        width: 4,
+        height: 4,
+        borderRadius: 2,
+        marginRight: 4,
     },
     categoryText: {
         fontSize: 9,
-        fontWeight: '600',
+        fontWeight: '700',
         letterSpacing: 0.3,
     },
-    metaInfo: {
+    timeContainer: {
         flexDirection: 'row',
         alignItems: 'center',
     },
     timeText: {
-        fontSize: 10,
+        fontSize: 11,
         fontWeight: '500',
         marginLeft: 3,
     },
     title: {
-        fontSize: 15,
-        fontWeight: '700',
-        lineHeight: 20,
-        marginBottom: 4,
+        fontSize: 13,
+        fontWeight: '600',
+        lineHeight: 18,
+        marginBottom: 2,
         letterSpacing: -0.1,
     },
     subtitle: {
-        fontSize: 12,
-        lineHeight: 16,
+        fontSize: 11,
+        lineHeight: 15,
         fontWeight: '400',
+        marginTop: 2,
     },
     imageContainer: {
-        width: 80,
-        height: 60,
-        borderRadius: 4,
+        width: 65,
+        height: 65,
+        borderRadius: 8,
         overflow: 'hidden',
     },
-    image: {
+    thumbnail: {
         width: '100%',
         height: '100%',
     },

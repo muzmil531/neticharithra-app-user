@@ -4,34 +4,65 @@ import Carousel from 'react-native-reanimated-carousel';
 import { timeAgo } from '../handelers/ReusableHandeler';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeContext';
+import LinearGradient from 'react-native-linear-gradient';
 
 const { width: screenWidth } = Dimensions.get('window');
 
 const ExampleParallaxCarousel = (props) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const carouselRef = useRef(null);
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
 
-  const navigation = useNavigation()
+  const navigation = useNavigation();
+
   const renderItem = ({ item, index }) => {
     return (
-
-      <TouchableOpacity style={styles.item} onPress={() => { navigation.navigate('NewsContainerV2', { data: item }) }}>
+      <TouchableOpacity
+        style={styles.item}
+        onPress={() => { navigation.navigate('NewsContainerV2', { data: item }) }}
+        activeOpacity={0.9}
+      >
+        {/* Hero Image */}
         <Image
-          source={{ uri: item.images?.[0]?.externalURL || item.images?.[0]?.tempURL || 'https://upload.wikimedia.org/wikipedia/commons/3/32/Googleplex_HQ_%28cropped%29.jpg' }}
-          style={[styles.imageContainer, { backgroundColor: colors.cardBackground }]}
+          source={{
+            uri: item.images?.[0]?.externalURL ||
+              item.images?.[0]?.tempURL ||
+              'https://upload.wikimedia.org/wikipedia/commons/3/32/Googleplex_HQ_%28cropped%29.jpg'
+          }}
+          style={styles.heroImage}
+          resizeMode="cover"
         />
-        {
-          item?.approvedOn &&
-          <View style={[styles.titleContianerV2, { backgroundColor: colors.overlayDark }]}>
-            <Text style={styles.title2}>
+
+        {/* Subtle Gradient Overlay */}
+        <LinearGradient
+          colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.6)']}
+          style={styles.gradientOverlay}
+        />
+
+        {/* Category Badge */}
+        {item?.category && (
+          <View style={styles.categoryBadge}>
+            <View style={[styles.categoryChip, { backgroundColor: colors.brandSecondary }]}>
+              <Text style={styles.categoryText}>
+                {String(item?.category).toUpperCase()}
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* Content Overlay - Bottom */}
+        <View style={styles.contentOverlay}>
+          {/* Time Badge */}
+          {item?.approvedOn && (
+            <Text style={styles.timeText}>
               {timeAgo(new Date(item?.approvedOn))}
             </Text>
-          </View>
-        }
-        <View style={[styles.titleContianer, { backgroundColor: colors.overlayDark }]}>
+          )}
 
-          <Text style={styles.title}>{item?.title}</Text>
+          {/* Title */}
+          <Text style={styles.title} numberOfLines={2}>
+            {item?.title}
+          </Text>
         </View>
       </TouchableOpacity>
     );
@@ -61,27 +92,32 @@ const ExampleParallaxCarousel = (props) => {
         ref={carouselRef}
         data={props?.newsItems || []}
         renderItem={renderItem}
-        width={screenWidth - 60}
-        height={200}
+        width={screenWidth - 24}
+        height={180}
         autoPlay={true}
-        autoPlayInterval={3000}
+        autoPlayInterval={4000}
         loop={true}
         onSnapToItem={(index) => setActiveIndex(index)}
         mode="parallax"
         modeConfig={{
-          parallaxScrollingScale: 0.9,
-          parallaxScrollingOffset: 50,
+          parallaxScrollingScale: 0.94,
+          parallaxScrollingOffset: 35,
         }}
       />
+
+      {/* Compact Page Indicators */}
       <View style={styles.paginationContainer}>
         {props?.newsItems?.map((_, index) => (
           <View
             key={index}
             style={[
-              styles.dotStyle,
-              index === activeIndex
-                ? { backgroundColor: colors.textPrimary }
-                : [styles.inactiveDotStyle, { backgroundColor: colors.textTertiary, opacity: 0.4 }]
+              styles.paginationDot,
+              {
+                backgroundColor: index === activeIndex
+                  ? colors.brandSecondary
+                  : isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.15)',
+                width: index === activeIndex ? 20 : 6,
+              },
             ]}
           />
         ))}
@@ -90,102 +126,122 @@ const ExampleParallaxCarousel = (props) => {
   );
 };
 
+export default ExampleParallaxCarousel;
+
 const styles = StyleSheet.create({
   container: {
+    marginVertical: 12,
     alignItems: 'center',
-    marginVertical: 20,
-    marginBottom: 5
-  },
-  emptyContainer: {
-    width: screenWidth,
-    minHeight: 250,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 30,
-    paddingVertical: 40,
-  },
-  emptyContent: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 40,
-    paddingHorizontal: 30,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderStyle: 'dashed',
-    width: '100%',
-    maxWidth: screenWidth - 60,
-  },
-  emptyIcon: {
-    fontSize: 48,
-    marginBottom: 12,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 6,
-    textAlign: 'center',
-  },
-  emptySubtitle: {
-    fontSize: 14,
-    textAlign: 'center',
-    lineHeight: 20,
   },
   item: {
-    width: screenWidth - 60,
-    height: 200, borderRadius: 30
+    width: '100%',
+    height: 180,
+    borderRadius: 12,
+    overflow: 'hidden',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 2,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
   },
-  imageContainer: {
-    flex: 1,
-    marginBottom: Platform.select({ ios: 0, android: 1 }),
-    borderRadius: 5,
-    resizeMode: 'cover',
+  heroImage: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
   },
-  titleContianer: {
+  gradientOverlay: {
     position: 'absolute',
     bottom: 0,
     left: 0,
-    width: "100%",
-    padding: 15,
-    borderBottomLeftRadius: 5,
-    borderBottomRightRadius: 5
+    right: 0,
+    height: '50%',
+  },
+  categoryBadge: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+  },
+  categoryChip: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+  },
+  categoryText: {
+    fontSize: 9,
+    fontWeight: '700',
+    letterSpacing: 0.4,
+    color: '#FFFFFF',
+  },
+  contentOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 12,
+  },
+  timeText: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: '#FFFFFF',
+    marginBottom: 4,
+    opacity: 0.9,
   },
   title: {
-
-    color: 'white',
-    fontSize: 16,
-    // width: '100%',
-
-  },
-  titleContianerV2: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    padding: 15,
-    width: '100%',
-    borderTopLeftRadius: 5,
-    borderTopRightRadius: 5
-  },
-  title2: {
-    color: 'white',
     fontSize: 14,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    lineHeight: 18,
+    letterSpacing: -0.2,
   },
   paginationContainer: {
-    paddingVertical: 10,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 8,
   },
-  dotStyle: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginHorizontal: 4,
-  },
-  inactiveDotStyle: {
-    width: 6,
+  paginationDot: {
     height: 6,
     borderRadius: 3,
+    marginHorizontal: 3,
+  },
+  // Empty state styles
+  emptyContainer: {
+    width: screenWidth,
+    height: 180,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 32,
+  },
+  emptyContent: {
+    width: '100%',
+    padding: 24,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    alignItems: 'center',
+  },
+  emptyIcon: {
+    fontSize: 32,
+    marginBottom: 8,
+  },
+  emptyTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  emptySubtitle: {
+    fontSize: 12,
+    textAlign: 'center',
+    lineHeight: 16,
   },
 });
-
-export default ExampleParallaxCarousel;

@@ -36,206 +36,206 @@ export const languageList = [
 const LanguageSelectionScreen = ({ }) => {
     const [selectedLanguage, setSelectedLanguage] = useState("te");
     const [scaleAnim] = useState(new Animated.Value(1));
-     const themeData = useTheme();
-     const colors = themeData?.colors || {
-       screenBackground: '#f8f9fa',
-       headerThemeBg: '#fff',
-       cardBackground: '#fff',
-       brandSecondary: '#007bff',
-       textPrimary: '#1a1a1a',
-       textSecondary: '#666',
-       textTertiary: '#999'
-     };
-     const isDark = themeData?.isDark || false;
+    const themeData = useTheme();
+    const colors = themeData?.colors || {
+        screenBackground: '#f8f9fa',
+        headerThemeBg: '#fff',
+        cardBackground: '#fff',
+        brandSecondary: '#007bff',
+        textPrimary: '#1a1a1a',
+        textSecondary: '#666',
+        textTertiary: '#999'
+    };
+    const isDark = themeData?.isDark || false;
     const { t } = useTranslation();
 
     const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    header: {
-        paddingTop: hp('6%'),
-        paddingBottom: hp('4%'),
-        paddingHorizontal: wp('6%'),
-        alignItems: 'center',
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
+        container: {
+            flex: 1,
         },
-        shadowOpacity: 0.1,
-        shadowRadius: 3.84,
-        borderBottomLeftRadius: wp('6%'),
-        borderBottomRightRadius: wp('6%'),
-    },
-    headerIconContainer: {
-        padding: wp('3%'),
-        borderRadius: wp('6%'),
-        marginBottom: hp('2%'),
-    },
-    headerTitle: {
-        fontSize: wp('7%'),
-        fontWeight: '700',
-        marginBottom: hp('1%'),
-        textAlign: 'center',
-    },
-    headerSubtitle: {
-        fontSize: wp('3.8%'),
-        textAlign: 'center',
-        lineHeight: wp('5.5%'),
-        paddingHorizontal: wp('4%'),
-    },
-    content: {
-        flex: 1,
-        paddingHorizontal: wp('5%'),
-        paddingTop: hp('3%'),
-    },
-    sectionHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: hp('2.5%'),
-        paddingHorizontal: wp('2%'),
-    },
-    sectionTitle: {
-        fontSize: wp('4.5%'),
-        fontWeight: '600',
-        marginLeft: wp('2%'),
-    },
-    languageContainer: {
-        marginBottom: hp('4%'),
-    },
-    languageCardWrapper: {
-        marginBottom: hp('2%'),
-    },
-    languageCard: {
-        borderRadius: wp('4%'),
-        padding: wp('4%'),
-        flexDirection: 'row',
-        alignItems: 'center',
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 1,
+        header: {
+            paddingTop: hp('6%'),
+            paddingBottom: hp('4%'),
+            paddingHorizontal: wp('6%'),
+            alignItems: 'center',
+            elevation: 2,
+            shadowColor: '#000',
+            shadowOffset: {
+                width: 0,
+                height: 2,
+            },
+            shadowOpacity: 0.1,
+            shadowRadius: 3.84,
+            borderBottomLeftRadius: wp('6%'),
+            borderBottomRightRadius: wp('6%'),
         },
-        shadowOpacity: 0.08,
-        shadowRadius: 2.22,
-        borderWidth: 1,
-        position: 'relative',
-    },
-    selectedCard: {
-        elevation: 4,
-        shadowOpacity: 0.15,
-    },
-    languageIcon: {
-        width: wp('12%'),
-        height: wp('12%'),
-        borderRadius: wp('6%'),
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: wp('4%'),
-    },
-    selectedIcon: {
-    },
-    languageIconText: {
-        fontSize: wp('6%'),
-        fontWeight: '600',
-    },
-    selectedIconText: {
-    },
-    languageInfo: {
-        flex: 1,
-        marginRight: wp('3%'),
-    },
-    languageNativeName: {
-        fontSize: wp('5%'),
-        fontWeight: '600',
-        marginBottom: hp('0.5%'),
-    },
-    selectedLanguageName: {
-    },
-    languageEnglishName: {
-        fontSize: wp('3.5%'),
-        fontWeight: '400',
-    },
-    selectedLanguageSubtext: {
-        color: colors.textSecondary,
-    },
-    selectionContainer: {
-        marginRight: wp('2%'),
-    },
-    radioButton: {
-        width: wp('6%'),
-        height: wp('6%'),
-        borderRadius: wp('3%'),
-        borderWidth: 2,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'white',
-    },
-    radioButtonSelected: {
-    },
-    radioButtonInner: {
-        width: wp('3%'),
-        height: wp('3%'),
-        borderRadius: wp('1.5%'),
-        backgroundColor: colors.brandSecondary,
-    },
-    selectedBadge: {
-        position: 'absolute',
-        top: wp('2%'),
-        right: wp('2%'),
-        borderRadius: wp('3%'),
-        width: wp('6%'),
-        height: wp('6%'),
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: colors.brandSecondary,
-        elevation: 3,
-        shadowColor: colors.shadowColor,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 1,
+        headerIconContainer: {
+            padding: wp('3%'),
+            borderRadius: wp('6%'),
+            marginBottom: hp('2%'),
         },
-        shadowOpacity: 0.2,
-        shadowRadius: 1.41,
-    },
-    buttonContainer: {
-        paddingBottom: hp('4%'),
-        paddingHorizontal: wp('2%'),
-    },
-    saveButton: {
-        borderRadius: wp('3%'),
-        paddingVertical: hp('2%'),
-        paddingHorizontal: wp('6%'),
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        elevation: 3,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
+        headerTitle: {
+            fontSize: wp('7%'),
+            fontWeight: '700',
+            marginBottom: hp('1%'),
+            textAlign: 'center',
         },
-        shadowOpacity: 0.15,
-        shadowRadius: 3.84,
-    },
-    saveButtonIcon: {
-        marginRight: wp('2%'),
-    },
-    saveButtonText: {
-        fontSize: wp('4.2%'),
-        fontWeight: '600',
-    },
-});
+        headerSubtitle: {
+            fontSize: wp('3.8%'),
+            textAlign: 'center',
+            lineHeight: wp('5.5%'),
+            paddingHorizontal: wp('4%'),
+        },
+        content: {
+            flex: 1,
+            paddingHorizontal: wp('5%'),
+            paddingTop: hp('3%'),
+        },
+        sectionHeader: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginBottom: hp('2.5%'),
+            paddingHorizontal: wp('2%'),
+        },
+        sectionTitle: {
+            fontSize: wp('4.5%'),
+            fontWeight: '600',
+            marginLeft: wp('2%'),
+        },
+        languageContainer: {
+            marginBottom: hp('4%'),
+        },
+        languageCardWrapper: {
+            marginBottom: hp('2%'),
+        },
+        languageCard: {
+            borderRadius: wp('4%'),
+            padding: wp('4%'),
+            flexDirection: 'row',
+            alignItems: 'center',
+            elevation: 2,
+            shadowColor: '#000',
+            shadowOffset: {
+                width: 0,
+                height: 1,
+            },
+            shadowOpacity: 0.08,
+            shadowRadius: 2.22,
+            borderWidth: 1,
+            position: 'relative',
+        },
+        selectedCard: {
+            elevation: 4,
+            shadowOpacity: 0.15,
+        },
+        languageIcon: {
+            width: wp('12%'),
+            height: wp('12%'),
+            borderRadius: wp('6%'),
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginRight: wp('4%'),
+        },
+        selectedIcon: {
+        },
+        languageIconText: {
+            fontSize: wp('6%'),
+            fontWeight: '600',
+        },
+        selectedIconText: {
+        },
+        languageInfo: {
+            flex: 1,
+            marginRight: wp('3%'),
+        },
+        languageNativeName: {
+            fontSize: wp('5%'),
+            fontWeight: '600',
+            marginBottom: hp('0.5%'),
+        },
+        selectedLanguageName: {
+        },
+        languageEnglishName: {
+            fontSize: wp('3.5%'),
+            fontWeight: '400',
+        },
+        selectedLanguageSubtext: {
+            color: colors.textSecondary,
+        },
+        selectionContainer: {
+            marginRight: wp('2%'),
+        },
+        radioButton: {
+            width: wp('6%'),
+            height: wp('6%'),
+            borderRadius: wp('3%'),
+            borderWidth: 2,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: colors.cardBackground,
+        },
+        radioButtonSelected: {
+        },
+        radioButtonInner: {
+            width: wp('3%'),
+            height: wp('3%'),
+            borderRadius: wp('1.5%'),
+            backgroundColor: colors.brandSecondary,
+        },
+        selectedBadge: {
+            position: 'absolute',
+            top: wp('2%'),
+            right: wp('2%'),
+            borderRadius: wp('3%'),
+            width: wp('6%'),
+            height: wp('6%'),
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: colors.brandSecondary,
+            elevation: 3,
+            shadowColor: '#000',
+            shadowOffset: {
+                width: 0,
+                height: 1,
+            },
+            shadowOpacity: 0.2,
+            shadowRadius: 1.41,
+        },
+        buttonContainer: {
+            paddingBottom: hp('4%'),
+            paddingHorizontal: wp('2%'),
+        },
+        saveButton: {
+            borderRadius: wp('3%'),
+            paddingVertical: hp('2%'),
+            paddingHorizontal: wp('6%'),
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            elevation: 3,
+            shadowColor: '#000',
+            shadowOffset: {
+                width: 0,
+                height: 2,
+            },
+            shadowOpacity: 0.15,
+            shadowRadius: 3.84,
+        },
+        saveButtonIcon: {
+            marginRight: wp('2%'),
+        },
+        saveButtonText: {
+            fontSize: wp('4.2%'),
+            fontWeight: '600',
+            color: '#fff',
+        },
+    });
     const changeLang = (lang) => {
         i18next.changeLanguage(lang);
     }
 
     const navigation = useNavigation();
-    
+
     useFocusEffect(
         React.useCallback(() => {
             const fetchData = async () => {
@@ -291,14 +291,14 @@ const LanguageSelectionScreen = ({ }) => {
     return (
         <View style={[styles.container, { backgroundColor: colors.screenBackground }]}>
             <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.headerThemeBg} />
-            
+
             {/* Modern Header */}
             <View style={[styles.header, { backgroundColor: colors.cardBackground }]}>
                 <View style={styles.headerIconContainer}>
-                    <MaterialCommunityIcons 
-                        name="translate" 
-                        size={wp('8%')} 
-                        color={colors.brandSecondary} 
+                    <MaterialCommunityIcons
+                        name="translate"
+                        size={wp('8%')}
+                        color={colors.brandSecondary}
                     />
                 </View>
                 <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>Choose Language</Text>
@@ -310,10 +310,10 @@ const LanguageSelectionScreen = ({ }) => {
             {/* Content */}
             <View style={styles.content}>
                 <View style={styles.sectionHeader}>
-                    <MaterialCommunityIcons 
-                        name="earth" 
-                        size={wp('5%')} 
-                        color={colors.textSecondary} 
+                    <MaterialCommunityIcons
+                        name="earth"
+                        size={wp('5%')}
+                        color={colors.textSecondary}
                     />
                     <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Available Languages</Text>
                 </View>
@@ -321,12 +321,12 @@ const LanguageSelectionScreen = ({ }) => {
                 {/* Language Cards */}
                 <View style={styles.languageContainer}>
                     {languageList.map((lang, index) => (
-                        <Animated.View 
-                            key={index} 
+                        <Animated.View
+                            key={index}
                             style={[styles.languageCardWrapper, { transform: [{ scale: scaleAnim }] }]}
                         >
-                            <TouchableOpacity 
-                                onPress={() => handleLanguageSelect(lang.code)} 
+                            <TouchableOpacity
+                                onPress={() => handleLanguageSelect(lang.code)}
                                 activeOpacity={0.7}
                                 style={[
                                     styles.languageCard,
@@ -383,10 +383,10 @@ const LanguageSelectionScreen = ({ }) => {
                                 {/* Selected Badge */}
                                 {selectedLanguage === lang.code && (
                                     <View style={[styles.selectedBadge, { backgroundColor: colors.brandSecondary }]}>
-                                        <MaterialCommunityIcons 
-                                            name="check" 
-                                            size={wp('4%')} 
-                                            color="white" 
+                                        <MaterialCommunityIcons
+                                            name="check"
+                                            size={wp('4%')}
+                                            color="white"
                                         />
                                     </View>
                                 )}
@@ -397,15 +397,15 @@ const LanguageSelectionScreen = ({ }) => {
 
                 {/* Save Button */}
                 <View style={styles.buttonContainer}>
-                    <TouchableOpacity 
-                        style={[styles.saveButton, { backgroundColor: colors.brandSecondary }]} 
+                    <TouchableOpacity
+                        style={[styles.saveButton, { backgroundColor: colors.brandSecondary }]}
                         onPress={handleSavePreferences}
                         activeOpacity={0.8}
                     >
-                        <MaterialCommunityIcons 
-                            name="content-save" 
-                            size={wp('5%')} 
-                            color="white" 
+                        <MaterialCommunityIcons
+                            name="content-save"
+                            size={wp('5%')}
+                            color="white"
                             style={styles.saveButtonIcon}
                         />
                         <Text style={styles.saveButtonText}>Save Preferences</Text>

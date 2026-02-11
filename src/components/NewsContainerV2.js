@@ -1,13 +1,13 @@
-import { 
-    Clipboard, 
-    Dimensions, 
-    Image, 
-    Linking, 
-    Pressable, 
-    ScrollView, 
-    Share, 
-    StyleSheet, 
-    Text, 
+import {
+    Clipboard,
+    Dimensions,
+    Image,
+    Linking,
+    Pressable,
+    ScrollView,
+    Share,
+    StyleSheet,
+    Text,
     View,
     StatusBar,
     SafeAreaView,
@@ -18,6 +18,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useTheme } from '../context/ThemeContext';
+import LinearGradient from 'react-native-linear-gradient';
 
 import imageBg from '../assets/branding/logo.png';
 import { timeAgo } from '../handelers/ReusableHandeler';
@@ -29,112 +30,57 @@ import EndPointConfig from '../handelers/EndPointConfig';
 const { height, width } = Dimensions.get('screen');
 
 const NewsContainerV2 = () => {
-    let route = useRoute();
-    let [newsInfo, setNewsInfo] = useState();
-    let [loading, setLoading] = useState(true);
-    let navigation = useNavigation();
-    const fadeAnim = useRef(new Animated.Value(0)).current;
-    const slideAnim = useRef(new Animated.Value(50)).current;
+    const route = useRoute();
+    const navigation = useNavigation();
     const { colors, isDark } = useTheme();
+    const [newsInfo, setNewsInfo] = useState(null);
+    const fadeAnim = useRef(new Animated.Value(0)).current;
+    const slideAnim = useRef(new Animated.Value(20)).current;
 
     useFocusEffect(
         React.useCallback(() => {
-            const fetchData = async () => {
-                try {
-                    setLoading(true);
-                    console.log(route.params.data)
-                    await getnewsInfo(route.params.data);
-                    
-                    // Animate content in
-                    Animated.parallel([
-                        Animated.timing(fadeAnim, {
-                            toValue: 1,
-                            duration: 800,
-                            useNativeDriver: true,
-                        }),
-                        Animated.timing(slideAnim, {
-                            toValue: 0,
-                            duration: 600,
-                            useNativeDriver: true,
-                        })
-                    ]).start();
-                } catch (error) {
-                    console.error('Error fetching data:', error);
-                    setLoading(false);
-                }
+            if (route?.params?.data) {
+                setNewsInfo(route.params.data);
+
+                // Fade in animation
+                Animated.parallel([
+                    Animated.timing(fadeAnim, {
+                        toValue: 1,
+                        duration: 300,
+                        useNativeDriver: true,
+                    }),
+                    Animated.timing(slideAnim, {
+                        toValue: 0,
+                        duration: 300,
+                        useNativeDriver: true,
+                    }),
+                ]).start();
+            }
+
+            return () => {
+                fadeAnim.setValue(0);
+                slideAnim.setValue(20);
             };
-
-            fetchData();
-        }, [route.params])
+        }, [route?.params?.data])
     );
-
 
     const handleShare = async () => {
         try {
-
-            const url = `https://neticharithra-ncmedia.web.app/#/view-news/${newsInfo.language}/${newsInfo.newsId}`;  // Replace with your actual URL
-            console.log(url)
-            const imageUrl = newsInfo?.images?.[0]?.['externalURL'] ||
-                newsInfo?.images?.[0]?.tempURL;  // Replace with your actual image URL
-            const subtitle = 'Neti Charithra';
-
-            // Copy URL to clipboard
-            await Clipboard.setString(url);
-
-            // Share content
-            await Share.share({
-                message: subtitle,
-                url: imageUrl,
-                title: newsInfo.title,  // Optional title for Android
+            const result = await Share.share({
+                message: `${newsInfo?.title}\n\nRead more at Neti Charithra`,
             });
-
         } catch (error) {
-            Alert.alert('Error', 'Failed to share content');
+            console.error('Error sharing:', error);
         }
     };
-
-    const openSourceLink = () => {
-        if (newsInfo?.source !== 'Neti Charithra' && newsInfo?.sourceLink) {
-            Linking.openURL(newsInfo?.sourceLink);
-        }
-    };
-
-    const getnewsInfo = async (payload) => {
-        try {
-            console.log("payload", payload);
-            const response = await post(EndPointConfig.getIndividualNewsInfo, payload);
-            console.log("response", response.data);
-            
-            if (response?.status === 'success') {
-                setNewsInfo(response?.data || {});
-                console.log(response?.data);
-            }
-            setLoading(false);
-        } catch (error) {
-            console.error(error);
-            setLoading(false);
-        }
-    };
-    if (loading) {
-        return (
-            <SafeAreaView style={[styles.loadingContainer, { backgroundColor: colors.backgroundColor }]}>
-                <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.headerThemeBg} />
-                <View style={styles.loadingContent}>
-                    <Animated.View style={[styles.loadingSpinner, { opacity: fadeAnim }]}>
-                        <Text style={[styles.loadingText, { color: colors.textPrimary }]}>Loading...</Text>
-                    </Animated.View>
-                </View>
-            </SafeAreaView>
-        );
-    }
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: colors.screenBackground }]}>
-            <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.headerThemeBg} />
+            <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
             {
                 newsInfo &&
                 <Animated.View style={[styles.mainContainer, { opacity: fadeAnim }]}>
-                    {/* Hero Image Section */}
+                    {/* Compact Hero Image Section */}
                     <View style={styles.heroSection}>
                         <Image
                             source={{
@@ -146,51 +92,67 @@ const NewsContainerV2 = () => {
                             style={styles.heroImage}
                             resizeMode="cover"
                         />
-                        
-                        {/* Gradient Overlay */}
-                        <View style={styles.gradientOverlay} />
-                        
+
+                        {/* Subtle Gradient Overlay */}
+                        <LinearGradient
+                            colors={['rgba(0,0,0,0.2)', 'rgba(0,0,0,0.5)']}
+                            style={styles.gradientOverlay}
+                        />
+
                         {/* Header Actions */}
                         <View style={styles.headerActions}>
-                            <TouchableOpacity 
-                                style={styles.actionButton}
+                            <TouchableOpacity
+                                style={[styles.actionButton, { backgroundColor: 'rgba(255,255,255,0.3)' }]}
                                 onPress={() => navigation.goBack()}
                                 activeOpacity={0.8}
                             >
-                                <Ionicons name="chevron-back" size={24} color="#fff" />
+                                <Ionicons name="chevron-back" size={22} color="#fff" />
                             </TouchableOpacity>
-                            
-                            <TouchableOpacity 
-                                style={styles.actionButton}
+
+                            <TouchableOpacity
+                                style={[styles.actionButton, { backgroundColor: 'rgba(255,255,255,0.3)' }]}
                                 onPress={handleShare}
                                 activeOpacity={0.8}
                             >
                                 <Ionicons name="share-social" size={20} color="#fff" />
                             </TouchableOpacity>
                         </View>
-                        
-                        {/* Time Badge */}
-                        {newsInfo?.approvedOn && (
-                            <View style={styles.timeBadge}>
-                                <Text style={styles.timeText}>
-                                    {timeAgo(new Date(newsInfo?.approvedOn))}
-                                </Text>
-                            </View>
-                        )}
                     </View>
+
                     {/* Content Section */}
-                    <Animated.View 
+                    <Animated.View
                         style={[
                             styles.contentSection,
                             { backgroundColor: colors.screenBackground },
                             { transform: [{ translateY: slideAnim }] }
                         ]}
                     >
-                        <ScrollView 
+                        <ScrollView
                             style={styles.scrollContainer}
                             showsVerticalScrollIndicator={false}
                             bounces={false}
                         >
+                            {/* Meta Info */}
+                            <View style={styles.metaContainer}>
+                                {newsInfo?.category && (
+                                    <View style={[styles.categoryBadge, { backgroundColor: isDark ? colors.backgroundColor : '#f5f5f5' }]}>
+                                        <View style={[styles.categoryDot, { backgroundColor: colors.brandSecondary }]} />
+                                        <Text style={[styles.categoryText, { color: colors.brandSecondary }]}>
+                                            {String(newsInfo?.category).toUpperCase()}
+                                        </Text>
+                                    </View>
+                                )}
+
+                                {newsInfo?.approvedOn && (
+                                    <View style={styles.timeContainer}>
+                                        <Ionicons name="time-outline" size={12} color={colors.textTertiary} />
+                                        <Text style={[styles.timeText, { color: colors.textTertiary }]}>
+                                            {timeAgo(new Date(newsInfo?.approvedOn))}
+                                        </Text>
+                                    </View>
+                                )}
+                            </View>
+
                             {/* Title */}
                             <View style={styles.titleContainer}>
                                 <Text style={[styles.newsTitle, { color: colors.textPrimary }]}>
@@ -198,64 +160,67 @@ const NewsContainerV2 = () => {
                                 </Text>
                             </View>
 
-                            {/* Description */}
-                            <View style={styles.descriptionContainer}>
-                                <Text style={[styles.newsDescription, { color: colors.textSecondary }]}>
-                                    {newsInfo?.description}
-                                </Text>
-                            </View>
+                            {/* Subtitle */}
+                            {newsInfo?.subTitle && (
+                                <View style={styles.descriptionContainer}>
+                                    <Text style={[styles.newsDescription, { color: colors.textSecondary }]}>
+                                        {newsInfo?.subTitle}
+                                    </Text>
+                                </View>
+                            )}
 
-                            {/* Author/Source Card */}
-                            <View style={[styles.authorCard, { backgroundColor: colors.cardBackground }]}>
-                                <View style={styles.authorInfo}>
-                                    <View style={styles.avatarContainer}>
-                                        {
-                                            newsInfo?.reportedBy?.profilePic
-                                                ?
-                                                <Avatar.Image
-                                                    size={48}
-                                                    source={{
-                                                        uri: newsInfo?.reportedBy?.profilePic?.externalURL ||
-                                                            newsInfo?.reportedBy?.profilePic?.tempURL
-                                                    }}
-                                                />
-                                                :
-                                                <Avatar.Text
-                                                    size={48}
-                                                    label={newsInfo?.reportedBy?.name?.charAt(0) || 'N'}
-                                                    style={styles.avatarText}
-                                                />
-                                        }
-                                    </View>
-                                    
-                                    <View style={styles.authorDetails}>
-                                        {
-                                            newsInfo?.source === 'Neti Charithra' && (
-                                                <View style={styles.reporterInfo}>
-                                                    <Text style={[styles.authorName, { color: colors.textPrimary }]}>
-                                                        {newsInfo?.reportedBy?.name}
-                                                    </Text>
-                                                    <Text style={[styles.authorRole, { color: colors.textSecondary }]}>
-                                                        {newsInfo?.reportedBy?.role}
-                                                    </Text>
-                                                </View>
-                                            )
-                                        }
-                                        
-                                        <Pressable onPress={openSourceLink} style={[styles.sourceContainer, { backgroundColor: colors.backgroundColor, borderLeftColor: colors.brandSecondary }]}>
-                                            <Text style={[styles.sourceLabel, { color: colors.textSecondary }]}>Source:</Text>
-                                            <Text style={[styles.sourceName, { color: colors.brandSecondary }]}>
-                                                {newsInfo?.source} 
-                                            </Text>
-                                            {newsInfo?.source !== 'Neti Charithra' && newsInfo?.sourceLink && (
-                                                <Ionicons name="open-outline" size={14} color={colors.brandSecondary} style={styles.externalIcon} />
-                                            )}
-                                        </Pressable>
+                            {/* Author Card */}
+                            {newsInfo?.author && (
+                                <View style={[styles.authorCard, { backgroundColor: colors.cardBackground, borderColor: colors.borderLight }]}>
+                                    <Avatar.Text
+                                        size={36}
+                                        label={newsInfo?.author?.charAt(0)?.toUpperCase() || 'A'}
+                                        style={{ backgroundColor: colors.brandSecondary }}
+                                    />
+                                    <View style={styles.authorInfo}>
+                                        <Text style={[styles.authorName, { color: colors.textPrimary }]}>
+                                            {newsInfo?.author}
+                                        </Text>
+                                        <Text style={[styles.authorRole, { color: colors.textSecondary }]}>
+                                            Contributor
+                                        </Text>
                                     </View>
                                 </View>
-                            </View>
-                            
-                            {/* Bottom Spacing */}
+                            )}
+
+                            {/* Description/Content */}
+                            {newsInfo?.description && (
+                                <View style={styles.contentContainer}>
+                                    <Text style={[styles.contentText, { color: colors.textPrimary }]}>
+                                        {newsInfo?.description}
+                                    </Text>
+                                </View>
+                            )}
+
+                            {/* Additional Images */}
+                            {newsInfo?.images && newsInfo.images.length > 1 && (
+                                <View style={styles.additionalImagesContainer}>
+                                    {newsInfo.images.slice(1).map((img, index) => (
+                                        <Image
+                                            key={index}
+                                            source={{ uri: img?.externalURL || img?.tempURL }}
+                                            style={[styles.additionalImage, { backgroundColor: colors.backgroundColor }]}
+                                            resizeMode="cover"
+                                        />
+                                    ))}
+                                </View>
+                            )}
+
+                            {/* Source */}
+                            {newsInfo?.source && (
+                                <View style={[styles.sourceCard, { backgroundColor: colors.cardBackground, borderColor: colors.borderLight }]}>
+                                    <Ionicons name="newspaper-outline" size={16} color={colors.textSecondary} />
+                                    <Text style={[styles.sourceText, { color: colors.textSecondary }]}>
+                                        Source: {newsInfo?.source}
+                                    </Text>
+                                </View>
+                            )}
+
                             <View style={styles.bottomSpacing} />
                         </ScrollView>
                     </Animated.View>
@@ -271,32 +236,16 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    loadingContainer: {
-        flex: 1,
-    },
-    loadingContent: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    loadingSpinner: {
-        padding: 20,
-    },
-    loadingText: {
-        fontSize: 16,
-        fontWeight: '500',
-    },
     mainContainer: {
         flex: 1,
     },
     heroSection: {
-        height: height * 0.45,
+        height: height * 0.35,
         position: 'relative',
     },
     heroImage: {
         width: '100%',
         height: '100%',
-        position: 'absolute',
     },
     gradientOverlay: {
         position: 'absolute',
@@ -307,141 +256,134 @@ const styles = StyleSheet.create({
     },
     headerActions: {
         position: 'absolute',
-        top: 50,
+        top: Platform.OS === 'ios' ? 50 : 20,
         left: 0,
         right: 0,
         flexDirection: 'row',
         justifyContent: 'space-between',
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         zIndex: 10,
     },
     actionButton: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
+        width: 40,
+        height: 40,
+        borderRadius: 20,
         justifyContent: 'center',
         alignItems: 'center',
-        backdropFilter: 'blur(10px)',
-    },
-    timeBadge: {
-        position: 'absolute',
-        bottom: 20,
-        left: 20,
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 16,
-    },
-    timeText: {
-        fontSize: 12,
-        fontWeight: '500',
     },
     contentSection: {
         flex: 1,
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
-        marginTop: -24,
-        paddingTop: 8,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        marginTop: -20,
     },
     scrollContainer: {
         flex: 1,
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
     },
-    titleContainer: {
-        marginTop: 20,
-        marginBottom: 16,
-    },
-    newsTitle: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        lineHeight: 36,
-        letterSpacing: -0.5,
-    },
-    descriptionContainer: {
-        marginBottom: 24,
-    },
-    newsDescription: {
-        fontSize: 16,
-        lineHeight: 26,
-        textAlign: 'justify',
-        letterSpacing: 0.2,
-    },
-    authorCard: {
-        borderRadius: 16,
-        padding: 20,
-        marginBottom: 20,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.08,
-        shadowRadius: 8,
-        elevation: 4,
-    },
-    authorInfo: {
+    metaContainer: {
         flexDirection: 'row',
-        alignItems: 'flex-start',
-    },
-    avatarContainer: {
-        marginRight: 16,
-    },
-    avatarText: {
-    },
-    authorDetails: {
-        flex: 1,
-    },
-    reporterInfo: {
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        marginTop: 16,
         marginBottom: 12,
     },
+    categoryBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 12,
+        marginRight: 12,
+    },
+    categoryDot: {
+        width: 4,
+        height: 4,
+        borderRadius: 2,
+        marginRight: 4,
+    },
+    categoryText: {
+        fontSize: 10,
+        fontWeight: '700',
+        letterSpacing: 0.4,
+    },
+    timeContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    timeText: {
+        fontSize: 11,
+        fontWeight: '500',
+        marginLeft: 4,
+    },
+    titleContainer: {
+        marginBottom: 12,
+    },
+    newsTitle: {
+        fontSize: 22,
+        fontWeight: '700',
+        lineHeight: 30,
+        letterSpacing: -0.4,
+    },
+    descriptionContainer: {
+        marginBottom: 16,
+    },
+    newsDescription: {
+        fontSize: 15,
+        lineHeight: 22,
+        fontWeight: '400',
+    },
+    authorCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 12,
+        borderRadius: 12,
+        marginBottom: 16,
+        borderWidth: 1,
+    },
+    authorInfo: {
+        marginLeft: 12,
+        flex: 1,
+    },
     authorName: {
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: '600',
         marginBottom: 2,
     },
     authorRole: {
-        fontSize: 14,
-        fontStyle: 'italic',
+        fontSize: 12,
     },
-    sourceContainer: {
+    contentContainer: {
+        marginBottom: 20,
+    },
+    contentText: {
+        fontSize: 15,
+        lineHeight: 24,
+        fontWeight: '400',
+    },
+    additionalImagesContainer: {
+        marginBottom: 20,
+    },
+    additionalImage: {
+        width: '100%',
+        height: 200,
+        borderRadius: 12,
+        marginBottom: 12,
+    },
+    sourceCard: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 8,
-        paddingHorizontal: 12,
+        padding: 12,
         borderRadius: 8,
-        borderLeftWidth: 3,
+        marginBottom: 16,
+        borderWidth: 1,
     },
-    sourceLabel: {
+    sourceText: {
         fontSize: 12,
+        marginLeft: 8,
         fontWeight: '500',
-        marginRight: 6,
-    },
-    sourceName: {
-        fontSize: 14,
-        fontWeight: '600',
-        flex: 1,
-    },
-    externalIcon: {
-        marginLeft: 4,
     },
     bottomSpacing: {
         height: 40,
-    },
-    // Legacy styles (keeping for compatibility)
-    backgroundImage: {
-        width: '50%',
-        height: '50%',
-        resizeMode: 'contain',
-        position: 'absolute',
-        opacity: 0.2,
-    },
-    overlayText: {
-        position: 'absolute',
-        fontSize: 20,
-        fontWeight: 'bold',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '85%',
-        paddingHorizontal: 20,
     },
 });
