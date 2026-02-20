@@ -39,8 +39,21 @@ const NewsContainerV2 = () => {
 
     useFocusEffect(
         React.useCallback(() => {
+            console.log("NEWS CONTAINER V2 Loaded", route?.params?.data)
             if (route?.params?.data) {
-                setNewsInfo(route.params.data);
+
+                if (!route.params?.data?.title) {
+                    post(EndPointConfig.getIndividualNewsInfo, {
+                        newsId: route.params.data.newsId
+                    }).then((res) => {
+                        if (res?.status) {
+                            setNewsInfo(res.data);
+                        }
+                    })
+                } else {
+                    setNewsInfo(route.params.data);
+
+                }
 
                 // Fade in animation
                 Animated.parallel([

@@ -55,11 +55,11 @@ function AppContent(): React.JSX.Element {
 
       const token = await getFCMToken();
       console.log("FCM TOKEN:", token);
-      
+
       if (token) {
         // Get unique device ID
         const deviceId = await DeviceInfo.getUniqueId();
-        
+
         // Get user's saved language
         let userLanguage: string | null = null;
         try {
@@ -71,10 +71,10 @@ function AppContent(): React.JSX.Element {
 
         // Request location permission and get coordinates
         const { latitude, longitude } = await getLocationWithPermission();
-        
+
         console.log('Device ID:', deviceId);
         console.log('Location:', { latitude, longitude, language: userLanguage });
-        
+
         // Send device ID instead of user ID
         await sendTokenToBackend(deviceId, token, latitude, longitude, userLanguage);
       }
@@ -99,10 +99,21 @@ function AppContent(): React.JSX.Element {
       .getInitialNotification()
       .then(remoteMessage => {
         if (remoteMessage) {
-          console.log("Opened from killed state:", remoteMessage);
+          console.log("Opened from killed state (FCM):", remoteMessage);
           handleNotificationNavigation(remoteMessage);
         }
       });
+
+    // ✅ When app opened from killed state by clicking Notifee notification
+    notifee.getInitialNotification().then(notification => {
+      if (notification) {
+        console.log("Opened from killed state (Notifee):", notification.notification.data);
+        if (notification.notification.data) {
+          handleNotificationNavigation({ data: notification.notification.data });
+        }
+      }
+    });
+
 
     // ✅ Handle foreground notification clicks (when user taps notification while app is open)
     const unsubscribeNotifee = notifee.onForegroundEvent(({ type, detail }) => {
