@@ -33,6 +33,17 @@ type SectionProps = PropsWithChildren<{
   title: string;
 }>;
 
+const linking = {
+  prefixes: ['https://neticharithra.com'],
+  config: {
+    screens: {
+      NewsContainerV2: {
+        path: 'news/:lang/:id',
+      },
+    },
+  },
+};
+
 function AppContent(): React.JSX.Element {
   const { colors, isDark } = useTheme();
 
@@ -145,7 +156,7 @@ function AppContent(): React.JSX.Element {
           />
 
           {/* ✅ Navigation container with ref for push notifications */}
-          <NavigationContainer ref={navigationRef} theme={navTheme}>
+          <NavigationContainer ref={navigationRef} theme={navTheme} linking={linking}>
             <Main />
           </NavigationContainer>
 

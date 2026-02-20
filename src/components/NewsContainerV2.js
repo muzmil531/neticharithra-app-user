@@ -39,20 +39,23 @@ const NewsContainerV2 = () => {
 
     useFocusEffect(
         React.useCallback(() => {
-            console.log("NEWS CONTAINER V2 Loaded", route?.params?.data)
-            if (route?.params?.data) {
+            const params = route?.params;
+            const deepLinkId = params?.id;
+            const notificationData = params?.data;
+            const newsId = notificationData?.newsId || deepLinkId;
 
-                if (!route.params?.data?.title) {
+
+            if (newsId) {
+                if (!notificationData || !notificationData.title) {
                     post(EndPointConfig.getIndividualNewsInfo, {
-                        newsId: route.params.data.newsId
+                        newsId: newsId
                     }).then((res) => {
                         if (res?.status) {
                             setNewsInfo(res.data);
                         }
                     })
                 } else {
-                    setNewsInfo(route.params.data);
-
+                    setNewsInfo(notificationData);
                 }
 
                 // Fade in animation
@@ -74,7 +77,7 @@ const NewsContainerV2 = () => {
                 fadeAnim.setValue(0);
                 slideAnim.setValue(20);
             };
-        }, [route?.params?.data])
+        }, [route?.params])
     );
 
     const handleShare = async () => {
